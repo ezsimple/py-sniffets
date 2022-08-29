@@ -14,12 +14,12 @@ import io
 import os
 import platform
 import subprocess
+import errno
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support.expected_conditions import \
-    staleness_of
+from selenium.webdriver.support.expected_conditions import staleness_of
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from lxml import html
@@ -63,21 +63,22 @@ class TcafeAttandance:
     def readConfig(self):
         try:
             self.path = os.path.dirname(os.path.realpath(__file__))
-            self.config.read(self.path+'\\'+ self.configFile , encoding="utf-8")
+            self.config.read(self.path+'/'+ self.configFile , encoding="utf-8")
             self.tcafe_host = self.config.get('CONFIG','HOST')
             self.tcafe_id = self.config.get('CONFIG','ID')
             self.tcafe_pw = self.config.get('CONFIG','PW')
             self.tcafe_key = self.config.get('CONFIG','KEY')
         except:
-            if os.access(self.configFile,os.F_OK):
-                os.remove(self.configFile)
-            self.config.add_section('CONFIG')
-            self.config.set('CONFIG','HOST', '')
-            self.config.set('CONFIG', 'ID', '')
-            self.config.set('CONFIG', 'PW', '')
-            self.config.set('CONFIG', 'KEY', '')
-            with open(self.configFile,'w',encoding="utf-8") as f:
-                self.config.write(f)
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
+            # if os.access(self.configFile,os.F_OK):
+            #     os.remove(self.configFile)
+            # self.config.add_section('CONFIG')
+            # self.config.set('CONFIG','HOST', '')
+            # self.config.set('CONFIG', 'ID', '')
+            # self.config.set('CONFIG', 'PW', '')
+            # self.config.set('CONFIG', 'KEY', '')
+            # with open(self.configFile,'w',encoding="utf-8") as f:
+            #     self.config.write(f)
 
     def ok_allow(self):
         URL = 'http://cloud.mkeasy.kro.kr:8800/allow/tcafe/check'
@@ -143,7 +144,7 @@ class TcafeAttandance:
         #     import ctypes
         #     ctypes.windll.kernel32.SetDllDirectoryA(None)
         # 2. 윈도우의 콘솔창을 숨긴다.
-        ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
+        # ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
 
         # 3. 크롬 드라이버 실행하기
         path = os.path.dirname(os.path.realpath(__file__))

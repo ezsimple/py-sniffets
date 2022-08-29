@@ -158,7 +158,9 @@ class AutoTcafe:
         LOGIN_PAGE=URL_TCAFE+"/bbs/login.php"
         req = self.http_get(LOGIN_PAGE)
         self.logging.debug(str(req.ok));
+
         with r.Session() as session:
+
             if not req.ok:
                 reason = str(req.status_code) + ' ' + req.reason
                 self.logging.error(reason + ' #ERROR# 로그인 페이지 접근 실패!!')
@@ -176,7 +178,7 @@ class AutoTcafe:
             LOGIN_INFO['mb_id'] = self.tcafe_id
             LOGIN_INFO['mb_password'] = self.tcafe_pw
             LOGIN_INFO['url'] = 'https://tcafe2a.com/'
-            req = session.post(LOGIN_CHECK, headers=self.headers, data=LOGIN_INFO)
+            req = session.post(LOGIN_CHECK, headers=self.headers, data=LOGIN_INFO, verify=False)
             if not req.ok:
                 reason = str(req.status_code) + ' ' + req.reason
                 self.logging.error(reason+' #ERROR# 로그인 실패!!')
@@ -191,7 +193,7 @@ class AutoTcafe:
 
             # 3. 출첵 페이지로 이동
             PAGE = URL_TCAFE + '/community' + '/attendance'
-            req = session.get(PAGE, headers=self.headers)
+            req = session.get(PAGE)
             if not req.ok:
                 reason = str(req.status_code) + ' ' + req.reason
                 self.logging.error(reason + ' #ERROR# 출첵 페이지 접근 실패!!')
@@ -199,21 +201,37 @@ class AutoTcafe:
 
             html = self.get_body(req)
             self.save_source(html)
+
             soup = BeautifulSoup(html,"html.parser")
             hidden_tags = soup.find_all('input', {'type':'hidden'})
-            v1 = soup.find("secdoe")
-            v2 = soup.find("proctype")
+            for ele in hidden_tags:
+                name = ele.get('name')
+                value = ele.get('value')
+                if name == "secdoe":
+                    secdoe = value
+                if name == "proctype":
+                    proctype = value
+
+            print(secdoe, proctype)
 
             self.logging.debug('===== 출첵 이동 ======')
-            self.logging.debug(req.text)
+            # self.logging.debug(req.text)
 
             # 4. 출첵 버튼 클릭하기
+            param = {}
+            param['secdoe'] = secdoe
+            param['proctype'] = proctype
+            # param['url'] = 'https://tcafe2a.com/'
+
             PAGE = URL_TCAFE + '/attendance' + '/selfattend2_p.php'
-            req = session.post(PAGE, headers=self.headers)
+            req = session.post(PAGE, data=param)
             if not req.ok:
                 reason = str(req.status_code) + ' ' + req.reason
                 self.logging.error(reason + ' #ERROR# 출첵 버튼 클릭 실패!!')
                 return
+
+            html = self.get_body(req)
+            self.save_source(html)
 
             self.logging.debug('===== 출첵 버튼 클릭 ======')
             self.logging.debug(req.text)

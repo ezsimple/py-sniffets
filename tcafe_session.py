@@ -154,25 +154,27 @@ class AutoTcafe:
         # Tcafe 주소가 자주 변경 되므로 자동 찾기를 한다.
         # URL_TCAFE = self.get_tcafe_domain()
         URL_TCAFE = self.tcafe_host;
+        debug = self.logging.debug
+        error = self.logging.error
 
         # / 페이지에는 reCaptcha 기능이 되어 있으므로, 별도의 다른 페이지로 접근하도록 한다.
         # reChapcha 기능이 있는 페이지로 접근해서는 안된다.
         LOGIN_PAGE=URL_TCAFE+"/bbs/login.php"
         req = self.http_get(LOGIN_PAGE)
-        self.logging.debug(str(req.ok));
+        debug(str(req.ok));
 
         with r.Session() as session:
 
             if not req.ok:
                 reason = str(req.status_code) + ' ' + req.reason
-                self.logging.error(reason + ' #ERROR# 로그인 페이지 접근 실패!!')
+                error(reason + ' #ERROR# 로그인 페이지 접근 실패!!')
                 return
 
             res = self.get_body(req)
             # print(res)
 
-            self.logging.debug('===== 접속하기 ======')
-            self.logging.debug(req.text)
+            debug('===== 접속하기 ======')
+            # debug(req.text)
 
             # 2. 로그인 하기
             LOGIN_CHECK = URL_TCAFE+'/bbs/login_check.php'
@@ -183,22 +185,22 @@ class AutoTcafe:
             req = session.post(LOGIN_CHECK, headers=self.headers, data=LOGIN_INFO, verify=False)
             if not req.ok:
                 reason = str(req.status_code) + ' ' + req.reason
-                self.logging.error(reason+' #ERROR# 로그인 실패!!')
+                error(reason+' #ERROR# 로그인 실패!!')
                 return
 
             html = self.get_body(req)
             # print(html)
             self.save_source(html)
 
-            self.logging.debug('===== 로그인 완료 ======')
-            self.logging.debug(req.text)
+            debug('===== 로그인 완료 ======')
+            # debug(req.text)
 
             # 3. 출첵 페이지로 이동
             PAGE = URL_TCAFE + '/community' + '/attendance'
             req = session.get(PAGE)
             if not req.ok:
                 reason = str(req.status_code) + ' ' + req.reason
-                self.logging.error(reason + ' #ERROR# 출첵 페이지 접근 실패!!')
+                error(reason + ' #ERROR# 출첵 페이지 접근 실패!!')
                 return
 
             html = self.get_body(req)
@@ -216,8 +218,8 @@ class AutoTcafe:
 
             print(secdoe, proctype)
 
-            self.logging.debug('===== 출첵 이동 ======')
-            # self.logging.debug(req.text)
+            debug('===== 출첵 이동 ======')
+            # debug(req.text)
 
             # 4. 출첵 버튼 클릭하기
             param = {}
@@ -229,14 +231,14 @@ class AutoTcafe:
             req = session.post(PAGE, data=param)
             if not req.ok:
                 reason = str(req.status_code) + ' ' + req.reason
-                self.logging.error(reason + ' #ERROR# 출첵 버튼 클릭 실패!!')
+                error(reason + ' #ERROR# 출첵 버튼 클릭 실패!!')
                 return
 
             html = self.get_body(req)
             self.save_source(html)
 
-            self.logging.debug('===== 출첵 버튼 클릭 ======')
-            self.logging.debug(req.text)
+            debug('===== 출첵 버튼 클릭 ======')
+            debug(req.text)
 
             # ===================================================
             # unicode 인코딩에 문제가 있다.

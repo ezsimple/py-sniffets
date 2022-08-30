@@ -8,7 +8,7 @@ class LogUtil:
     def __init__(self, prefix=None):
 
         # 현재 디렉토리에 log 폴더가 없으면 생성 합시다.
-        path = os.getcwd()+"\\log"
+        path = os.getcwd()+"/log"
         if not os.path.exists(path):
             os.mkdir(path)
 
@@ -17,7 +17,7 @@ class LogUtil:
             PREFIX_LOG = str(prefix)
 
         today = strftime("%Y-%m-%d", localtime())
-        filename = path + '\\' + PREFIX_LOG +'-' + str(today)+'.log'
+        filename = path + '/' + PREFIX_LOG +'-' + str(today)+'.log'
 
         # 파일에 새로운 내용이 추가(append) 됩니다.
         handlers = [logging.FileHandler(filename=filename, mode='a', encoding='utf-8')]

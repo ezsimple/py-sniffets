@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # ==================================
@@ -6,6 +7,7 @@
 # 좋은 소스가 있네요. 공부합시다.
 # https://github.com/lumyjuwon/NaverCaptcha
 # ==================================
+# %%
 
 import configparser
 import contextlib

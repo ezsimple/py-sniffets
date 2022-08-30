@@ -241,6 +241,7 @@ class AutoTcafe:
             # debug(req.text)
 
             debug('===== 출첵 확인 메세지 ======')
+            # fix : TypeError: expected string or bytes-like object
             txt = re.compile(r'출석.*주세요').findall(html)
             debug(txt)
 

@@ -238,7 +238,20 @@ class AutoTcafe:
             self.save_source(html)
 
             debug('===== 출첵 버튼 클릭 ======')
-            debug(req.text)
+            # debug(req.text)
+
+            debug('===== 출첵 확인 메세지 ======')
+            txt = re.compile(r'출석.*주세요').findall(html)
+            debug(txt)
+
+            # soup = BeautifulSoup(html,"html.parser")
+            # lines = soup(text='출석')
+            # for line in lines:
+            #     debug(line)
+
+            # for line in req.text:
+            #     if re.search('출석', line):
+            #         debug(line)
 
             # ===================================================
             # unicode 인코딩에 문제가 있다.

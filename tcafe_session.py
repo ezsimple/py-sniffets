@@ -240,10 +240,10 @@ class AutoTcafe:
             debug('===== 출첵 버튼 클릭 ======')
             # debug(req.text)
 
-            debug('===== 출첵 확인 메세지 ======')
+            debug('===== 출첵 완료 검사 ======')
             # fix : TypeError: expected string or bytes-like object
             txt = re.compile(r'출석.*주세요').findall(html)
-            debug(txt)
+            debug(''.join(txt))
 
             # soup = BeautifulSoup(html,"html.parser")
             # lines = soup(text='출석')

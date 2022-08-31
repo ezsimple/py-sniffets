@@ -24,6 +24,7 @@ import requests as r
 from fake_useragent import UserAgent
 import errno
 from bs4 import BeautifulSoup
+import telegram
 
 # from win32process import CREATE_NO_WINDOW
 
@@ -58,7 +59,13 @@ class AutoTcafe:
         userAgent = ua.random
         self.headers['User-Agent'] = userAgent
 
-        pass
+        telegram_token = '5758487515:AAFfZ9fZsv7padX_6StJbn3T9zFOvW46jcc'
+        self.bot = telegram.Bot(token = telegram_token)
+        updates = self.bot.getUpdates()
+        self.chat_id = updates[-1].message.chat_id
+
+    def telegram_bot(self, txt):
+        self.bot.sendMessage(chat_id=self.chat_id , text=txt)
 
     def http_get(self, url):
         response = r.get(url, headers=self.headers)
@@ -243,21 +250,9 @@ class AutoTcafe:
             debug('===== 출첵 완료 검사 ======')
             # fix : TypeError: expected string or bytes-like object
             txt = re.compile(r'출석.*주세요').findall(html)
-            debug(''.join(txt))
-
-            # soup = BeautifulSoup(html,"html.parser")
-            # lines = soup(text='출석')
-            # for line in lines:
-            #     debug(line)
-
-            # for line in req.text:
-            #     if re.search('출석', line):
-            #         debug(line)
-
-            # ===================================================
-            # unicode 인코딩에 문제가 있다.
-            # print('최종 페이지 : ' + unicode(req.text, "cp949"))
-            # ===================================================
+            msg = ''.join(txt)
+            debug(msg)
+            self.telegram_bot(msg)
 
         pass
 

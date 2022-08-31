@@ -22,5 +22,6 @@ telegram_token = '5758487515:AAFfZ9fZsv7padX_6StJbn3T9zFOvW46jcc'
 bot = telegram.Bot(token = telegram_token)
 chat_id = get_chat_id(bot)
 
+# %%
 txt = '안녕하세요'
 send(bot, txt)

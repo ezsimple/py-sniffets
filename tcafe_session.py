@@ -68,7 +68,6 @@ class AutoTcafe:
         self.writeConfig()
 
     def telegram_bot(self, txt):
-        self.logging.debug(txt)
         self.bot.sendMessage(chat_id=self.chat_id , text=txt)
 
     def http_get(self, url):
@@ -194,7 +193,9 @@ class AutoTcafe:
 
             if not req.ok:
                 reason = str(req.status_code) + ' ' + req.reason
-                error(reason + ' #ERROR# 로그인 페이지 접근 실패!!')
+                msg = reason + ' #ERROR# 로그인 페이지 접근 실패!!'
+                error(msg)
+                self.telegram_bot(msg)
                 return
 
             res = self.get_body(req)
@@ -212,7 +213,9 @@ class AutoTcafe:
             req = session.post(LOGIN_CHECK, headers=self.headers, data=LOGIN_INFO, verify=False)
             if not req.ok:
                 reason = str(req.status_code) + ' ' + req.reason
-                error(reason+' #ERROR# 로그인 실패!!')
+                msg = reason+' #ERROR# 로그인 실패!!'
+                error(msg)
+                self.telegram_bot(msg)
                 return
 
             html = self.get_body(req)
@@ -227,7 +230,9 @@ class AutoTcafe:
             req = session.get(PAGE)
             if not req.ok:
                 reason = str(req.status_code) + ' ' + req.reason
-                error(reason + ' #ERROR# 출첵 페이지 접근 실패!!')
+                msg = reason + ' #ERROR# 출첵 페이지 접근 실패!!'
+                error(msg)
+                self.telegram_bot(msg)
                 return
 
             html = self.get_body(req)
@@ -258,7 +263,9 @@ class AutoTcafe:
             req = session.post(PAGE, data=param)
             if not req.ok:
                 reason = str(req.status_code) + ' ' + req.reason
-                error(reason + ' #ERROR# 출첵 버튼 클릭 실패!!')
+                msg = reason + ' #ERROR# 출첵 버튼 클릭 실패!!'
+                error(msg)
+                self.telegram_bot(msg)
                 return
 
             html = self.get_body(req)
@@ -271,6 +278,7 @@ class AutoTcafe:
             # fix : TypeError: expected string or bytes-like object
             txt = re.compile(r'출석.*주세요|출석.*획득').findall(html)
             msg = '출석 확인 필요합니다.' if len(txt) == 0 else ''.join(txt)
+            debug(msg)
             self.telegram_bot(msg)
 
 if __name__ == '__main__':

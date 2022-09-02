@@ -62,9 +62,12 @@ class AutoTcafe:
         telegram_token = '5758487515:AAFfZ9fZsv7padX_6StJbn3T9zFOvW46jcc'
         self.bot = telegram.Bot(token = telegram_token)
         updates = self.bot.getUpdates()
-        self.chat_id = updates[-1].message.chat_id
+
+        # 파이썬 3 항연산자
+        self.chat_id = 918743728 if not updates else updates[-1].message.chat_id
 
     def telegram_bot(self, txt):
+        self.logging.debug(txt)
         self.bot.sendMessage(chat_id=self.chat_id , text=txt)
 
     def http_get(self, url):
@@ -250,11 +253,11 @@ class AutoTcafe:
             debug('===== 출첵 완료 검사 ======')
             # fix : TypeError: expected string or bytes-like object
             txt = re.compile(r'출석.*주세요').findall(html)
-            msg = ''.join(txt)
-            debug(msg)
-            self.telegram_bot(msg)
+            if not txt:
+                txt = re.compile(r'출석.*획득').findall(html)
 
-        pass
+            msg = '출석 확인 필요합니다.' if not txt else ''.join(txt)
+            self.telegram_bot(msg)
 
 if __name__ == '__main__':
     attandance = AutoTcafe()

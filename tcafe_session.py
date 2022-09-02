@@ -59,12 +59,13 @@ class AutoTcafe:
         userAgent = ua.random
         self.headers['User-Agent'] = userAgent
 
-        telegram_token = '5758487515:AAFfZ9fZsv7padX_6StJbn3T9zFOvW46jcc'
-        self.bot = telegram.Bot(token = telegram_token)
+        # telegram_token = '5758487515:AAFfZ9fZsv7padX_6StJbn3T9zFOvW46jcc'
+        self.bot = telegram.Bot(token = self.telegram_token)
         updates = self.bot.getUpdates()
 
         # 파이썬 3 항연산자
-        self.chat_id = 918743728 if len(updates) == 0 else updates[-1].message.chat_id
+        self.chat_id = self.telegram_chat_id if len(updates) == 0 else updates[-1].message.chat_id
+        self.writeConfig()
 
     def telegram_bot(self, txt):
         self.logging.debug(txt)
@@ -92,6 +93,8 @@ class AutoTcafe:
             self.tcafe_id = self.config.get('CONFIG','ID')
             self.tcafe_pw = self.config.get('CONFIG','PW')
             self.tcafe_key = self.config.get('CONFIG','KEY')
+            self.telegram_token = self.config.get('CONFIG','TELEGRAM_TOKEN')
+            self.telegram_chat_id = self.config.get('CONFIG','TELEGRAM_CHAT_ID')
         except:
             filename = self.configFile
             raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
@@ -105,6 +108,20 @@ class AutoTcafe:
             # with open(self.configFile,'w',encoding="utf-8") as f:
             #     self.config.write(f)
 
+    def writeConfig(self):
+        if len(self.chat_id) == 0:
+            return
+        if self.chat_id == self.telegram_chat_id:
+            return
+        self.config.add_section('CONFIG')
+        self.config.set('CONFIG','HOST', self.tcafe_host)
+        self.config.set('CONFIG', 'ID', self.tcafe_id)
+        self.config.set('CONFIG', 'PW', self.tcafe_pw)
+        self.config.set('CONFIG', 'KEY', self.tcafe_key)
+        self.config.set('CONFIG', 'TELEGRAM_TOKEN', self.telegram_token)
+        self.config.set('CONFIG', 'TELEGRAM_CHAT_ID', self.telegram_chat_id)
+        with open(self.configFile,'w',encoding="utf-8") as f:
+            self.config.write(f)
 
     # 1. 나무위키 사이트에서 tcafe 주소를 가져온다.
     # Tcafe 주소가 자주 변경 되므로 자동 찾기를 한다.
@@ -252,11 +269,8 @@ class AutoTcafe:
 
             debug('===== 출첵 완료 검사 ======')
             # fix : TypeError: expected string or bytes-like object
-            txt = re.compile(r'출석.*주세요').findall(html)
-            if not txt:
-                txt = re.compile(r'출석.*획득').findall(html)
-
-            msg = '출석 확인 필요합니다.' if not txt else ''.join(txt)
+            txt = re.compile(r'출석.*주세요|출석.*획득').findall(html)
+            msg = '출석 확인 필요합니다.' if len(txt) == 0 else ''.join(txt)
             self.telegram_bot(msg)
 
 if __name__ == '__main__':

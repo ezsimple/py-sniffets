@@ -11,7 +11,7 @@ print(html)
 from bs4 import BeautifulSoup
 import re
 
-txt = re.compile(r'출석.*주세요').findall(html)
+txt = re.compile(r'출석.*주세요|출석.*획득').findall(html)
 print(txt)
 
 # for line in soup.body:

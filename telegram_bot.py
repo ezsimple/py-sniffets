@@ -22,8 +22,42 @@ bot = telegram.Bot(token = telegram_token)
 chat_id = get_chat_id(bot)
 
 # %%
+import os
+import configparser
+import errno
+
+try:
+    path = os.path.dirname(os.path.realpath(__file__))
+    config = configparser.RawConfigParser()
+    configFile = 'tcafe_config.ini'
+    config.read(path+'/'+ configFile , encoding="utf-8")
+    tcafe_host = config.get('CONFIG','HOST')
+    tcafe_id = config.get('CONFIG','ID')
+    tcafe_pw = config.get('CONFIG','PW')
+    tcafe_key = config.get('CONFIG','KEY')
+    telegram_token = config.get('CONFIG','TELEGRAM_TOKEN')
+    telegram_chat_id = config.get('CONFIG','TELEGRAM_CHAT_ID')
+except:
+    raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), configFile)
+
+# %%
+telegram_chat_id
+
+# %%
+
 updates = bot.getUpdates()
-len(updates)
+chat_id = telegram_chat_id if len(updates) == 0 else updates[-1].message.chat_id
+if len(chat_id) > 0 and chat_id != telegram_chat_id:
+  config.add_section('CONFIG')
+  config.set('CONFIG','HOST', tcafe_host)
+  config.set('CONFIG', 'ID', tcafe_id)
+  config.set('CONFIG', 'PW', tcafe_pw)
+  config.set('CONFIG', 'KEY', tcafe_key)
+  config.set('CONFIG', 'TELEGRAM_TOKEN', telegram_token)
+  config.set('CONFIG', 'TELEGRAM_CHAT_ID', telegram_chat_id)
+  with open(configFile,'w',encoding="utf-8") as f:
+      config.write(f)
+
 
 # %%
 txt = '안녕하세요'

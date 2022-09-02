@@ -11,8 +11,7 @@ import telegram
 # 918743728
 def get_chat_id(bot):
   updates = bot.getUpdates()
-  chat_id = updates[-1].message.chat_id
-  print(chat_id)
+  chat_id = 918743728 if len(updates) == 0 else updates[-1].message.chat_id
   return chat_id
 
 def send(bot, txt):
@@ -21,6 +20,10 @@ def send(bot, txt):
 telegram_token = '5758487515:AAFfZ9fZsv7padX_6StJbn3T9zFOvW46jcc'
 bot = telegram.Bot(token = telegram_token)
 chat_id = get_chat_id(bot)
+
+# %%
+updates = bot.getUpdates()
+len(updates)
 
 # %%
 txt = '안녕하세요'

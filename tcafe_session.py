@@ -64,7 +64,7 @@ class AutoTcafe:
         updates = self.bot.getUpdates()
 
         # 파이썬 3 항연산자
-        self.chat_id = 918743728 if not updates else updates[-1].message.chat_id
+        self.chat_id = 918743728 if len(updates) == 0 else updates[-1].message.chat_id
 
     def telegram_bot(self, txt):
         self.logging.debug(txt)

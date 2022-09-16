@@ -278,7 +278,7 @@ class AutoTcafe:
             # fix : TypeError: expected string or bytes-like object
             txt = re.compile(r'출석.*주세요|출석.*획득').findall(html)
             msg = '출석 확인 필요합니다.' if len(txt) == 0 else ''.join(txt)
-            msg = BeautifulSoup(msg, "html.parser").text
+            msg = BeautifulSoup(msg, "html.parser").text # html태그 제거(xml 구조 오류가 있어도 무시하고 파싱처리 됩니다. 단 처리속도가 다소 늦습니다.)
             debug(msg)
             self.telegram_bot(msg)
 

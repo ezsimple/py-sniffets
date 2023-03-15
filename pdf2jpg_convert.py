@@ -11,5 +11,6 @@ pages = convert_from_path(source + "/" + fname)
 print(str(len(pages)))
 
 for i, page in enumerate(pages):
-  page.save(target+"/"+"p"+str(i)+".jpg", "JPEG")
-  print(target+"/"+"p"+str(i).zfill(3)+".jpg" + " saved")
+  image_name = "p_"+str(i).zfill(3)+".jpg"
+  page.save(target + "/" + image_name, "JPEG")
+  print(target + "/" + image_name + " saved")

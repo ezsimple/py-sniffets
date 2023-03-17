@@ -15,7 +15,8 @@ plt.pie(
     counterclock=True, # True: 시계방향순 , False:반시계방향순
     # explode=[0.05, 0.25, 0.05, 0.05], # 중심에서 벗어나는 정도 표시
     shadow=True, # 그림자 표시 여부
-    colors = ['#ff9999', '#ffc000', '#8fd9b6', '#d395d0'], # colors=['gold','silver','whitesmoke','gray']
+    colors = ['#ff9999', '#ffc000', '#8fd9b6', '#d395d0'],
+    # colors=['gold','silver','whitesmoke','gray']
     wedgeprops = {'width':0.7,'edgecolor':'w','linewidth':3}
 )
 

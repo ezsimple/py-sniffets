@@ -4,41 +4,68 @@
 import telegram
 from datetime import datetime
 from playwright.sync_api import Playwright, sync_playwright, expect
+import asyncio
+import requests
+import re
+from bs4 import BeautifulSoup
 
-telegram_token = '5758487515:AAFfZ9fZsv7padX_6StJbn3T9zFOvW46jcc'
-telegram_chat_id = '918743728'
+TOKEN = '5758487515:AAFfZ9fZsv7padX_6StJbn3T9zFOvW46jcc'
+CHAT_ID = '918743728'
+URL = "http://tcafe2a.com"
 
-def bot(txt: str) -> None:
-  bot = telegram.Bot(telegram_token)
-  updates = bot.getUpdates()
-  chat_id = telegram_chat_id if len(updates) == 0 else updates[-1].message.chat_id
+def send_message(text):
 
-  today = datetime.today().strftime('%Y-%m-%d')
-  msg = today + ' ' + '출석 완료'
-  bot.sendMessage(chat_id = chat_id, text = msg)  
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    params = {
+      "chat_id": CHAT_ID,
+      "text": text,
+    }
+    resp = requests.get(url, params=params)
+
+    # Throw an exception if Telegram API fails
+    resp.raise_for_status()
+
+# async def report():
+#     today = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#     msg = "{} 출석완료".format(today)
+#     bot = telegram.Bot(token = TOKEN)
+#     await bot.send_message(CHAT_ID, msg)
 
 def run(playwright: Playwright) -> None:
     browser = playwright.chromium.launch(headless=True)
     context = browser.new_context()
     page = context.new_page()
-    page.goto("http://tcafe2a.com/")
-    page.get_by_placeholder("아이디").click()
-    page.get_by_placeholder("아이디").fill("mkeasy")
+    page.goto(URL)
+    page.locator("#ol_id").click()
+    page.locator("#ol_id").fill("mkeasy")
     page.locator("#ol_pw").click()
     page.locator("#ol_pw").fill("dodls9gka")
     page.locator("#ol_pw").press("Enter")
     page.get_by_role("link", name="출석확인", exact=True).click()
     page.locator("#cnftjr img").click()
 
-    # page.get_by_text("오늘 출석으로 100P 획득 하셨습니다 회원 가입 후 3007일째 이십니다.").click()
-    # page.get_by_text("오늘 이미 출석 하셨습니다. 연속 출석 포인트 150P 를 위해 내일도 출석 잊지 말아 주세요. 회원 가입 후 3007일째 이십니다.").click()
+    # page.goto(URL + "/attendance/selfattend2_p.php")
+    # html = page.content()
+    # print(html)
+
+    # txt = re.compile(r'출석.*주세요|출석.*획득').findall(html)
+    # msg = '출석 확인 필요합니다.' if len(txt) == 0 else ''.join(txt)
+    # msg = BeautifulSoup(msg, "html.parser").text # html태그 제거(xml 구조 오류가 있어도 무시하고 파싱처리 됩니다. 단 처리속도가 다소 늦습니다.)
+
+    today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    msg = "{} 출석완료".format(today)
+    send_message(msg)
+
     page.close()
+
 
     # ---------------------
     context.close()
     browser.close()
-    bot('')
 
+    # today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # msg = "{} 출석완료".format(today)
+    # send_message(msg)
 
 with sync_playwright() as playwright:
-    run(playwright)
+  run(playwright)

@@ -179,7 +179,7 @@ class AutoTcafe:
         # 1. 나무위키 사이트에서 tcafe 주소를 가져온다.
         # Tcafe 주소가 자주 변경 되므로 자동 찾기를 한다.
         # URL_TCAFE = self.get_tcafe_domain()
-        URL_TCAFE = self.tcafe_host;
+        URL_TCAFE = self.tcafe_host
         debug = self.logging.debug
         error = self.logging.error
 
@@ -187,7 +187,7 @@ class AutoTcafe:
         # reChapcha 기능이 있는 페이지로 접근해서는 안된다.
         LOGIN_PAGE=URL_TCAFE+"/bbs/login.php"
         req = self.http_get(LOGIN_PAGE)
-        debug(str(req.ok));
+        debug(str(req.ok))
 
         with r.Session() as session:
 

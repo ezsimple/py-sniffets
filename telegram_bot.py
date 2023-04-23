@@ -9,8 +9,8 @@
 import telegram
 
 # 918743728
-def get_chat_id(bot):
-  updates = bot.getUpdates()
+async def get_chat_id(bot):
+  updates = await bot.getUpdates()
   chat_id = 918743728 if len(updates) == 0 else updates[-1].message.chat_id
   return chat_id
 

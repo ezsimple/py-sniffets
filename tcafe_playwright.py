@@ -8,10 +8,12 @@ import asyncio
 import requests
 import re
 from bs4 import BeautifulSoup
+from LogUtil import LogUtil
 
 TOKEN = '5758487515:AAFfZ9fZsv7padX_6StJbn3T9zFOvW46jcc'
 CHAT_ID = '918743728'
 URL = "http://tcafe2a.com"
+LOGGING = LogUtil('TCAFE_ACCESS')
 
 def send_message(text):
 
@@ -21,6 +23,7 @@ def send_message(text):
       "text": text,
     }
     resp = requests.get(url, params=params)
+    LOGGING.debug(text)
 
     # Throw an exception if Telegram API fails
     resp.raise_for_status()
@@ -43,29 +46,19 @@ def run(playwright: Playwright) -> None:
     page.locator("#ol_pw").press("Enter")
     page.get_by_role("link", name="출석확인", exact=True).click()
     page.locator("#cnftjr img").click()
+    page.wait_for_timeout(1000)
 
-    # page.goto(URL + "/attendance/selfattend2_p.php")
-    # html = page.content()
-    # print(html)
-
-    # txt = re.compile(r'출석.*주세요|출석.*획득').findall(html)
-    # msg = '출석 확인 필요합니다.' if len(txt) == 0 else ''.join(txt)
-    # msg = BeautifulSoup(msg, "html.parser").text # html태그 제거(xml 구조 오류가 있어도 무시하고 파싱처리 됩니다. 단 처리속도가 다소 늦습니다.)
-
-    today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    msg = "{} 출석완료".format(today)
+    # 출첵확인
+    html =page.content()
+    txt = re.compile(r'출석.*주세요|출석.*획득').findall(html)
+    msg = '출석 확인 필요합니다.' if len(txt) == 0 else ''.join(txt)
+    msg = BeautifulSoup(msg, "html.parser").text # html태그 제거(xml 구조 오류가 있어도 무시하고 파싱처리 됩니다. 단 처리속도가 다소 늦습니다.)
     send_message(msg)
 
     page.close()
-
-
     # ---------------------
     context.close()
     browser.close()
-
-    # today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    # msg = "{} 출석완료".format(today)
-    # send_message(msg)
 
 with sync_playwright() as playwright:
   run(playwright)

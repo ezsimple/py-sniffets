@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/home/ubuntu/.virtualenvs/머신러닝/bin/python
 # -*- coding: utf-8 -*-
 
 import telegram

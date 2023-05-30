@@ -19,7 +19,7 @@ def handle_dialog(dialog):
 
 
 def run(playwright: Playwright) -> None:
-    browser = playwright.chromium.launch(headless=False)
+    browser = playwright.chromium.launch(headless=True)
     context = browser.new_context()
     page = context.new_page()
     page.goto("https://www.jobkorea.co.kr/Login/Login_Tot.asp")

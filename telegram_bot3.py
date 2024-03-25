@@ -10,14 +10,18 @@ import datetime
 
 import asyncio
 
-TOKEN = '5758487515:AAFfZ9fZsv7padX_6StJbn3T9zFOvW46jcc'
-CHAT_ID = '918743728'
+TOKEN = "5758487515:AAFfZ9fZsv7padX_6StJbn3T9zFOvW46jcc"
+CHAT_ID = "918743728"
 
-async def main(msg): #실행시킬 함수명 임의지정
-    token = "텔레그램 봇 API"
-    bot = telegram.Bot(token = TOKEN)
-    await bot.send_message(CHAT_ID, msg)
+
+async def main(msg):  # 실행시킬 함수명 임의지정
+    token = TOKEN
+    bot = telegram.Bot(token=TOKEN)
+    # await bot.send_message(CHAT_ID, msg)
+    # https://github.com/python-telegram-bot/python-telegram-bot/wiki/Code-snippets
+    await bot.send_message(chat_id=CHAT_ID, text=msg)
+
 
 # yyyy-mm-dd now time format
 today = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-asyncio.run(main("{} 출석완료".format(today))) #봇 실행하는 코드
+asyncio.run(main("{} 출석완료".format(today)))  # 봇 실행하는 코드

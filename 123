@@ -1,0 +1,10 @@
+get https://www.jobkorea.co.kr/Login/Logout.asp
+- id & pw -> login
+
+get https://www.jobkorea.co.kr/User/ResumeMng
+
+post https://www.jobkorea.co.kr/User/Resume/SetEditDate?rNo=22846133
+- 
+
+볼 헤드 마운트 어댑터
+홀더용 볼 헤드 확장 암

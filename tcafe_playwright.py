@@ -28,6 +28,13 @@ def send_message(text):
     # Throw an exception if Telegram API fails
     resp.raise_for_status()
 
+def close_notify(page: Page):
+    try:
+        close_button = page.wait_for_selector('button >> text="닫기"', timeout=1000)
+        close_button.click()
+    except TimeoutError:
+        pass
+
 # async def report():
 #     today = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 #     msg = "{} 출석완료".format(today)
@@ -39,6 +46,9 @@ def run(playwright: Playwright) -> None:
     context = browser.new_context()
     page = context.new_page()
     page.goto(URL)
+
+    close_notify(page)
+
     page.locator("#ol_id").click()
     page.locator("#ol_id").fill("mkeasy")
     page.locator("#ol_pw").click()

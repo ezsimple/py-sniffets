@@ -3,7 +3,7 @@
 
 import telegram
 from datetime import datetime
-from playwright.sync_api import Playwright, sync_playwright, expect
+from playwright.sync_api import Playwright, sync_playwright, expect, Page
 import asyncio
 import requests
 import re

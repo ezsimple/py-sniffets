@@ -93,6 +93,7 @@ def save_captcha_image(page: Page, file_path: str):
     with open(file_path, "wb") as file:
         file.write(captcha_image)
 
+# sudo apt install tesseract-ocr
 def extract_text_from_image(image_path: str) -> str:
     # Tesseract OCR 엔진의 경로 설정
     pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'

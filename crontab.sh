@@ -4,4 +4,5 @@ PATH=.:$HOME:$HOME/.virtualenvs/머신러닝/bin:$HOME/.local/bin:.:/usr/local/s
 WORK_DIR=/home/ubuntu/py-sniffets
 
 ( cd $WORK_DIR; ./tcafe_playwright.py )
-( cd $WORK_DIR; ./jobkorea_renew4.py )
+( cd $WORK_DIR; ./jobkorea_renew5.py )
+( cd $WORK_DIR; ./saramin_00.py )

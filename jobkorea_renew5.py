@@ -1,6 +1,7 @@
 #!/home/ubuntu/.virtualenvs/머신러닝/bin/python
 # -*- coding: utf-8 -*-
 
+# %%
 import os
 import json
 import traceback
@@ -39,7 +40,8 @@ class AutoJobkoreaProfileUpdate:
         page.fill('input[placeholder="아이디"]', self.LOGIN_ID)
         page.fill('input[placeholder="비밀번호"]', self.LOGIN_PW)
 
-        captcha_element = page.get_by_role("img", name="그림문자")
+        # captcha_element = page.get_by_role("img", name="그림문자")
+        captcha_element = page.query_selector("img[name='그림문자']")
         if captcha_element:
             self.STATE = "캡챠로 인한 로그인 불가"
             raise Exception(self.STATE)
@@ -124,6 +126,7 @@ class AutoJobkoreaProfileUpdate:
 
             except Exception as e:
                 print("An exception occurred:", e)
+
                 traceback.print_exc()
 
                 bot = TelegramSimpleBot()
@@ -135,6 +138,7 @@ class AutoJobkoreaProfileUpdate:
                 browser.close()
 
 
+# %%
 if __name__ == "__main__":
     clazz = AutoJobkoreaProfileUpdate()
     clazz.run()

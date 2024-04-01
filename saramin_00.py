@@ -5,6 +5,10 @@ from playwright.sync_api import sync_playwright
 from TelegramSimpleBot import TelegramSimpleBot
 import os
 
+# ----------------------------------------------
+# 디버깅방법 : HEADLESS=false ./saramin_00.py
+# HEADLESS란 : 브라우저UI 있으면 false, 브라우저UI 없으면 true
+# ----------------------------------------------
 
 class AutoSaraminUpdateResume:
     HEADLESS = False

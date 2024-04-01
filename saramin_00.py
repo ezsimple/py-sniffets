@@ -12,7 +12,7 @@ import os
 
 
 class AutoSaraminUpdateResume:
-    HEADLESS = False
+    HEADLESS = True
     LOGIN_URL = "https://www.saramin.co.kr/zf_user/auth?ut=p"
     LOGIN_ID = "ezsimple"
     LOGIN_PW = "dbslgusl2Qh!"

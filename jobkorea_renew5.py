@@ -40,6 +40,25 @@ class AutoJobkoreaProfileUpdate:
         page.fill('input[placeholder="아이디"]', self.LOGIN_ID)
         page.fill('input[placeholder="비밀번호"]', self.LOGIN_PW)
 
+        # ---------------------------------------------------------------------------------
+        # page.get_by_role("img", name="그림문자") .vs. page.query_selector("img[name='그림문자']") 의 차이
+        # ---------------------------------------------------------------------------------
+        # get_by_role: 이 메서드는 Playwright의 특정 역할(role)을 가진 요소를 검색합니다.
+        # 예를 들어, "img"와 같은 역할을 가진 요소를 찾습니다.
+        # 그러나 HTML 요소의 속성(attribute)을 직접적으로 지원하지 않습니다.
+        # 따라서 name 속성을 사용할 수 없습니다.
+        # 일반적으로 웹 표준에서 정의된 역할에 따라 요소를 찾을 때 사용됩니다.
+
+        # query_selector: 이 메서드는 CSS 선택자를 사용하여 요소를 찾습니다.
+        # 따라서 HTML 요소의 속성을 직접 지정하여 검색할 수 있습니다.
+        # 예를 들어, img[name='그림문자']와 같은 선택자를 사용하여
+        # "그림문자"라는 이름을 가진 이미지 태그를 찾을 수 있습니다.
+        # 이 방법은 보다 유연하며, CSS 선택자의 다양한 기능을 활용하여 요소를 찾을 수 있습니다.
+
+        # 따라서, page.query_selector("img[name='그림문자']")는 HTML 요소의 속성을 직접 지정하여 검색하는 반면,
+        # page.get_by_role("img", name="그림문자")는 특정 역할에 따라 요소를 검색하는 것입니다.
+        # ------------------------------------------------------------------------------------
+
         # captcha_element = page.get_by_role("img", name="그림문자")
         captcha_element = page.query_selector("img[name='그림문자']")
         if captcha_element:

@@ -3,16 +3,23 @@
 
 from playwright.sync_api import sync_playwright
 from TelegramSimpleBot import TelegramSimpleBot
+import os
 
 
 class AutoSaraminUpdateResume:
-    HEADLESS = True
+    HEADLESS = False
     LOGIN_URL = "https://www.saramin.co.kr/zf_user/auth?ut=p"
     LOGIN_ID = "ezsimple"
     LOGIN_PW = "dbslgusl2Qh!"
     WORK_URL = "https://www.saramin.co.kr/zf_user/resume/resume-manage"
 
     def __init__(self):
+        env_headless = os.getenv("HEADLESS")
+        # 대소문자 구분 없이 값 비교
+        if env_headless is not None:
+            if env_headless.lower() in ["false", "true"]:
+                HEADLESS = env_headless.lower() == "true"
+        print(f"HEADLESS 설정: {HEADLESS}")
         self.bot = TelegramSimpleBot()
 
     def handle_dialog(self, dialog):
@@ -24,14 +31,13 @@ class AutoSaraminUpdateResume:
         # dialog.dismiss() # alert 창의 경우 사용
 
     def run(self):
-        STATE = "사람인 업데이트 시작"
+        with sync_playwright() as playwright:
+            STATE = "사람인 업데이트 시작"
+            browser = playwright.chromium.launch(headless=self.HEADLESS)
+            context = browser.new_context()
+            page = context.new_page()
 
-        try:
-            with sync_playwright() as playwright:
-                browser = playwright.chromium.launch(headless=self.HEADLESS)
-                context = browser.new_context()
-                page = context.new_page()
-
+            try:
                 page.goto(self.LOGIN_URL)
                 STATE = "사람인 로그인 시도"
                 page.get_by_label("아이디", exact=True).click()
@@ -55,13 +61,13 @@ class AutoSaraminUpdateResume:
 
                 page.wait_for_timeout(3000)
 
-        except Exception as e:
-            self.bot.send_message(f"사람인 이력서 업데이트 실패: {STATE}")
+            except Exception as e:
+                self.bot.send_message(f"사람인 이력서 업데이트 실패: {STATE}")
 
-        finally:
-            page.close()
-            context.close()
-            browser.close()
+            finally:
+                page.close()
+                context.close()
+                browser.close()
 
 
 if __name__ == "__main__":

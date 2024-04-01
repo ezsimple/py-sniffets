@@ -10,6 +10,7 @@ import os
 # HEADLESS란 : 브라우저UI 있으면 false, 브라우저UI 없으면 true
 # ----------------------------------------------
 
+
 class AutoSaraminUpdateResume:
     HEADLESS = False
     LOGIN_URL = "https://www.saramin.co.kr/zf_user/auth?ut=p"
@@ -22,8 +23,8 @@ class AutoSaraminUpdateResume:
         # 대소문자 구분 없이 값 비교
         if env_headless is not None:
             if env_headless.lower() in ["false", "true"]:
-                HEADLESS = env_headless.lower() == "true"
-        print(f"HEADLESS 설정: {HEADLESS}")
+                self.HEADLESS = env_headless.lower() == "true"
+
         self.bot = TelegramSimpleBot()
 
     def handle_dialog(self, dialog):
@@ -37,6 +38,7 @@ class AutoSaraminUpdateResume:
     def run(self):
         with sync_playwright() as playwright:
             STATE = "사람인 업데이트 시작"
+            print(f"HEADLESS 설정: {self.HEADLESS}")
             browser = playwright.chromium.launch(headless=self.HEADLESS)
             context = browser.new_context()
             page = context.new_page()

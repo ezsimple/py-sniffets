@@ -12,16 +12,26 @@ from playwright.sync_api import Playwright, sync_playwright, Page
 from TelegramSimpleBot import TelegramSimpleBot
 
 
+# ----------------------------------------------
+# 디버깅방법 : HEADLESS=false ./jobkorea_renew5.py
+# HEADLESS란 : 브라우저UI 있으면 false, 브라우저UI 없으면 true
+# ----------------------------------------------
 class AutoJobkoreaProfileUpdate:
+    HEADLESS = True
+    HOST_URL = "https://www.jobkorea.co.kr"
+    LOGIN_URL = HOST_URL + "/Login/Logout.asp"
+    LOGIN_ID = "mkeasy"
+    LOGIN_PW = "ksgi10280514!"
+    R_NO = 918743728
+    UPDATE_URL = HOST_URL + "/User/ResumeMng"
+    STATE = "이력서 업데이트 시작"
+
     def __init__(self):
-        self.HEADLESS = True
-        self.HOST_URL = "https://www.jobkorea.co.kr"
-        self.LOGIN_URL = self.HOST_URL + "/Login/Logout.asp"
-        self.LOGIN_ID = "mkeasy"
-        self.LOGIN_PW = "ksgi10280514!"
-        self.R_NO = 918743728
-        self.UPDATE_URL = self.HOST_URL + "/User/ResumeMng"
-        self.STATE = "이력서 업데이트 시작"
+        env_headless = os.getenv("HEADLESS")
+        # 대소문자 구분 없이 값 비교
+        if env_headless is not None:
+            if env_headless.lower() in ["false", "true"]:
+                self.HEADLESS = env_headless.lower() == "true"
 
     def handle_dialog(self, dialog):
         msg = dialog.message
@@ -120,6 +130,7 @@ class AutoJobkoreaProfileUpdate:
 
     def run(self):
         with sync_playwright() as playwright:
+            print(f"HEADLESS 설정: {self.HEADLESS}")
             browser = playwright.chromium.launch(headless=self.HEADLESS)
 
             context = browser.new_context()

@@ -1,6 +1,7 @@
 #!/home/ubuntu/.virtualenvs/머신러닝/bin/python
 # -*- coding: utf-8 -*-
 
+# %%
 import telegram
 from datetime import datetime
 from playwright.sync_api import Playwright, sync_playwright, expect, Page
@@ -34,7 +35,8 @@ def close_notify(page: Page):
     try:
         close_button = page.wait_for_selector('button >> text="닫기"', timeout=1000)
         close_button.click()
-    except TimeoutError:
+    except Exception as e:
+        print(e)
         pass
 
 
@@ -50,6 +52,7 @@ def run(playwright: Playwright) -> None:
     context = browser.new_context()
     page = context.new_page()
 
+    STATE = "티카페 사이트 접근"
     try:
         page.goto(URL)
 
@@ -84,5 +87,6 @@ def run(playwright: Playwright) -> None:
         browser.close()
 
 
+# %%
 with sync_playwright() as playwright:
     run(playwright)

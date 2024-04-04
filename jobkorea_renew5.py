@@ -27,11 +27,18 @@ class AutoJobkoreaProfileUpdate:
     STATE = "이력서 업데이트 시작"
 
     def __init__(self):
-        env_headless = os.getenv("HEADLESS")
+        env_headless = os.getenv("HEADLESS", "True")
         # 대소문자 구분 없이 값 비교
-        if env_headless is not None:
-            if env_headless.lower() in ["false", "true"]:
-                self.HEADLESS = env_headless.lower() == "true"
+        # if env_headless is not None:
+        #     if env_headless.lower() in ["false", "true"]:
+        #         self.HEADLESS = env_headless.lower() == "true"
+        # ==> 함수 switch문장으로 변환
+        self.HEADLESS = self.set_headless(env_headless)
+
+    # 함수와 case 를 이용한 switch 문장
+    def set_headless(self, env_headless):
+        switcher = {"false": False, "true": True}
+        return switcher.get(env_headless.lower(), self.HEADLESS)
 
     def handle_dialog(self, dialog):
         msg = dialog.message

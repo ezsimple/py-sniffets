@@ -1,6 +1,7 @@
 #!/home/ubuntu/.virtualenvs/머신러닝/bin/python
 # -*- coding: utf-8 -*-
 
+# %%
 from playwright.sync_api import sync_playwright
 from TelegramSimpleBot import TelegramSimpleBot
 import os
@@ -19,13 +20,24 @@ class AutoSaraminUpdateResume:
     WORK_URL = "https://www.saramin.co.kr/zf_user/resume/resume-manage"
 
     def __init__(self):
+
         env_headless = os.getenv("HEADLESS")
+
         # 대소문자 구분 없이 값 비교
         if env_headless is not None:
             if env_headless.lower() in ["false", "true"]:
                 self.HEADLESS = env_headless.lower() == "true"
-
+        # ==> 함수 switch문장으로 변환
+        # self.HEADLESS = self.set_headless(env_headless)
         self.bot = TelegramSimpleBot()
+
+    # 함수와 case 를 이용한 switch 문장
+    def set_headless(self, env_headless):
+        if env_headless is None:
+            return self.HEADLESS
+
+        switcher = {"false": False, "true": True}
+        return switcher.get(env_headless.lower(), self.HEADLESS)
 
     def handle_dialog(self, dialog):
         msg = dialog.message
@@ -37,13 +49,15 @@ class AutoSaraminUpdateResume:
 
     def run(self):
         with sync_playwright() as playwright:
-            STATE = "사람인 업데이트 시작"
             print(f"HEADLESS 설정: {self.HEADLESS}")
             browser = playwright.chromium.launch(headless=self.HEADLESS)
             context = browser.new_context()
             page = context.new_page()
 
+            STATE = "사람인 업데이트 시작"
+
             try:
+                print(self.LOGIN_URL)
                 page.goto(self.LOGIN_URL)
                 STATE = "사람인 로그인 시도"
                 page.get_by_label("아이디", exact=True).click()
@@ -76,6 +90,7 @@ class AutoSaraminUpdateResume:
                 browser.close()
 
 
+# %%
 if __name__ == "__main__":
     clazz = AutoSaraminUpdateResume()
     clazz.run()

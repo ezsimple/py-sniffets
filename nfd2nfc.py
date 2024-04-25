@@ -2,7 +2,11 @@
 # -*- coding: utf-8 -*-
 
 # 맥에서 한글 파일명 자소분리 문제 해결
+# 이미 자소분리되어 있는 파일명을 NFC형식으로 변환해 주는 유틸리티
 # - 한글 자소 분리 문제
+# - Mac은 한글 문자의 정규화 방식으로 NFD(Normalization Form Decomposition)를 사용하는데, 
+#   Windows나 대부분의 Linux distribution에서는 NFC(Normalization Form Decomposition)를 사용하기 때문
+# 
 # https://devocean.sk.com/blog/techBoardDetail.do?ID=164376
 
 import argparse

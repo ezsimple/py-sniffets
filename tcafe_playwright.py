@@ -10,6 +10,7 @@ import requests
 import re
 from bs4 import BeautifulSoup
 from LogUtil import LogUtil
+from lxml import html
 
 TOKEN = "5758487515:AAFfZ9fZsv7padX_6StJbn3T9zFOvW46jcc"
 CHAT_ID = "918743728"
@@ -56,7 +57,7 @@ def run(playwright: Playwright) -> None:
     try:
         page.goto(URL)
 
-        close_notify(page)
+        # close_notify(page)
 
         page.locator("#ol_id").click()
         page.locator("#ol_id").fill("mkeasy")
@@ -65,16 +66,45 @@ def run(playwright: Playwright) -> None:
         page.locator("#ol_pw").press("Enter")
         page.get_by_role("link", name="출석확인", exact=True).click()
         page.locator("#cnftjr img").click()
-        page.wait_for_timeout(1000)
+        # page.wait_for_timeout(1000)
+
+
+	# XPath를 사용해 특정 요소가 로드될 때까지 대기
+        xpath = '//*[@id="thema_wrapper"]/div/div[3]/div/div/div[1]/div/div[2]/div[1]'
+        element_handle = page.wait_for_selector(xpath)
+        # print(element_handle)
+
+        if element_handle:
+            # 페이지 HTML 가져오기
+            html_content = page.content()
+
+            # lxml을 이용해 HTML 파싱
+            tree = html.fromstring(html_content)
+
+            # XPath를 사용해 특정 요소의 텍스트 추출
+            elements = tree.xpath(xpath)
+            
+            if elements:
+                text = elements[0].text_content()
+                send_message(text)
+                return
+
+            text = "#ERROR# 출첵메세지 없음"
+            send_message(text)
+            return
+            
+        send_message("#ERROR# tcafe2a 출책 안됨")
+        return
+
 
         # 출첵확인
-        html = page.content()
-        txt = re.compile(r"출석.*주세요|출석.*획득").findall(html)
-        msg = "출석 확인 필요합니다." if len(txt) == 0 else "".join(txt)
-        msg = BeautifulSoup(
-            msg, "html.parser"
-        ).text  # html태그 제거(xml 구조 오류가 있어도 무시하고 파싱처리 됩니다. 단 처리속도가 다소 늦습니다.)
-        send_message(msg)
+        #html = page.content()
+        #txt = re.compile(r"출석.*주세요|출석.*획득").findall(html)
+        #msg = "출석 확인 필요합니다." if len(txt) == 0 else "".join(txt)
+        #msg = BeautifulSoup(
+        #    msg, "html.parser"
+        #).text  # html태그 제거(xml 구조 오류가 있어도 무시하고 파싱처리 됩니다. 단 처리속도가 다소 늦습니다.)
+        #send_message(msg)
 
     except Exception as e:
         send_message("#ERROR# tcafe2a 출책 실패")

@@ -7,4 +7,4 @@ WORK_DIR=/home/ubuntu/py-sniffets
 
 ( cd $WORK_DIR; ./tcafe_playwright.py )
 ( cd $WORK_DIR; ./jobkorea_renew5.py )
-( cd $WORK_DIR; ./saramin_00.py )
+# ( cd $WORK_DIR; ./saramin_00.py )

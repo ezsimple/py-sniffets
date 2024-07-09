@@ -89,11 +89,12 @@ def run(playwright: Playwright) -> None:
                 send_message(text)
                 return
 
-            text = "#ERROR# 출첵메세지 없음"
+            text = f"#ERROR# 출첵메세지 없음: {URL}"
             send_message(text)
             return
             
-        send_message("#ERROR# tcafe2a 출책 안됨")
+        text = f"#ERROR# tcafe2a 출책 안됨 : {URL}"
+        send_message(text)
         return
 
 
@@ -107,7 +108,8 @@ def run(playwright: Playwright) -> None:
         #send_message(msg)
 
     except Exception as e:
-        send_message("#ERROR# tcafe2a 출책 실패")
+        text = f"#ERROR# tcafe2a 출책 실패: {URL}"
+        send_message(text)
         pass
 
     finally:

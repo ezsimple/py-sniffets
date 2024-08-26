@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import json
 import asyncio
 import requests
 from bs4 import BeautifulSoup
@@ -36,5 +37,11 @@ if __name__ == "__main__":
         pronunciation, meanings = loop.run_until_complete(search_daum_dictionary(search_word))
 
         if search_word or pronunciation or meanings:
-            print(f"'단어': {search_word}, '발음': {pronunciation}, '의미': {meanings}")
+            result = {
+                '단어': search_word, 
+                '발음': pronunciation, 
+                '뜻': meanings
+            }
+            json_result = json.dumps(result, ensure_ascii=False, indent=2)
+            print(json_result)
 

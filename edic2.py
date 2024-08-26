@@ -21,6 +21,7 @@ async def search_daum_dictionary(word):
     # meanings = soup.select(".list_search > li > .txt_search")
     # meanings = [meaning.text.strip() for meaning in meanings]
     # 주의 : await 를 사용하면 동기화 처리가 되지 않음
+    # 뜻이 너무 많이 나와서, 다음 번역을 사용합니다.
     meanings = daum_translate(word)
 
     return pronunciation, meanings

@@ -2,15 +2,11 @@
 # -*- coding: utf-8 -*-
 
 # %%
-import telegram
-from datetime import datetime
-from playwright.sync_api import Playwright, sync_playwright, expect, Page
-import asyncio
+from playwright.sync_api import Playwright, sync_playwright, Page
 import requests
-import re
-from bs4 import BeautifulSoup
 from LogUtil import LogUtil
 from lxml import html
+import random
 
 TOKEN = "5758487515:AAFfZ9fZsv7padX_6StJbn3T9zFOvW46jcc"
 CHAT_ID = "918743728"
@@ -31,6 +27,13 @@ def send_message(text):
     # Throw an exception if Telegram API fails
     resp.raise_for_status()
 
+def simulate_human_behavior() -> int:
+    """
+    https://www.zenrows.com/blog/playwright-cloudflare-bypass#simulate-human-behavior
+    이 코드에서는 random.random()을 사용하여 0과 1 사이의 난수를 생성한 후, 
+    이를 2000으로 곱하고 1000을 더하여 범위를 1000에서 3000으로 설정합니다. 
+    """
+    return int(random.random() * 2000 + 1000)
 
 def close_notify(page: Page):
     try:

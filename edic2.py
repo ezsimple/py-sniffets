@@ -36,5 +36,5 @@ if __name__ == "__main__":
         pronunciation, meanings = loop.run_until_complete(search_daum_dictionary(search_word))
 
         if search_word or pronunciation or meanings:
-            print(f"'단어': {search_word}, '발음기호': {pronunciation}, '뜻': {meanings}")
+            print(f"'단어': {search_word}, '발음': {pronunciation}, '의미': {meanings}")
 

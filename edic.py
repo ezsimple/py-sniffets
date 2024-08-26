@@ -128,7 +128,7 @@ class Translator(object):
 
 def daum_translate(target_str):
 	translator = Translator()
-	print(translator.translate(target_str))
+	return (translator.translate(target_str))
 
 
 if __name__ == "__main__":

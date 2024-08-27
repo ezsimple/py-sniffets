@@ -83,8 +83,7 @@ class Translator(object):
         # This helps the translator to understand the query and split the sentences more clearly
         query = " ".join(query.strip().split())
 
-        pattern = re.compile(r"[ㄱ-ㅣ가-힣]")
-        results = re.findall(pattern, query)
+        results = is_kor_lang(query)
         if results:
             src = "kr"
             tgt = "en"
@@ -125,6 +124,11 @@ class Translator(object):
         else:
             return " ".join(translated_lines)
 
+
+def is_kor_lang(query):
+    pattern = re.compile(r"[ㄱ-ㅣ가-힣]")
+    results = re.findall(pattern, query)
+    return results
 
 def daum_translate(target_str):
 	translator = Translator()

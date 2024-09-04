@@ -37,9 +37,9 @@ def print_json(result):
     print(json_result)
 
 if __name__ == "__main__":
-    # print("파라미터 갯수 : {}".format(len(sys.argv)))
+    # print("파라미터 갯수 : {0} {1}".format(sys.argv[0], len(sys.argv)))
     if len(sys.argv) < 2:
-        print("사용법: ./edic2.py 단어1 단어2 ...")
+        print("사용법: ./edic2.py [단어|숙어|뜻]")
         sys.exit(-1)
 
     # 여러개의 파라미터를 하나의 단어로 합치기

@@ -83,7 +83,7 @@ class Translator(object):
         # This helps the translator to understand the query and split the sentences more clearly
         query = " ".join(query.strip().split())
 
-        results = is_kor_lang(query)
+        results = is_korean(query)
         if results:
             src = "kr"
             tgt = "en"
@@ -125,7 +125,7 @@ class Translator(object):
             return " ".join(translated_lines)
 
 
-def is_kor_lang(query):
+def is_korean(query):
     pattern = re.compile(r"[ㄱ-ㅣ가-힣]")
     results = re.findall(pattern, query)
     return results

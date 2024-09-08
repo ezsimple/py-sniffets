@@ -2,14 +2,49 @@
 # -*- coding: utf-8 -*-
 
 # %%
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import rc
 from enum import Enum
 import matplotlib.colors as mcolors
+import matplotlib.font_manager as fm
 
+# ubuntu에 한글 폰트 적용하기
+# https://velog.io/@euisuk-chung/파이썬-우분투에서-한글-폰트-설치하고-matplotlib에-사용하기
+print(mpl.__file__)
+print([f.fname for f in fm.fontManager.ttflist])
+
+# %%
+
+fp=r'/usr/share/fonts/truetype/d2coding/D2Coding/D2Coding-Ver1.3.2-20180524.ttf'
+fs = 14
+fn = 'D2Coding'
+fe = fm.FontEntry(
+    fname=fp,
+    name=fn
+)
+fm.fontManager.ttflist.insert(0, fe)
+plt.rcParams.update({'font.size': fs, 'font.family': fn})
+
+# %%
+
+print([f.name for f in fm.fontManager.ttflist])
+
+# %%
+
+for nm in fm.get_font_names():
+    if "Na" in nm:
+        print(nm)
+
+print("mpl cachedir : {}".format(mpl.get_cachedir()))
+# WSL2에서 plt.show()가 안되는 문제 보완
+# import matplotlib
+# matplotlib.use('TkAgg')
+
+# %%
 # 한글 깨짐 방지
-rc('font', family='AppleGothic')  # 폰트 설정
+rc('font', family='NanumGothic')  # 폰트 설정
 plt.rcParams['axes.unicode_minus'] = False  # 유니코드 마이너스 설정
 
 # 무지개 색상을 순서대로 생성
@@ -70,7 +105,7 @@ for i, (wedge, activity) in enumerate(zip(wedges, activities)):
     angle = (wedge.theta2 + wedge.theta1) / 2  # 각 활동의 중앙 각도 계산
     x = np.cos(np.radians(angle)) * 0.6  # x 좌표 (원의 60% 지점에 활동명을 표시)
     y = np.sin(np.radians(angle)) * 0.6  # y 좌표
-    plt.text(x, y, activity, ha='center', va='center', fontsize=12)  # 원 안에 활동명 표시
+    plt.text(x, y, activity, ha='center', va='center')  # 원 안에 활동명 표시
 
 # 그래프 제목 추가
 plt.title('일일 시간 계획표')

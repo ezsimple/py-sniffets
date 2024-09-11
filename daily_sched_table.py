@@ -44,7 +44,7 @@ print("mpl cachedir : {}".format(mpl.get_cachedir()))
 
 # %%
 # 한글 깨짐 방지
-rc('font', family='NanumGothic')  # 폰트 설정
+rc('font', family='AppleGothic')  # 폰트 설정
 plt.rcParams['axes.unicode_minus'] = False  # 유니코드 마이너스 설정
 
 # 무지개 색상을 순서대로 생성

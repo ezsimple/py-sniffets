@@ -1,3 +1,4 @@
+# %%
 # 파이썬을 이용한 class adbUtils 만들기
 # adb를 이용한 좌표값 x, y 에 대한 colorpicker 기능 구현
 

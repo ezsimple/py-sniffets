@@ -1,36 +1,53 @@
-# %%
-import turtle as t
-import random
+'''
+거북이 그리기 - 장미 그리기
+'''
+from turtle import Turtle, Screen, TurtleScreenBase
+import sys
 
-t.setup(width=800, height=600)
+t = Turtle()
+t.shape('turtle')
+t.speed(0)
+t.color('pink')
 
-def player(color: str):
-    _t = t.Turtle()
-    _t.shape('turtle')
-    _t.color(color)
+# 펜을 들어서, x,y 좌표로 이동하기
+t.penup()
+t.goto(x=0, y=200)
+t.pendown()
 
-    _t.penup()
-    _t.goto(0, -200)  # Move the turtle to the bottom-center of the screen (x=0, y=-200)
-    _t.pendown()
-    return _t
+# 배경설정
+s = Screen()
+s.bgcolor("black")
 
-def running(_t: t.Turtle, direction: str, angle: int):
-    _t.speed(random.randint(0,10))
-    if direction == 'forward':
-        _t.forward(40)
-        _t.left(360/a)
-    
-    if direction == 'backward':
-        _t.backward(40)
-        _t.right(360/a)
+# 꽃잎그리기
+for i in range(200):
+    t.pensize(i/50)
+    t.forward(i)
+    t.left(65)
 
+# 줄기그리기
+t.color('lightblue')
+t.setheading(270)
 
-t1 = player('red')
-t2 = player('green')
+for i in range(50):
+    t.pensize(25 - i/2)
+    t.forward(i/4)
 
-a = 36
-for i in range(a):
-    running(t1, 'forward', a) 
-    running(t2, 'backward', a)
+# 잎그리기
+t.color('yellowgreen')
+t.setheading(60)
+for i in range(100):
+    t.pensize(100 - i)
+    t.forward(i/10)
 
-t.bye()
+# 마지막으로 거북이를 숨긴다.
+t.hideturtle()
+
+def wait_for_quit(s : TurtleScreenBase):
+    # q 또는 스페이스를 입력하거나, 마우스 클릭이 발생하면 스크린을 닫는다.
+    s.onkey(lambda: sys.exit(), "q")
+    s.onkey(lambda: sys.exit(), " ")
+    s.onclick(lambda x, y: sys.exit())
+    s.listen()
+    s.mainloop()
+
+wait_for_quit(s)

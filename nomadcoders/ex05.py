@@ -14,15 +14,17 @@ t.penup()
 t.goto(x=0, y=200)
 t.pendown()
 
+# 배경설정
 s = Screen()
 s.bgcolor("black")
 
-
+# 꽃잎그리기
 for i in range(200):
     t.pensize(i/50)
     t.forward(i)
     t.left(65)
 
+# 줄기그리기
 t.color('lightblue')
 t.setheading(270)
 
@@ -30,13 +32,14 @@ for i in range(50):
     t.pensize(25 - i/2)
     t.forward(i/4)
 
+# 잎그리기
 t.color('yellowgreen')
 t.setheading(60)
 for i in range(100):
     t.pensize(100 - i)
     t.forward(i/10)
 
-# 일을 마쳤으니, 이젠 거북이를 숨긴다.
+# 마지막으로 거북이를 숨긴다.
 t.hideturtle()
 
 def wait_for_quit(s : TurtleScreenBase):

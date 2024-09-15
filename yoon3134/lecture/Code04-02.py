@@ -1,3 +1,7 @@
+'''
+학습용: 거북이가 맘대로 다니기
+'''
+
 import turtle
 import random
 

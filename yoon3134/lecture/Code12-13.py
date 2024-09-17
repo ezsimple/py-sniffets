@@ -1,3 +1,6 @@
+'''
+학습용: 다중실행(멀티쓰레드)
+'''
 import multiprocessing
 import time
 

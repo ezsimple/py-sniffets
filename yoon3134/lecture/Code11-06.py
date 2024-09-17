@@ -1,3 +1,6 @@
+'''
+학습용 : 파일읽기
+'''
 import os
 
 inFp = None 

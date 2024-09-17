@@ -1,3 +1,6 @@
+'''
+학습용 : 서브클래스
+'''
 ## 클래스 선언 부분 ##
 class SuperClass :
     def  method(self) :

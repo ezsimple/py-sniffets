@@ -1,3 +1,6 @@
+'''
+학습용: 바이너리모드 (참고용)
+'''
 inFp, outFp = None, None 
 inStr = ""
 

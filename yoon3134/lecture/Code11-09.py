@@ -1,3 +1,6 @@
+'''
+학습용 : 파일읽고, 쓰기
+'''
 ## 변수 선언 부분 ##
 inFp, outFp = None, None
 inStr, outStr = "", ""

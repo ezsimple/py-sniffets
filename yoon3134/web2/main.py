@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from typing import List
 
 HOST = '127.0.0.1'
+PATH = 'static'
 PORT = 5000
 
 app = FastAPI()
@@ -17,9 +18,9 @@ class Image(BaseModel):
 
 # 이미지 목록
 images = [
-    Image(filename="image1.jpg"),
-    Image(filename="image2.jpg"),
-    Image(filename="image3.jpg")
+    Image(filename=f"{PATH}/image1.jpg"),
+    Image(filename=f"{PATH}/image2.jpg"),
+    Image(filename=f"{PATH}/image3.jpg")
 ]
 
 # 정적 파일 제공

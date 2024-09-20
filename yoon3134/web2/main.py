@@ -26,9 +26,14 @@ images = [
 # 정적 파일 제공
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.get("/", response_class=HTMLResponse)
-async def get_gallery(request: Request):
-    return templates.TemplateResponse("gallery.html", {"request": request, "images": images})
+# 미들웨어 정의
+@app.middleware("http")
+async def add_gallery_middleware(request: Request, call_next):
+    if request.url.path == "/":
+        response = templates.TemplateResponse("gallery.html", {"request": request, "images": images})
+        return response
+    response = await call_next(request)
+    return response
 
 # 애플리케이션 실행 시 사용
 if __name__ == "__main__":

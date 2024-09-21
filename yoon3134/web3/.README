@@ -1,2 +1,1 @@
-ollama langserve 를 모델로한 
-단순 FastAPI 웹서버 구현
+단순 FastAPI 웹서버 구현(MVC 구조)

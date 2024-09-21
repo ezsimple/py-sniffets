@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>갤러리</title>
+		<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <h1>갤러리</h1>
+    <div>
+        {% for image in images %}
+            <div>
+                <h2>{{ image.title }}</h2>
+                <img src="/static/images/{{ image.filename }}" alt="{{ image.title }}">
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

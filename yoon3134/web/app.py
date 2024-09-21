@@ -8,9 +8,9 @@ PATH = 'static' # Flask에서는 정적 파일(이미지등)을 제공하기 위
 HOST = 'http://127.0.0.1'
 
 images = [
-    {'url': f'{HOST}:{PORT}/{PATH}/image1.jpg', 'title': '이미지 1'},
-    {'url': f'{HOST}:{PORT}/{PATH}/image2.jpg', 'title': '이미지 2'},
-    {'url': f'{HOST}:{PORT}/{PATH}/image3.jpg', 'title': '이미지 3'},
+    {'url': f'{PATH}/image1.jpg', 'title': '이미지 1'},
+    {'url': f'{PATH}/image2.jpg', 'title': '이미지 2'},
+    {'url': f'{PATH}/image3.jpg', 'title': '이미지 3'},
 ]
 
 @app.route('/')

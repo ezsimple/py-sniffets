@@ -12,6 +12,9 @@ import re
 USERNAME = "yoon"
 PASSWORD = "dbsl2Qh!"
 
+# 서버정보
+PORT = 3333
+
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         # 로그인 페이지 요청 처리
@@ -121,7 +124,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         else:
             self.send_error(400, "Bad request")
 
-def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8000):
+def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=PORT):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     print(f'Starting http server on port {port}...')

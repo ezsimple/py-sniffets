@@ -153,9 +153,6 @@ async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(c
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
 
-    # MIME 타입에 따라 직접 표시하도록 설정
-    response = FileResponse(file_path, media_type=mime_type or 'application/octet-stream')
-
     return response
 
 def get_readme_content(path):

@@ -12,11 +12,16 @@ from pathlib import Path
 import mimetypes
 import logging
 from urllib.parse import unquote, quote
+from starlette.middleware.sessions import SessionMiddleware
 
 # .env 파일의 환경변수 로드
 load_dotenv()
 
 app = FastAPI()
+
+# 세션 미들웨어 추가 (비밀키 설정 필요)
+session_key = os.getenv("SESSION_KEY")
+app.add_middleware(SessionMiddleware, secret_key=session_key)
 
 # 로그 디렉토리 생성
 log_dir = "log"

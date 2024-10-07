@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -12,6 +13,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI()
+
+# CORS 설정
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 모든 도메인 허용, 필요에 따라 수정
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -69,12 +80,27 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
 @app.get("/download/{path:path}")
 async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(check_auth)):
     root_dir = os.getenv("ROOT_DIR")
-    file_path = os.path.join(root_dir, path.lstrip("/")).rstrip("/")  # 마지막 슬래시 제거
-    
-    if not os.path.isfile(file_path):
+
+    file_path = Path(root_dir) / Path(path).relative_to("/")  # 안전하게 경로 생성
+    if not file_path.is_file():
         raise HTTPException(status_code=404, detail="File not found")
 
-    return FileResponse(file_path, media_type='application/octet-stream')
+    # 파일 이름 추출
+    filename = file_path.name
+    # MIME 타입 자동 설정
+    mime_type, _ = mimetypes.guess_type(file_path)
+
+    # MIME 타입에 따라 직접 표시하도록 설정
+    response = FileResponse(file_path, media_type=mime_type or 'application/octet-stream')
+
+    return response
+
+    # file_path = os.path.join(root_dir, path.lstrip("/")).rstrip("/")  # 마지막 슬래시 제거
+		#
+    # if not os.path.isfile(file_path):
+    #    raise HTTPException(status_code=404, detail="File not found")
+		#
+    # return FileResponse(file_path, media_type='application/octet-stream')
 
 def get_readme_content(path):
     readme_path = os.path.join(path, '.README')
@@ -84,8 +110,8 @@ def get_readme_content(path):
         return '<br>'.join(line.strip() for line in content if not line.startswith('#'))
     return ""
 
-if __name__ == "__main__":
-    import uvicorn
-    host = os.getenv("HOST")
-    port = os.getenv("PORT")
-    uvicorn.run(app, host=host, port=port, reload=True)
+# if __name__ == "__main__":
+#    import uvicorn
+#    host = os.getenv("HOST")
+#    port = int(os.getenv("PORT"))
+#    uvicorn.run(app, host=host, port=port)

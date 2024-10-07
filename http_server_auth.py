@@ -20,6 +20,39 @@
 8. 예 GET : "https://a1.mkeasy.kro.kr/dl/파이썬/무지_이쁜_유니를_위한_초간단_파이썬_강의.pdf"
 	/home/ubuntu/dl/파이썬/무지_이쁜_유니를_위한_초간단_파이썬_강의.pdf 파일 다운로드 시작
 9. 서브디렉토리 목록의 경우, 상위폴더로 바로가기 .. 을 파일목록에 추가해줘.
+---
+실행
+---
+#!/bin/bash
+
+# 환경 변수 설정
+export PATH=.:$HOME/.local/bin:/home/ubuntu/.virtualenvs/머신러닝/bin:$PATH
+
+USERNAME="yoon"
+PASSWORD=$(ipass.py | awk -F ' : ' '/임시암호/ {print $2}') # 실행 시마다 암호 변경
+PASSWORD="dbsl2Qh" # 주석 처리된 기존 암호
+
+# 기존 프로세스 종료
+PID=$(pgrep -f "python.*http_server_auth")
+if [[ -n "$PID" ]]; then
+    kill -9 "$PID"
+    echo "Terminated existing process with PID: $PID"
+fi
+
+# nohup.out 파일 삭제
+rm -f nohup.out
+
+# 서버 실행
+nohup python -m http_server_auth -b 0.0.0.0 3333 -u "$USERNAME" -p "$PASSWORD" -d /home/ubuntu/dl &
+
+# 대기 후 PID 확인
+sleep 1
+PID=$(pgrep -f "python.*http_server_auth")
+if [[ -n "$PID" ]]; then
+    echo "Started new server with PID: $PID"
+else
+    echo "Failed to start the server."
+fi
 '''
 import re
 import base64

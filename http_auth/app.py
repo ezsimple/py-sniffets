@@ -108,7 +108,7 @@ def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
     if credentials.username != correct_username or credentials.password != correct_password:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
-@app.get("/download/{path:path}")
+@app.get("/download/{path:path}", response_class=FileResponse)
 async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(check_auth)):
     path = unquote(path)  # URL 인코딩된 문자열을 디코딩
     logger.debug(f"path=/download/{path}")

@@ -140,6 +140,10 @@ async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(c
     encoded_filename = quote(filename.encode('utf-8'))
 
     response = FileResponse(file_path, media_type=mime_type or 'application/octet-stream')
+
+    # 캐시 제어 헤더 추가
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
     response.headers["Content-Disposition"] = f'{disposition}; filename="{encoded_filename}"'
 
     # MIME 타입에 따라 직접 표시하도록 설정

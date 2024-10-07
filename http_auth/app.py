@@ -164,4 +164,4 @@ if __name__ == "__main__":
     import uvicorn
     host = os.getenv("HOST")
     port = int(os.getenv("PORT"))
-    uvicorn.run(app, host=host, port=port, log_level="debug")
+    uvicorn.run(app, host=host, port=port)

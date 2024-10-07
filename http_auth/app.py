@@ -138,14 +138,13 @@ async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(c
 
     # Content-Disposition 설정
     disposition = 'attachment' # default : 다운로드할 파일
-    # if extension in ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif']:  # 직접 열 수 있는 파일 형식
-    #     disposition = 'inline'
+    if extension in ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif']:  # 직접 열 수 있는 파일 형식
+        disposition = 'inline'
 
     # 파일 이름을 UTF-8로 인코딩
     encoded_filename = quote(filename.encode('utf-8'))
-
     response = FileResponse(file_path, media_type=mime_type or 'application/octet-stream')
-    response.headers["Content-Disposition"] = f'{disposition}; filename="{encoded_filename}"'
+    # response.headers["Content-Disposition"] = f'{disposition}; filename="{encoded_filename}"'
 
     # 캐시 제어 헤더 추가
     # response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
@@ -165,4 +164,4 @@ if __name__ == "__main__":
     import uvicorn
     host = os.getenv("HOST")
     port = int(os.getenv("PORT"))
-    uvicorn.run(app, host=host, port=port)
+    uvicorn.run(app, host=host, port=port, log_level="debug")

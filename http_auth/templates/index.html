@@ -19,9 +19,9 @@
         {% for file, is_dir in file_info %}
             <li class="{{ 'directory' if is_dir else 'file' }}">
                 {% if is_dir %}
-                    <a href="/dl/{{ current_path }}/{{ file }}">{{ file }}/</a>  <!-- 디렉토리인 경우 슬래시 추가 -->
+                    <a href="/dl/{{ current_path }}{{ '/' if current_path else '' }}{{ file }}">{{ file }}/</a>  <!-- 디렉토리인 경우 슬래시 추가 -->
                 {% else %}
-                    <a href="/download/{{ current_path }}/{{ file }}">{{ file }}</a>
+                    <a href="/download/{{ current_path }}{{ '/' if current_path else '' }}{{ file }}">{{ file }}</a>
                 {% endif %}
             </li>
         {% endfor %}

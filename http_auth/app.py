@@ -85,7 +85,8 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
     parent_path = os.path.dirname(path).rstrip("/")  # 마지막 슬래시 제거
 
     # 파일이 디렉토리인지 여부 확인
-    file_info = [(file, os.path.isdir(os.path.join(directory_path, file))) for file in filtered_files]
+    file_info = [(file.lstrip('/'), os.path.isdir(os.path.join(directory_path, file))) for file in filtered_files]
+    print(file_info)
 
     return templates.TemplateResponse("index.html", {
         "request": request,

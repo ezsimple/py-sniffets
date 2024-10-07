@@ -8,6 +8,8 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import os
 import re
 from dotenv import load_dotenv
+from pathlib import Path
+import mimetypes
 
 # .env 파일의 환경변수 로드
 load_dotenv()
@@ -110,8 +112,8 @@ def get_readme_content(path):
         return '<br>'.join(line.strip() for line in content if not line.startswith('#'))
     return ""
 
-# if __name__ == "__main__":
-#    import uvicorn
-#    host = os.getenv("HOST")
-#    port = int(os.getenv("PORT"))
-#    uvicorn.run(app, host=host, port=port)
+if __name__ == "__main__":
+    import uvicorn
+    host = os.getenv("HOST")
+    port = int(os.getenv("PORT"))
+    uvicorn.run(app, host=host, port=port)

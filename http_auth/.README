@@ -1,1 +1,3 @@
-.env에 USERNAME, PASSWORD 환경설정 있음
+FastAPI로 구현한 간편파일다운로드
+--
+.env 에 USERNAME, PASSWORD 환경설정 있음

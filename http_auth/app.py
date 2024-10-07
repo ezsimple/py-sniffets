@@ -10,11 +10,27 @@ import re
 from dotenv import load_dotenv
 from pathlib import Path
 import mimetypes
+import logging
 
 # .env 파일의 환경변수 로드
 load_dotenv()
 
 app = FastAPI()
+
+# 로그 디렉토리 생성
+log_dir = "log"
+os.makedirs(log_dir, exist_ok=True)  # log 디렉토리가 없으면 생성
+
+# 로깅 설정 (파일에 기록)
+logging.basicConfig(
+		level=logging.DEBUG,
+		format='%(asctime)s - %(levelname)s - %(message)s',
+		handlers=[
+        logging.FileHandler(os.path.join(log_dir, "app.log")),  # 로그를 log/app.log 파일에 기록
+				logging.StreamHandler()          # 콘솔에도 로그 출력
+		]
+)
+logger = logging.getLogger(__name__)
 
 # CORS 설정
 app.add_middleware(
@@ -79,25 +95,22 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
         "is_root": (path == '')  # 최상위 경로인지 여부
     })
 
+def check_auth(credentials: HTTPBasicCredentials):
+    # 인증 로직 구현
+    pass
+
 @app.get("/download/{path:path}")
 async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(check_auth)):
+    # path = unquote(path)  # URL 인코딩된 문자열을 디코딩
+    # logger.debug(f"path=/download/{path}")
+
     root_dir = os.getenv("ROOT_DIR")
-    file_path = Path(root_dir) / Path(path).relative_to("/")  # 안전하게 경로 생성
+
+    # 직접 경로 생성 (상대 경로 사용하지 않음) 
+    # .relative_to("/")  # 한글파일의 경우 오류 발생(relative_to)
+    file_path = Path(root_dir) / Path(path)  # 안전하게 경로 생성
     if not file_path.is_file():
         raise HTTPException(status_code=404, detail="File not found")
-
-    def get_mime_type(extension: str) -> str:
-        mime_types = {
-            '.pdf': 'application/pdf',
-            '.jpg': 'image/jpeg',
-            '.jpeg': 'image/jpeg',
-            '.png': 'image/png',
-            '.gif': 'image/gif',
-            '.txt': 'text/plain',
-            '.html': 'text/html',
-            # 필요에 따라 추가적인 MIME 타입을 여기에 추가
-        }
-        return mime_types.get(extension.lower(), 'application/octet-stream')
 
     # 파일 이름 추출
     filename = file_path.name
@@ -106,14 +119,21 @@ async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(c
     extension = file_path.suffix
 
     # MIME 타입 자동 설정
-    # mime_type, _ = mimetypes.guess_type(file_path) # nginx를 경유하는 경우 비정상
-    mime_type = get_mime_type(extension)
+    mime_type, _ = mimetypes.guess_type(file_path) # nginx를 경유하는 경우 비정상
+
+		# 디버깅 정보 로그
+    logger.debug(f"media_type={mime_type or 'application/octet-stream'}, file_path={file_path}, filename={filename}, extension={extension}")
+
+    # Content-Disposition 설정
+    disposition = 'attachment' # default : 다운로드할 파일
+    if extension in ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif']:  # 직접 열 수 있는 파일 형식
+        disposition = 'inline'
+
+    response = FileResponse(file_path, media_type=mime_type or 'application/octet-stream')
+    response.headers["Content-Disposition"] = f'{disposition}; filename="{filename}"'
 
     # MIME 타입에 따라 직접 표시하도록 설정
-    response = FileResponse(file_path, media_type=mime_type)
-
-    # Content-Disposition 헤더를 통해 브라우저에서 직접 열도록 설정
-    response.headers["Content-Disposition"] = f'inline; filename="{filename}"'
+    response = FileResponse(file_path, media_type=mime_type or 'application/octet-stream')
 
     return response
 

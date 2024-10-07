@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>File List</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>파일 목록</h1>
+    {% if readme_content %}
+        <div class="readme-box">
+            <div>{{ readme_content | safe }}</div>
+        </div>
+    {% endif %}
+    <ul>
+        {% if not is_root %}
+            <li><a href="/dl/{{ parent_path }}">..</a></li>  <!-- 상위 디렉토리 -->
+        {% endif %}
+        {% for file, is_dir in file_info %}
+            <li class="{{ 'directory' if is_dir else 'file' }}">
+                {% if is_dir %}
+                    <a href="/dl/{{ current_path }}/{{ file }}">{{ file }}/</a>  <!-- 디렉토리인 경우 슬래시 추가 -->
+                {% else %}
+                    <a href="/download/{{ current_path }}/{{ file }}">{{ file }}</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

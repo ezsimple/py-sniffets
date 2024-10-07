@@ -56,7 +56,6 @@ class FileItem(BaseModel):
     name: str
 
 def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
-    logger.debug(f"Received credentials: {credentials.username}, {credentials.password}")
     correct_username = os.getenv("USERNAME")
     correct_password = os.getenv("PASSWORD")
     if credentials.username != correct_username or credentials.password != correct_password:

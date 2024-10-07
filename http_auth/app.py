@@ -137,7 +137,7 @@ async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(c
         disposition = 'inline'
 
     # 파일 이름을 UTF-8로 인코딩
-    encoded_filename = quote(filename)
+    encoded_filename = quote(filename.encode('utf-8'))
 
     response = FileResponse(file_path, media_type=mime_type or 'application/octet-stream')
     response.headers["Content-Disposition"] = f'{disposition}; filename="{encoded_filename}"'

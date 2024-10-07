@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -12,6 +13,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI()
+
+# CORS 설정
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 모든 도메인 허용, 필요에 따라 수정
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -84,8 +95,8 @@ def get_readme_content(path):
         return '<br>'.join(line.strip() for line in content if not line.startswith('#'))
     return ""
 
-if __name__ == "__main__":
-    import uvicorn
-    host = os.getenv("HOST")
-    port = os.getenv("PORT")
-    uvicorn.run(app, host=host, port=port, reload=True)
+# if __name__ == "__main__":
+#    import uvicorn
+#    host = os.getenv("HOST")
+#    port = int(os.getenv("PORT"))
+#    uvicorn.run(app, host=host, port=port)

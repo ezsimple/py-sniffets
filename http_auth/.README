@@ -1,1 +1,37 @@
-.env에 USERNAME, PASSWORD 환경설정 있음
+.env 에 USERNAME, PASSWORD 환경설정 있음
+
+# -----------------------------
+# nginx 설정 
+# -----------------------------
+location /static/ {
+		alias /home/ubuntu/py-sniffets/http_auth/static/;  # (주의) 실제 static 파일 경로로 수정
+}
+
+# 다운로드 경로를 FastAPI로 전달
+location /download/ {
+		alias /home/ubuntu/dl/;
+		proxy_pass http://localhost:3333;  # FastAPI의 기본 경로로 전달
+		proxy_http_version 1.1;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection 'upgrade';
+		proxy_set_header Host $host;
+		proxy_cache_bypass $http_upgrade;
+}
+
+location /dl/ {
+		alias /home/ubuntu/dl/;
+		proxy_pass http://localhost:3333/dl/; # 파일서버연결
+		# 추가 설정
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+
+		# WebSocket 지원을 위해 아래 설정 추가
+		proxy_http_version 1.1;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection "upgrade";
+
+		# 시간 제한 설정
+		proxy_read_timeout 90;
+		proxy_connect_timeout 90;                                                                                               proxy_send_timeout 90;                                                                                                                                                                                                                          # Buffer 설정                                                                                                           proxy_buffers 32 4k;                                                                                                    proxy_buffer_size 8k;                                                                                               }                                  

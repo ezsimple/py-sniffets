@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 import mimetypes
 import logging
+from urllib.parse import unquote, quote
 
 # .env 파일의 환경변수 로드
 load_dotenv()
@@ -95,33 +96,38 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
         "is_root": (path == '')  # 최상위 경로인지 여부
     })
 
-def check_auth(credentials: HTTPBasicCredentials):
-    # 인증 로직 구현
-    pass
+def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = os.getenv("USERNAME")
+    correct_password = os.getenv("PASSWORD")
+    if credentials.username != correct_username or credentials.password != correct_password:
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
 
 @app.get("/download/{path:path}")
 async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(check_auth)):
-    # path = unquote(path)  # URL 인코딩된 문자열을 디코딩
-    # logger.debug(f"path=/download/{path}")
+    path = unquote(path)  # URL 인코딩된 문자열을 디코딩
+    logger.debug(f"path=/download/{path}")
 
     root_dir = os.getenv("ROOT_DIR")
 
     # 직접 경로 생성 (상대 경로 사용하지 않음) 
     # .relative_to("/")  # 한글파일의 경우 오류 발생(relative_to)
-    file_path = Path(root_dir) / Path(path)  # 안전하게 경로 생성
-    if not file_path.is_file():
+    file_path = os.path.join(root_dir, path.lstrip('/'))  # 선행 슬래시 제거
+    if not os.path.isfile(file_path):
         raise HTTPException(status_code=404, detail="File not found")
 
+    # file 객체 생성
+    file = Path(file_path)
+
     # 파일 이름 추출
-    filename = file_path.name
+    filename = file.name
 
     # 파일 확장자 추출
-    extension = file_path.suffix
+    extension = file.suffix
 
     # MIME 타입 자동 설정
     mime_type, _ = mimetypes.guess_type(file_path) # nginx를 경유하는 경우 비정상
 
-		# 디버깅 정보 로그
+    # 디버깅 정보 로그
     logger.debug(f"media_type={mime_type or 'application/octet-stream'}, file_path={file_path}, filename={filename}, extension={extension}")
 
     # Content-Disposition 설정
@@ -129,8 +135,11 @@ async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(c
     if extension in ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif']:  # 직접 열 수 있는 파일 형식
         disposition = 'inline'
 
+    # 파일 이름을 UTF-8로 인코딩
+    encoded_filename = quote(filename)
+
     response = FileResponse(file_path, media_type=mime_type or 'application/octet-stream')
-    response.headers["Content-Disposition"] = f'{disposition}; filename="{filename}"'
+    response.headers["Content-Disposition"] = f'{disposition}; filename="{encoded_filename}"'
 
     # MIME 타입에 따라 직접 표시하도록 설정
     response = FileResponse(file_path, media_type=mime_type or 'application/octet-stream')

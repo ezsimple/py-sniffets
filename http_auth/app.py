@@ -82,27 +82,40 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
 @app.get("/download/{path:path}")
 async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(check_auth)):
     root_dir = os.getenv("ROOT_DIR")
-
     file_path = Path(root_dir) / Path(path).relative_to("/")  # 안전하게 경로 생성
     if not file_path.is_file():
         raise HTTPException(status_code=404, detail="File not found")
 
+    def get_mime_type(extension: str) -> str:
+        mime_types = {
+            '.pdf': 'application/pdf',
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.png': 'image/png',
+            '.gif': 'image/gif',
+            '.txt': 'text/plain',
+            '.html': 'text/html',
+            # 필요에 따라 추가적인 MIME 타입을 여기에 추가
+        }
+        return mime_types.get(extension.lower(), 'application/octet-stream')
+
     # 파일 이름 추출
     filename = file_path.name
+
+    # 파일 확장자 추출
+    extension = file_path.suffix
+
     # MIME 타입 자동 설정
-    mime_type, _ = mimetypes.guess_type(file_path)
+    # mime_type, _ = mimetypes.guess_type(file_path) # nginx를 경유하는 경우 비정상
+    mime_type = get_mime_type(extension)
 
     # MIME 타입에 따라 직접 표시하도록 설정
-    response = FileResponse(file_path, media_type=mime_type or 'application/octet-stream')
+    response = FileResponse(file_path, media_type=mime_type)
+
+    # Content-Disposition 헤더를 통해 브라우저에서 직접 열도록 설정
+    response.headers["Content-Disposition"] = f'inline; filename="{filename}"'
 
     return response
-
-    # file_path = os.path.join(root_dir, path.lstrip("/")).rstrip("/")  # 마지막 슬래시 제거
-		#
-    # if not os.path.isfile(file_path):
-    #    raise HTTPException(status_code=404, detail="File not found")
-		#
-    # return FileResponse(file_path, media_type='application/octet-stream')
 
 def get_readme_content(path):
     readme_path = os.path.join(path, '.README')

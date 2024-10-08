@@ -93,7 +93,8 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
 
     # 파일이 디렉토리인지 여부 확인
     file_info = [(file.lstrip('/'), os.path.isdir(os.path.join(directory_path, file))) for file in filtered_files]
-    print(file_info)
+    current_path = path.lstrip('/').rstrip('/')  # 현재 경로 설정
+    print(current_path, file_info)
 
     return templates.TemplateResponse("index.html", {
         "request": request,
@@ -133,7 +134,6 @@ async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(c
 
     # Content-Disposition 설정
     disposition = 'attachment'  # default : 다운로드할 파일
-    # 브라우저에게 맞김
     if extension in ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif']:  # 직접 열 수 있는 파일 형식
         disposition = 'inline'
 

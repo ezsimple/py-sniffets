@@ -1,6 +1,5 @@
-from fastapi import FastAPI, Depends, HTTPException, Request, APIRouter
+from fastapi import FastAPI, Depends, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -13,7 +12,12 @@ import mimetypes
 import logging
 from urllib.parse import unquote, quote
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import RedirectResponse, FileResponse, HTMLResponse
+from starlette.requests import Request
 import platform
+from datetime import datetime
+import pdb
 
 # 운영 체제에 따라 환경 변수 파일 로드
 if platform.system() == 'Darwin':  # Mac OS
@@ -51,6 +55,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 모든 요청에 대해 타임스탬프를 전달하는 라우터
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -60,11 +65,45 @@ router = APIRouter(prefix="/v1")  # /v1 경로를 prefix로 설정
 class FileItem(BaseModel):
     name: str
 
+class LoginRequiredMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # 세션에서 로그인 상태 확인
+        is_logged_in = "username" in request.session
+        
+        # 로그인하지 않은 경우 리다이렉트
+        if not is_logged_in:
+            return RedirectResponse(url="/v1/login")
+
+        # 다음 미들웨어 또는 요청 처리기로 넘어감
+        response = await call_next(request)
+        return response
+
+class CustomTemplateResponse(HTMLResponse):
+    def __init__(self, template_name: str, context: dict):
+        # 현재 타임스탬프를 context에 추가
+        context["timestamp"] = datetime.now().timestamp() 
+
+        # 로그인 상태 확인
+        is_login = "username" in context.get("request").session
+        context["is_login"] = is_login 
+
+        super().__init__(content=templates.get_template(template_name).render(context))
+
 def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = os.getenv("USERNAME")
     correct_password = os.getenv("PASSWORD")
-    if credentials.username != correct_username or credentials.password != correct_password:
-        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    if credentials.username == correct_username and credentials.password == correct_password:
+        return True
+    raise HTTPException(status_code=401, detail="Incorrect username or password")
+
+@router.get("/login")
+async def get_login(request: Request):
+
+    is_login = 'username' in request.session
+    if is_login:
+        return RedirectResponse(url="/v1/dl", status_code=303)
+
+    return CustomTemplateResponse("login.html", {"request": request})
 
 @router.post("/login")
 async def login(request: Request, credentials: HTTPBasicCredentials = Depends(security)):
@@ -72,13 +111,15 @@ async def login(request: Request, credentials: HTTPBasicCredentials = Depends(se
 
     # 세션에 사용자 정보 저장
     request.session['username'] = credentials.username
-    return RedirectResponse(url="/v1/dl/")
 
-@router.post("/logout")
+    # 303 응답 코드로 GET 요청으로 리다이렉트
+    # (주의) status_code=307을 사용하면 POST 요청으로 리다이렉트됨
+    return RedirectResponse(url="/v1/dl/", status_code=303)
+
+@router.api_route("/logout", methods=["GET", "POST"], response_class=RedirectResponse)
 async def logout(request: Request):
-    # 세션에서 사용자 정보 삭제
     request.session.pop('username', None)
-    return RedirectResponse(url="/v1")
+    return RedirectResponse(url="/v1", status_code=303)
 
 @router.get("/", response_class=RedirectResponse)
 async def redirect_to_dl():
@@ -86,6 +127,12 @@ async def redirect_to_dl():
 
 @router.get("/dl/{path:path}", response_class=HTMLResponse)
 async def list_files(request: Request, path: str = '', credentials: HTTPBasicCredentials = Depends(check_auth)):
+
+    # 로그인 상태 체크
+    is_login = 'username' in request.session
+    if not is_login:
+        return RedirectResponse(url="/v1/login", status_code=303)
+
     root_dir = os.getenv("ROOT_DIR")
     directory_path = os.path.join(root_dir, path.lstrip("/")).rstrip("/")  # 선행 슬래시 제거 및 마지막 슬래시 제거
 
@@ -134,7 +181,7 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
     # 현재 경로 설정
     current_path = path.lstrip('/').rstrip('/')
 
-    return templates.TemplateResponse("index.html", {
+    return CustomTemplateResponse("index.html", {
         "request": request,
         "file_info": file_info,
         "readme_content": readme_content,

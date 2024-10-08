@@ -1,12 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>파일 목록</h1>
+    <div class="header">
+        <h1>파일 목록</h1>
+        {% if is_login %}
+        <div class="logout-form">
+            <form action="{{ url_for('logout') }}" method="post">
+                <button type="submit" class="logout-button">로그아웃</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
     {% if readme_content %}
     <div class="readme-box">
         <div>{{ readme_content | safe }}</div>
     </div>
     {% endif %}
+
     <ul>
         {% if has_parent %}
         <li class="back-to-parent">

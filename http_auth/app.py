@@ -134,8 +134,8 @@ async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(c
     # Content-Disposition 설정
     disposition = 'attachment'  # default : 다운로드할 파일
     # 브라우저에게 맞김
-    # if extension in ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif']:  # 직접 열 수 있는 파일 형식
-    #     disposition = 'inline'
+    if extension in ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif']:  # 직접 열 수 있는 파일 형식
+        disposition = 'inline'
 
     # 파일 이름을 UTF-8로 인코딩
     encoded_filename = quote(filename.encode('utf-8'))

@@ -96,35 +96,16 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
     parent_path = ""  # path가 비어있다면 parent_path도 비워둠
     if path:  # path가 비어있지 않을 때
         parent_path = os.path.dirname(path).rstrip("/")  # 마지막 슬래시 제거
-    has_parent = parent_path != "" or parent_path == "." # path명에 . 이 표함된 경우
-    print(f'1. has_parent={has_parent}, parent_path={parent_path}, path={path}')
-
-    # 상위 디렉토리 경로 계산
-    parent_path = ""
-    if path:
-        # 문자열에서 마지막 슬래시의 위치를 찾음
-        last_slash_index = path.rfind('/')
-        if last_slash_index != -1:
-            parent_path = path[:last_slash_index]  # 마지막 슬래시 이전의 부분
-
-    # has_parent는 path가 비어있지 않으면 True
-    has_parent = parent_path != ""
-    print(f'2. has_parent={has_parent}, parent_path={parent_path}, path={path}')
-
-    # 현재 요청한 전체 경로를 제거한다.
-    # 전체경로에서 ROOT_DIR 만큼 삭제한다.
-    # 남은 스트링에서 rstrip("/"), lstrip("/")한 결과값이 있으면 has_parent 는 True 이다.
 
     # 현재 요청한 전체 경로
     full_path = path  # 요청한 전체 경로 (예: "ROOT_DIR/서브디렉토리/파일")
 
     # ROOT_DIR을 제거
-    root_dir = os.getenv("ROOT_DIR")  # 환경 변수에서 ROOT_DIR 가져오기
     remaining_path = full_path.replace(root_dir, "", 1).lstrip("/")  # ROOT_DIR 만큼 삭제하고 선행 슬래시 제거
 
     # has_parent 결정
     has_parent = bool(remaining_path)  # 남은 스트링이 있으면 True
-    print(f'3. has_parent={has_parent}, remaining_path={remaining_path}, full_path={full_path}')
+    print(f'has_parent={has_parent}, remaining_path={remaining_path}, full_path={full_path}')
 
     # 파일이 디렉토리인지 여부 확인
     file_info = [(file.lstrip('/'), os.path.isdir(os.path.join(directory_path, file))) for file in filtered_files]

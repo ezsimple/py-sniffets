@@ -115,3 +115,17 @@ li a:hover {
 .back-to-top i {
     margin-right: 5px; /* 아이콘과 텍스트 간격 */
 }
+
+.directory {
+    color: #008080; /* 감청색 */
+    font-style: italic; /* 이탤릭체 */
+}
+
+.back-to-parent {
+    display: flex;
+    align-items: center;
+}
+
+.back-to-parent i {
+    margin-right: 5px; /* 아이콘과 텍스트 사이의 간격 */
+}

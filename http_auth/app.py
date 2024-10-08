@@ -13,9 +13,13 @@ import mimetypes
 import logging
 from urllib.parse import unquote, quote
 from starlette.middleware.sessions import SessionMiddleware
+import platform
 
-# .env 파일의 환경변수 로드
-load_dotenv()
+# 운영 체제에 따라 환경 변수 파일 로드
+if platform.system() == 'Darwin':  # Mac OS
+    load_dotenv('.env.mac')
+else:  # Linux 및 기타 운영 체제는 기본 .env 파일 로드
+    load_dotenv()
 
 app = FastAPI()
 
@@ -71,7 +75,7 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
     root_dir = os.getenv("ROOT_DIR")
     directory_path = os.path.join(root_dir, path.lstrip("/")).rstrip("/")  # 선행 슬래시 제거 및 마지막 슬래시 제거
 
-    print(directory_path)
+    # print(directory_path)
     if not os.path.isdir(directory_path):
         raise HTTPException(status_code=404, detail="Directory not found")
 
@@ -89,12 +93,24 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
     readme_content = get_readme_content(directory_path)
 
     # 상위 디렉토리 경로 계산
-    parent_path = os.path.dirname(path).rstrip("/")  # 마지막 슬래시 제거
+    parent_path = ""  # path가 비어있다면 parent_path도 비워둠
+    if path:  # path가 비어있지 않을 때
+        parent_path = os.path.dirname(path).rstrip("/")  # 마지막 슬래시 제거
+    has_parent = parent_path != "" or parent_path == "." # path명에 . 이 표함된 경우
+    # print(f'has_parent={has_parent}, parent_path={parent_path}, path={path}')
 
     # 파일이 디렉토리인지 여부 확인
     file_info = [(file.lstrip('/'), os.path.isdir(os.path.join(directory_path, file))) for file in filtered_files]
-    current_path = path.lstrip('/').rstrip('/')  # 현재 경로 설정
-    print(current_path, file_info)
+
+    # is_dir가 True인 항목과 False인 항목으로 분리
+    directories = [(file, is_dir) for file, is_dir in file_info if is_dir]
+    files = [(file, is_dir) for file, is_dir in file_info if not is_dir]
+
+    # 두 목록을 합치고, 알파벳 순으로 정렬
+    file_info = sorted(directories) + sorted(files)
+
+    # 현재 경로 설정
+    current_path = path.lstrip('/').rstrip('/')
 
     return templates.TemplateResponse("index.html", {
         "request": request,
@@ -102,7 +118,8 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
         "readme_content": readme_content,
         "current_path": path.lstrip('/').rstrip('/'),
         "parent_path": parent_path,
-        "is_root": (path == '')  # 최상위 경로인지 여부
+        "is_root": (path == ''),  # 최상위 경로인지 여부
+        "has_parent": has_parent,  # 상위 디렉토리가 있는지 여부
     })
 
 @router.get("/download/{path:path}", response_class=FileResponse)

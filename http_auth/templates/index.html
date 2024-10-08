@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>File List</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}"> <!-- style.css 경로 추가 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome CSS 추가 -->
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}파일 목록{% endblock %}
+
+{% block content %}
     <h1>파일 목록</h1>
     {% if readme_content %}
     <div class="readme-box">
@@ -18,21 +10,27 @@
     </div>
     {% endif %}
     <ul>
+        {% if has_parent %}
+        <li class="back-to-parent">
+            <a href="{{ url_for('list_files', path=parent_path) }}" class="directory">
+                <i class="fas fa-arrow-up"></i> .. (상위로 가기)
+            </a>
+        </li>
+        {% endif %}
         {% for file, is_dir in file_info %}
             <li>
                 {% if is_dir %}
-                    <a href="{{ url_for('list_files', path=(current_path + '/' + file) if current_path else file) }}">{{ file }}/</a>
+                    <a href="{{ url_for('list_files', path=(current_path + '/' + file) if current_path else file) }}" class="directory">{{ file }}/</a>
                 {% else %}
                     <a href="{{ url_for('download_file', path=(current_path + '/' + file) if current_path else file) }}">{{ file }}</a>
                 {% endif %}
             </li>
         {% endfor %}
     </ul>
-    <!-- 최상위 경로에서 버튼 숨기기 -->
+    
     {% if not is_root %}
     <a href="{{ url_for('redirect_to_dl') }}" class="back-to-top">
         <i class="fas fa-arrow-up"></i> 처음으로
     </a>
     {% endif %}
-</body>
-</html>
+{% endblock %}

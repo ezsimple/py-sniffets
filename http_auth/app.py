@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi import FastAPI, Depends, HTTPException, Request, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -29,12 +29,12 @@ os.makedirs(log_dir, exist_ok=True)  # log 디렉토리가 없으면 생성
 
 # 로깅 설정 (파일에 기록)
 logging.basicConfig(
-		level=logging.DEBUG,
-		format='%(asctime)s - %(levelname)s - %(message)s',
-		handlers=[
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
         logging.FileHandler(os.path.join(log_dir, "app.log")),  # 로그를 log/app.log 파일에 기록
-				logging.StreamHandler()          # 콘솔에도 로그 출력
-		]
+        logging.StreamHandler()  # 콘솔에도 로그 출력
+    ]
 )
 logger = logging.getLogger(__name__)
 
@@ -51,6 +51,7 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 security = HTTPBasic()
+router = APIRouter(prefix="/v1")  # /v1 경로를 prefix로 설정
 
 class FileItem(BaseModel):
     name: str
@@ -61,15 +62,16 @@ def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
     if credentials.username != correct_username or credentials.password != correct_password:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
-@app.get("/", response_class=RedirectResponse)
+@router.get("/", response_class=RedirectResponse)
 async def redirect_to_dl():
-    return RedirectResponse(url="/dl/")
+    return RedirectResponse(url="/v1/dl/")
 
-@app.get("/dl/{path:path}", response_class=HTMLResponse)
+@router.get("/dl/{path:path}", response_class=HTMLResponse)
 async def list_files(request: Request, path: str = '', credentials: HTTPBasicCredentials = Depends(check_auth)):
     root_dir = os.getenv("ROOT_DIR")
     directory_path = os.path.join(root_dir, path.lstrip("/")).rstrip("/")  # 선행 슬래시 제거 및 마지막 슬래시 제거
-    
+
+    print(directory_path)
     if not os.path.isdir(directory_path):
         raise HTTPException(status_code=404, detail="Directory not found")
 
@@ -102,21 +104,14 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
         "is_root": (path == '')  # 최상위 경로인지 여부
     })
 
-def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
-    correct_username = os.getenv("USERNAME")
-    correct_password = os.getenv("PASSWORD")
-    if credentials.username != correct_username or credentials.password != correct_password:
-        raise HTTPException(status_code=401, detail="Incorrect username or password")
-
-@app.get("/download/{path:path}", response_class=FileResponse)
+@router.get("/download/{path:path}", response_class=FileResponse)
 async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(check_auth)):
     path = unquote(path)  # URL 인코딩된 문자열을 디코딩
-    logger.debug(f"path=/download/{path}")
+    logger.debug(f"path=/v1/download/{path}")
 
     root_dir = os.getenv("ROOT_DIR")
 
-    # 직접 경로 생성 (상대 경로 사용하지 않음) 
-    # .relative_to("/")  # 한글파일의 경우 오류 발생(relative_to)
+    # 직접 경로 생성
     file_path = os.path.join(root_dir, path.lstrip('/'))  # 선행 슬래시 제거
     if not os.path.isfile(file_path):
         raise HTTPException(status_code=404, detail="File not found")
@@ -131,24 +126,21 @@ async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(c
     extension = file.suffix
 
     # MIME 타입 자동 설정
-    mime_type, _ = mimetypes.guess_type(file_path) # nginx를 경유하는 경우 비정상
+    mime_type, _ = mimetypes.guess_type(file_path)
 
     # 디버깅 정보 로그
     logger.debug(f"media_type={mime_type or 'application/octet-stream'}, file_path={file_path}, filename={filename}, extension={extension}")
 
     # Content-Disposition 설정
-    disposition = 'attachment' # default : 다운로드할 파일
-    if extension in ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif']:  # 직접 열 수 있는 파일 형식
-        disposition = 'inline'
+    disposition = 'attachment'  # default : 다운로드할 파일
+    # 브라우저에게 맞김
+    # if extension in ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif']:  # 직접 열 수 있는 파일 형식
+    #     disposition = 'inline'
 
     # 파일 이름을 UTF-8로 인코딩
     encoded_filename = quote(filename.encode('utf-8'))
     response = FileResponse(file_path, media_type=mime_type or 'application/octet-stream')
-    # response.headers["Content-Disposition"] = f'{disposition}; filename="{encoded_filename}"'
-
-    # 캐시 제어 헤더 추가
-    # response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    # response.headers["Pragma"] = "no-cache"
+    response.headers["Content-Disposition"] = f'{disposition}; filename="{encoded_filename}"'
 
     return response
 
@@ -159,6 +151,8 @@ def get_readme_content(path):
             content = f.readlines()
         return '<br>'.join(line.strip() for line in content if not line.startswith('#'))
     return ""
+
+app.include_router(router)  # 라우터 등록
 
 if __name__ == "__main__":
     import uvicorn

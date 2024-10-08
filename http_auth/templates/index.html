@@ -2,29 +2,29 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File List</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}"> <!-- style.css 경로 추가 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome CSS 추가 -->
 </head>
 <body>
     <h1>파일 목록</h1>
-    {% if readme_content %}
-        <div class="readme-box">
-            <div>{{ readme_content | safe }}</div>
-        </div>
-    {% endif %}
     <ul>
-        {% if not is_root %}
-            <li><a href="/dl/{{ parent_path }}">..</a></li>  <!-- 상위 디렉토리 -->
-        {% endif %}
         {% for file, is_dir in file_info %}
-            <li class="{{ 'directory' if is_dir else 'file' }}">
+            <li>
                 {% if is_dir %}
-                    <a href="/dl/{{ current_path }}{{ '/' if current_path else '' }}{{ file }}">{{ file }}/</a>  <!-- 디렉토리인 경우 슬래시 추가 -->
+                    <a href="{{ url_for('list_files', path=current_path + '/' + file) }}">{{ file }}</a>
                 {% else %}
-                    <a href="/download/{{ current_path }}{{ '/' if current_path else '' }}{{ file }}">{{ file }}</a>
+                    <a href="{{ url_for('download_file', path=current_path + '/' + file) }}">{{ file }}</a>
                 {% endif %}
             </li>
         {% endfor %}
     </ul>
+    <a href="{{ url_for('redirect_to_dl') }}" class="back-to-top">
+        <i class="fas fa-arrow-up"></i> 처음으로
+    </a>
+    <div>
+        {{ readme_content | safe }}
+    </div>
 </body>
 </html>

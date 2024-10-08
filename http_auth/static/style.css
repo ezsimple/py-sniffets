@@ -93,3 +93,25 @@ li a:hover {
     margin-bottom: 10px;
     color: #2196F3; /* 제목 색상 */
 }
+
+/* 상위로 돌아가기 버튼 스타일 */
+.back-to-top {
+    display: inline-flex; /* inline-flex로 변경 */
+    align-items: center; /* 아이콘과 텍스트 수직 정렬 */
+    justify-content: center; /* 수평 중앙 정렬 */
+    margin: 20px 15px; /* 좌우 마진 추가 */
+    background-color: #007bff; /* 버튼 배경색 */
+    color: white; /* 글자 색상 */
+    padding: 10px 15px; /* 패딩 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    text-decoration: none; /* 링크 기본 스타일 제거 */
+    transition: background 0.3s;
+}
+
+.back-to-top:hover {
+    background-color: #0056b3; /* 호버시 배경색 */
+}
+
+.back-to-top i {
+    margin-right: 5px; /* 아이콘과 텍스트 간격 */
+}

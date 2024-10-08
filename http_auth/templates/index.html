@@ -18,9 +18,9 @@
         {% for file, is_dir in file_info %}
             <li>
                 {% if is_dir %}
-                    <a href="{{ url_for('list_files', path=current_path + '/' + file) }}">{{ file }}</a>
+                    <a href="{{ url_for('list_files', path=current_path + '/' + file.lstrip('/')) }}">{{ file }}</a>
                 {% else %}
-                    <a href="{{ url_for('download_file', path=current_path + '/' + file) }}">{{ file }}</a>
+                    <a href="{{ url_for('download_file', path=current_path + '/' + file.lstrip('/')) }}">{{ file }}</a>
                 {% endif %}
             </li>
         {% endfor %}

@@ -85,7 +85,7 @@ li a:hover {
     background-color: #e7f3fe; /* 연한 파란색 배경 */
     border-left: 6px solid #2196F3; /* 파란색 왼쪽 테두리 */
     padding: 15px;
-    margin: 20px 15px; /* 좌우 마진 추가 */
+    margin: 20px 20px; /* 좌우 마진 추가 */
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }

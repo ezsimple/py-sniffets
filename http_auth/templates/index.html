@@ -25,8 +25,11 @@
             </li>
         {% endfor %}
     </ul>
+    <!-- 최상위 경로에서 버튼 숨기기 -->
+    {% if not is_root %}
     <a href="{{ url_for('redirect_to_dl') }}" class="back-to-top">
         <i class="fas fa-arrow-up"></i> 처음으로
     </a>
+    {% endif}
 </body>
 </html>

@@ -97,7 +97,19 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
     if path:  # path가 비어있지 않을 때
         parent_path = os.path.dirname(path).rstrip("/")  # 마지막 슬래시 제거
     has_parent = parent_path != "" or parent_path == "." # path명에 . 이 표함된 경우
-    print(f'has_parent={has_parent}, parent_path={parent_path}, path={path}')
+    print(f'1. has_parent={has_parent}, parent_path={parent_path}, path={path}')
+
+    # 상위 디렉토리 경로 계산
+    parent_path = ""
+    if path:
+        # 문자열에서 마지막 슬래시의 위치를 찾음
+        last_slash_index = path.rfind('/')
+        if last_slash_index != -1:
+            parent_path = path[:last_slash_index]  # 마지막 슬래시 이전의 부분
+
+    # has_parent는 path가 비어있지 않으면 True
+    has_parent = parent_path != ""
+    print(f'2. has_parent={has_parent}, parent_path={parent_path}, path={path}')
 
     # 파일이 디렉토리인지 여부 확인
     file_info = [(file.lstrip('/'), os.path.isdir(os.path.join(directory_path, file))) for file in filtered_files]

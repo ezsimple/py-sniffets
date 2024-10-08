@@ -66,6 +66,20 @@ def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
     if credentials.username != correct_username or credentials.password != correct_password:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
+@router.post("/login")
+async def login(request: Request, credentials: HTTPBasicCredentials = Depends(security)):
+    check_auth(credentials)
+
+    # 세션에 사용자 정보 저장
+    request.session['username'] = credentials.username
+    return RedirectResponse(url="/v1/dl/")
+
+@router.post("/logout")
+async def logout(request: Request):
+    # 세션에서 사용자 정보 삭제
+    request.session.pop('username', None)
+    return RedirectResponse(url="/v1")
+
 @router.get("/", response_class=RedirectResponse)
 async def redirect_to_dl():
     return RedirectResponse(url="/v1/dl/")

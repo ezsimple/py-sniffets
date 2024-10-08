@@ -10,6 +10,7 @@ body {
     background-color: #f4f4f4;
     color: #333;
     line-height: 1.6;
+    margin: 20px;
 }
 
 h1 {
@@ -128,4 +129,39 @@ li a:hover {
 
 .back-to-parent i {
     margin-right: 5px; /* 아이콘과 텍스트 사이의 간격 */
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #e7e7e7;
+}
+
+.logout-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #007bff;
+}
+
+.logout-button:hover {
+    color: #0056b3;
+}
+
+form {
+    margin-top: 10px;
+}
+
+input[type="text"], input[type="password"] {
+    margin: 5px 0;
+    padding: 8px;
+    width: 200px;
+}
+
+button {
+    padding: 8px 12px;
 }

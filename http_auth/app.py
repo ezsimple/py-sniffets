@@ -65,6 +65,14 @@ router = APIRouter(prefix="/v1")  # /v1 경로를 prefix로 설정
 class FileItem(BaseModel):
     name: str
 
+class RedirectGetResponse(RedirectResponse):
+    def __init__(self, url: str, **kwargs):
+        # status_code를 303으로 설정
+        # 302: 일시적 리다이렉션, 원래 HTTP 메서드를 유지.
+        # 303: 리소스가 다른 URI에 있으며, GET 메서드를 사용하여 요청해야 함.
+        # 307 Temporary Redirect: 요청한 리소스가 일시적으로 다른 URI로 이동했으며, 클라이언트는 원래의 HTTP 메서드를 유지해야 합니다. 
+        super().__init__(url=url, status_code=303, **kwargs)
+
 class LoginRequiredMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # 세션에서 로그인 상태 확인
@@ -72,7 +80,7 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
         
         # 로그인하지 않은 경우 리다이렉트
         if not is_logged_in:
-            return RedirectResponse(url="/v1/login")
+            return RedirectGetResponse(url="/v1/login")
 
         # 다음 미들웨어 또는 요청 처리기로 넘어감
         response = await call_next(request)
@@ -101,7 +109,7 @@ async def get_login(request: Request):
 
     is_login = 'username' in request.session
     if is_login:
-        return RedirectResponse(url="/v1/dl", status_code=303)
+        return RedirectGetResponse(url="/v1/dl")
 
     return CustomTemplateResponse("login.html", {"request": request})
 
@@ -114,16 +122,16 @@ async def login(request: Request, credentials: HTTPBasicCredentials = Depends(se
 
     # 303 응답 코드로 GET 요청으로 리다이렉트
     # (주의) status_code=307을 사용하면 POST 요청으로 리다이렉트됨
-    return RedirectResponse(url="/v1/dl/", status_code=303)
+    return RedirectGetResponse(url="/v1/dl/")
 
 @router.api_route("/logout", methods=["GET", "POST"], response_class=RedirectResponse)
 async def logout(request: Request):
     request.session.pop('username', None)
-    return RedirectResponse(url="/v1", status_code=303)
+    return RedirectGetResponse(url="/v1")
 
 @router.get("/", response_class=RedirectResponse)
 async def redirect_to_dl():
-    return RedirectResponse(url="/v1/dl/")
+    return RedirectGetResponse(url="/v1/dl/")
 
 @router.get("/dl/{path:path}", response_class=HTMLResponse)
 async def list_files(request: Request, path: str = '', credentials: HTTPBasicCredentials = Depends(check_auth)):
@@ -131,7 +139,7 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
     # 로그인 상태 체크
     is_login = 'username' in request.session
     if not is_login:
-        return RedirectResponse(url="/v1/login", status_code=303)
+        return RedirectGetResponse(url="/v1/login")
 
     root_dir = os.getenv("ROOT_DIR")
     directory_path = os.path.join(root_dir, path.lstrip("/")).rstrip("/")  # 선행 슬래시 제거 및 마지막 슬래시 제거

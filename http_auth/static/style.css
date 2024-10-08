@@ -100,7 +100,7 @@ li a:hover {
     display: inline-flex; /* inline-flex로 변경 */
     align-items: center; /* 아이콘과 텍스트 수직 정렬 */
     justify-content: center; /* 수평 중앙 정렬 */
-    margin: 20px 15px; /* 좌우 마진 추가 */
+    margin: 20px 20px; /* 좌우 마진 추가 */
     background-color: #007bff; /* 버튼 배경색 */
     color: white; /* 글자 색상 */
     padding: 10px 15px; /* 패딩 */

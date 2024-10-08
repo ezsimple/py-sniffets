@@ -99,7 +99,7 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
         "request": request,
         "file_info": file_info,
         "readme_content": readme_content,
-        "current_path": path.lstrip('/'),
+        "current_path": path.lstrip('/').rstrip('/'),
         "parent_path": parent_path,
         "is_root": (path == '')  # 최상위 경로인지 여부
     })

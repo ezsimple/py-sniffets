@@ -9,6 +9,11 @@
 </head>
 <body>
     <h1>파일 목록</h1>
+    {% if readme_content %}
+    <div class="readme-box">
+        <div>{{ readme_content | safe }}</div>
+    </div>
+    {% endif %}
     <ul>
         {% for file, is_dir in file_info %}
             <li>
@@ -23,8 +28,5 @@
     <a href="{{ url_for('redirect_to_dl') }}" class="back-to-top">
         <i class="fas fa-arrow-up"></i> 처음으로
     </a>
-    <div>
-        {{ readme_content | safe }}
-    </div>
 </body>
 </html>

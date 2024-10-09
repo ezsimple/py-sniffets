@@ -115,7 +115,7 @@ async def get_login(request: Request):
 
 @router.post("/login")
 async def login(request: Request, credentials: HTTPBasicCredentials = Depends(security)):
-    check_auth(credentials)
+    check_auth(credentials):
 
     # 세션에 사용자 정보 저장
     request.session['username'] = credentials.username
@@ -201,6 +201,9 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
 
 @router.get("/download/{path:path}", response_class=FileResponse)
 async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(check_auth)):
+    session_id = request.session.get("user")   # 세션미들웨어에서 관리되는 사용자 정보 가져오기
+    logger.debug(f"Session ID: {session_id}")  # 여기서 session_id는 사용자 이름으로 사용됨
+
     path = unquote(path)  # URL 인코딩된 문자열을 디코딩
     logger.debug(f"path=/v1/download/{path}")
 

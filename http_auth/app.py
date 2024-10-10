@@ -32,15 +32,6 @@ PREFIX = os.getenv("PREFIX", '').rstrip('/')
 if not PREFIX.startswith('/'): # 반드시 '/'로 시작하도록 설정
     PREFIX = '/' + PREFIX
 
-def validate_dotenv():
-    # ROOT_DIR이 존재하는지 확인
-    ROOT_DIR = os.getenv("ROOT_DIR", '').rstrip('/')
-    if not ROOT_DIR or not os.path.exists(ROOT_DIR):
-        print(f"Error: The specified ROOT_DIR '{ROOT_DIR}' does not exist.")
-        raise SystemExit(1)  # SystemExit 예외 발생
-
-validate_dotenv()
-
 # (중요) SessionMiddleWare가 가장 먼저 호출되어야 함.
 class LoginRequiredMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -80,6 +71,7 @@ middleware = [
 ]
 
 app = FastAPI(middleware=middleware)
+
 
 # 로깅 설정 (파일에 기록)
 log_dir = "log"
@@ -137,6 +129,16 @@ def check_auth(form: LoginForm):
     if form.username == correct_username and form.password == correct_password:
         return True
     raise HTTPException(status_code=401, detail="Incorrect username or password")
+
+@app.lifespan
+async def validate_dotenv_variables(app: FastAPI):
+    ROOT_DIR = os.getenv("ROOT_DIR")
+    if not ROOT_DIR or not os.path.exists(ROOT_DIR):
+        print(f"Error: The specified ROOT_DIR '{ROOT_DIR}' does not exist.")
+        os._exit(1)  # 강제 종료
+
+    logger.debug("call yield??")
+    yield  # 애플리케이션이 실행되는 동안 지속
 
 # HTTPException 처리기
 @app.exception_handler(HTTPException)

@@ -52,7 +52,7 @@ async def value_error_handler(request: Request, exc: ValueError):
     return RedirectGetResponse(url=f"{PREFIX}/login") # 추후 에러페이지로
 
 @router.get("/login")
-async def get_login(request: Request):
+async def login_view(request: Request):
 
     # Middleware에서 처리할 수 없는, 예외상황
     is_logined = "username" in request.session
@@ -143,7 +143,7 @@ async def list_files(request: Request, path: str = ''):
         "has_parent": has_parent,  # 상위 디렉토리가 있는지 여부
     })
 
-def can_display_inline(file_path: str, mime_type: str) -> bool:
+def guess_display_inline(file_path: str, mime_type: str) -> bool:
     if len(mime_type) == 0:
         return False
 
@@ -188,7 +188,7 @@ async def download_file(request: Request, path: str):
     logger.debug(f"media_type={mime_type or 'application/octet-stream'}, file_path={file_path}, filename={filename}, extension={extension}")
 
     # Content-Disposition 설정
-    disposition = 'inline' if can_display_inline(file_path, mime_type) else 'attachment'
+    disposition = 'inline' if guess_display_inline(file_path, mime_type) else 'attachment'
 
     # 파일 이름을 UTF-8로 인코딩
     encoded_filename = quote(filename.encode('utf-8'))

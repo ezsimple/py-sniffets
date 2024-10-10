@@ -1,0 +1,68 @@
+
+
+
+(머신러닝) ubuntu@a1:~/py-sniffets/http_auth$ python app.py
+INFO:     Started server process [3377926]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:3333 (Press CTRL+C to quit)
+> /home/ubuntu/py-sniffets/http_auth/app.py(205)download_file()
+-> path = unquote(path)  # URL 인코딩된 문자열을 디코딩
+(Pdb) c
+2024-10-09 11:06:54,750 - DEBUG - path=/v1/download/파이썬/Do it! 점프 투 파이썬 - 라이브러리 예제 편.pdf
+2024-10-09 11:06:54,755 - DEBUG - media_type=application/pdf, file_path=/home/ubuntu/dl/파이썬/Do it! 점프 투 파이썬 - 라이브러리 예제 편.pdf, filename=Do it! 점프 투 파이썬 - 라이브러리 예제 편.pdf, extension=.pdf
+INFO:     116.34.248.173:0 - "GET /v1/download/%ED%8C%8C%EC%9D%B4%EC%8D%AC/Do%20it%21%20%EC%A0%90%ED%94%84%20%ED%88%AC%20%ED%8C%8C%EC%9D%B4%EC%8D%AC%20-%20%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC%20%EC%98%88%EC%A0%9C%20%ED%8E%B8.pdf HTTP/1.1" 200 OK <== 1. 안드로이드 삼성브라우저에서 접근해서 다운로드함.
+INFO:     116.34.248.173:0 - "GET /v1/download/%ED%8C%8C%EC%9D%B4%EC%8D%AC/Do%20it%21%20%EC%A0%90%ED%94%84%20%ED%88%AC%20%ED%8C%8C%EC%9D%B4%EC%8D%AC%20-%20%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC%20%EC%98%88%EC%A0%9C%20%ED%8E%B8.pdf HTTP/1.1" 401 Unauthorized <== 2. 안드로이드 삼성브라우저에서 구글드라이브앱 연동하려고 하는데, 401 발생
+INFO:     116.34.248.173:0 - "GET /v1/download/%ED%8C%8C%EC%9D%B4%EC%8D%AC/Do%20it%21%20%EC%A0%90%ED%94%84%20%ED%88%AC%20%ED%8C%8C%EC%9D%B4%EC%8D%AC%20-%20%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC%20%EC%98%88%EC%A0%9C%20%ED%8E%B8.pdf HTTP/1.1" 401 Unauthorized
+INFO:     116.34.248.173:0 - "GET /v1/download/%ED%8C%8C%EC%9D%B4%EC%8D%AC/Do%20it%21%20%EC%A0%90%ED%94%84%20%ED%88%AC%20%ED%8C%8C%EC%9D%B4%EC%8D%AC%20-%20%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC%20%EC%98%88%EC%A0%9C%20%ED%8E%B8.pdf HTTP/1.1" 401 Unauthorized
+INFO:     116.34.248.173:0 - "GET /v1/download/%ED%8C%8C%EC%9D%B4%EC%8D%AC/Do%20it%21%20%EC%A0%90%ED%94%84%20%ED%88%AC%20%ED%8C%8C%EC%9D%B4%EC%8D%AC%20-%20%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC%20%EC%98%88%EC%A0%9C%20%ED%8E%B8.pdf HTTP/1.1" 401 Unauthorized
+INFO:     116.34.248.173:0 - "GET /v1/download/%ED%8C%8C%EC%9D%B4%EC%8D%AC/Do%20it%21%20%EC%A0%90%ED%94%84%20%ED%88%AC%20%ED%8C%8C%EC%9D%B4%EC%8D%AC%20-%20%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC%20%EC%98%88%EC%A0%9C%20%ED%8E%B8.pdf HTTP/1.1" 401 Unauthorized
+
+다운로드 받고, 연계된 구글드라이브에서도 200OK 가 될수 있도록하는 인증방법을 추가하고 싶어.
+아래의 소스를 참조해서 제안해줘. 앱간의 연계되더라도 인증이 항상 유지될 수 있는 방법을 알고 싶어.
+--
+def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = os.getenv("USERNAME")
+    correct_password = os.getenv("PASSWORD")
+    if credentials.username == correct_username and credentials.password == correct_password:
+        return True
+    raise HTTPException(status_code=401, detail="Incorrect username or password")
+
+@router.get("/download/{path:path}", response_class=FileResponse)
+async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(check_auth)):
+    path = unquote(path)  # URL 인코딩된 문자열을 디코딩
+    logger.debug(f"path=/v1/download/{path}")
+
+    root_dir = os.getenv("ROOT_DIR")
+
+    # 직접 경로 생성
+    file_path = os.path.join(root_dir, path.lstrip('/'))  # 선행 슬래시 제거
+    if not os.path.isfile(file_path):
+        raise HTTPException(status_code=404, detail="File not found")
+
+    # file 객체 생성
+    file = Path(file_path)
+
+    # 파일 이름 추출
+    filename = file.name
+
+    # 파일 확장자 추출
+    extension = file.suffix
+
+    # MIME 타입 자동 설정
+    mime_type, _ = mimetypes.guess_type(file_path)
+
+    # 디버깅 정보 로그
+    logger.debug(f"media_type={mime_type or 'application/octet-stream'}, file_path={file_path}, filename={filename}, extension={extension}")
+
+    # Content-Disposition 설정
+    disposition = 'attachment'  # default : 다운로드할 파일
+    if extension in ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif']:  # 직접 열 수 있는 파일 형식
+        disposition = 'inline'
+
+    # 파일 이름을 UTF-8로 인코딩
+    encoded_filename = quote(filename.encode('utf-8'))
+    response = FileResponse(file_path, media_type=mime_type or 'application/octet-stream')
+    response.headers["Content-Disposition"] = f'{disposition}; filename="{encoded_filename}"'
+
+    return response

@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Depends, HTTPException, APIRouter
+from fastapi import FastAPI, Depends, HTTPException, APIRouter, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+# from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import os
 import re
 from dotenv import load_dotenv
@@ -29,7 +29,23 @@ app = FastAPI()
 
 # 세션 미들웨어 추가 (비밀키 설정 필요)
 session_key = os.getenv("SESSION_KEY")
+if not session_key:
+    raise ValueError("SESSION_KEY must be set in environment variables")
 app.add_middleware(SessionMiddleware, secret_key=session_key)
+
+# get_session, set_session 함수들은 FastAPI 애플리케이션의 엔드포인트로 정의되어 있습니다.
+@app.get("/set_session")
+async def set_session(request: Request, username: str):
+    # 세션에 값 저장
+    request.session["username"] = username
+    return {"message": "세션에 username 저장 완료"}
+
+@app.get("/get_session")
+async def get_session(request: Request):
+    username = request.session.get("username")
+    if username:
+        return {"username": username}
+    return {"message": "세션에 username이 없습니다."}
 
 # 로그 디렉토리 생성
 log_dir = "log"
@@ -59,11 +75,13 @@ app.add_middleware(
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-security = HTTPBasic()
+# security = HTTPBasic()
 router = APIRouter(prefix="/v1")  # /v1 경로를 prefix로 설정
 
-class FileItem(BaseModel):
-    name: str
+# Pydantic 모델 정의
+class LoginForm(BaseModel):
+    username: str
+    password: str
 
 class RedirectGetResponse(RedirectResponse):
     def __init__(self, url: str, **kwargs):
@@ -76,15 +94,18 @@ class RedirectGetResponse(RedirectResponse):
 class LoginRequiredMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # 세션에서 로그인 상태 확인
-        is_logged_in = "username" in request.session
+        is_logined = "username" in request.session
         
         # 로그인하지 않은 경우 리다이렉트
-        if not is_logged_in:
+        if not is_logined:
             return RedirectGetResponse(url="/v1/login")
 
         # 다음 미들웨어 또는 요청 처리기로 넘어감
         response = await call_next(request)
         return response
+
+# 로그인 미들웨어 등록
+app.add_middleware(LoginRequiredMiddleware)
 
 class CustomTemplateResponse(HTMLResponse):
     def __init__(self, template_name: str, context: dict):
@@ -92,33 +113,50 @@ class CustomTemplateResponse(HTMLResponse):
         context["timestamp"] = datetime.now().timestamp() 
 
         # 로그인 상태 확인
-        is_login = "username" in context.get("request").session
-        context["is_login"] = is_login 
+        is_logined = "username" in context.get("request").session
+        context["is_logined"] = is_logined 
 
         super().__init__(content=templates.get_template(template_name).render(context))
 
-def check_auth(credentials: HTTPBasicCredentials = Depends(security)):
+def check_auth(form: LoginForm):
     correct_username = os.getenv("USERNAME")
     correct_password = os.getenv("PASSWORD")
-    if credentials.username == correct_username and credentials.password == correct_password:
+    if form.username == correct_username and form.password == correct_password:
         return True
     raise HTTPException(status_code=401, detail="Incorrect username or password")
+
+# HTTPException 처리기
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    # 예외 로그 기록
+    logger.error(f"HTTPException occurred: {exc.detail}, Status code: {exc.status_code}, Path: {request.url.path}")
+    return RedirectGetResponse(url="/v1/login")
+
+# ValueError 처리기
+@app.exception_handler(ValueError)
+async def value_error_handler(request: Request, exc: ValueError):
+    # 예외 로그 기록
+    logger.error(f"ValueError occurred: {exc}, Path: {request.url.path}")
+    return RedirectGetResponse(url="/v1/login") # 추후 에러페이지로
 
 @router.get("/login")
 async def get_login(request: Request):
 
-    is_login = 'username' in request.session
-    if is_login:
-        return RedirectGetResponse(url="/v1/dl")
+    # LoginRequiredMiddleware 에서 처리
+    # is_logined = 'username' in request.session
+    # if is_logined:
+    #     return RedirectGetResponse(url="/v1/dl")
 
     return CustomTemplateResponse("login.html", {"request": request})
 
 @router.post("/login")
-async def login(request: Request, credentials: HTTPBasicCredentials = Depends(security)):
-    check_auth(credentials):
+async def login(request: Request, username: str = Form(...), password: str = Form(...)):
+    # 폼객체로 변환
+    form = LoginForm(username=username, password=password)
+    check_auth(form)
 
     # 세션에 사용자 정보 저장
-    request.session['username'] = credentials.username
+    request.session['username'] = form.username
 
     # 303 응답 코드로 GET 요청으로 리다이렉트
     # (주의) status_code=307을 사용하면 POST 요청으로 리다이렉트됨
@@ -134,17 +172,17 @@ async def redirect_to_dl():
     return RedirectGetResponse(url="/v1/dl/")
 
 @router.get("/dl/{path:path}", response_class=HTMLResponse)
-async def list_files(request: Request, path: str = '', credentials: HTTPBasicCredentials = Depends(check_auth)):
+async def list_files(request: Request, path: str = ''):
 
     # 로그인 상태 체크
-    is_login = 'username' in request.session
-    if not is_login:
-        return RedirectGetResponse(url="/v1/login")
+    # LoginRequiredMiddleware 에서 처리
+    # is_logined = 'username' in request.session
+    # if not is_logined:
+    #     return RedirectGetResponse(url="/v1/login")
 
     root_dir = os.getenv("ROOT_DIR")
     directory_path = os.path.join(root_dir, path.lstrip("/")).rstrip("/")  # 선행 슬래시 제거 및 마지막 슬래시 제거
 
-    # print(directory_path)
     if not os.path.isdir(directory_path):
         raise HTTPException(status_code=404, detail="Directory not found")
 
@@ -174,7 +212,7 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
 
     # has_parent 결정
     has_parent = bool(remaining_path)  # 남은 스트링이 있으면 True
-    print(f'has_parent={has_parent}, remaining_path={remaining_path}, full_path={full_path}')
+    logger.debug(f'has_parent={has_parent}, remaining_path={remaining_path}, full_path={full_path}')
 
     # 파일이 디렉토리인지 여부 확인
     file_info = [(file.lstrip('/'), os.path.isdir(os.path.join(directory_path, file))) for file in filtered_files]
@@ -200,9 +238,13 @@ async def list_files(request: Request, path: str = '', credentials: HTTPBasicCre
     })
 
 @router.get("/download/{path:path}", response_class=FileResponse)
-async def download_file(path: str, credentials: HTTPBasicCredentials = Depends(check_auth)):
-    session_id = request.session.get("user")   # 세션미들웨어에서 관리되는 사용자 정보 가져오기
-    logger.debug(f"Session ID: {session_id}")  # 여기서 session_id는 사용자 이름으로 사용됨
+async def download_file(request: Request, path: str):
+
+    # pdb.set_trace()
+    # session_id = request.session.get("session_id")
+    # logger.debug(f"Session ID from request.session.get(session_id): {session_id}")
+    # 세션ID를 알수가 없네.. 뭐지????
+    # request.session.get("session_id") 이거 왜 안되지???? 값이 None으로 나와
 
     path = unquote(path)  # URL 인코딩된 문자열을 디코딩
     logger.debug(f"path=/v1/download/{path}")

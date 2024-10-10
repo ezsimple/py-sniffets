@@ -3,7 +3,7 @@
 {% block content %}
     <div class="header">
         <h1>파일 목록</h1>
-        {% if is_login %}
+        {% if is_logined %}
         <div class="logout-form">
             <form action="{{ url_for('logout') }}" method="post">
                 <button type="submit" class="logout-button">로그아웃</button>

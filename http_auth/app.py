@@ -47,6 +47,7 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
         
         # 로그인하지 않은 경우 리다이렉트
         if not is_logined:
+            logger.warning(f"Unauthorized access attempt: {request.url.path}")
             return RedirectGetResponse(url=f"{PREFIX}/login")
 
         # 다음 미들웨어 또는 요청 처리기로 넘어감

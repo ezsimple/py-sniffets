@@ -20,6 +20,7 @@ from starlette.responses import RedirectResponse, FileResponse, HTMLResponse
 from starlette.requests import Request
 import platform
 from datetime import datetime
+from contextlib import asynccontextmanager
 import pdb
 
 # 운영 체제에 따라 환경 변수 파일 로드
@@ -130,12 +131,19 @@ def check_auth(form: LoginForm):
         return True
     raise HTTPException(status_code=401, detail="Incorrect username or password")
 
-@app.lifespan
-async def lifespan(app: FastAPI):
+@asynccontextmanager
+async def monitoring_env(app: FastAPI):
     ROOT_DIR = os.getenv("ROOT_DIR")
     if not ROOT_DIR or not os.path.exists(ROOT_DIR):
-        print(f"Error: The specified ROOT_DIR '{ROOT_DIR}' does not exist.")
+        logger.error(f"Error: The specified ROOT_DIR '{ROOT_DIR}' does not exist.")
         os._exit(1)  # 강제 종료
+
+    yield  # 애플리케이션이 실행되는 동안 지속
+
+    # 종료 시 처리할 코드 (필요한 경우)
+    logger.info("Shutting down...")
+
+app.add_event_handler("lifespan", monitoring_env)
 
 # HTTPException 처리기
 @app.exception_handler(HTTPException)

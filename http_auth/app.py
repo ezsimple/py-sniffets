@@ -7,6 +7,7 @@ from pydantic import BaseModel
 import magic
 import os
 import re
+import sys
 from dotenv import load_dotenv
 from pathlib import Path
 import mimetypes
@@ -30,6 +31,15 @@ else:  # Linux 및 기타 운영 체제는 기본 .env 파일 로드
 PREFIX = os.getenv("PREFIX", '').rstrip('/')
 if not PREFIX.startswith('/'): # 반드시 '/'로 시작하도록 설정
     PREFIX = '/' + PREFIX
+
+def validate_dotenv():
+    # ROOT_DIR이 존재하는지 확인
+    ROOT_DIR = os.getenv("ROOT_DIR", '').rstrip('/')
+    if not ROOT_DIR or not os.path.exists(ROOT_DIR):
+        print(f"Error: The specified ROOT_DIR '{ROOT_DIR}' does not exist.")
+        sys.exit(1)  # 프로그램 종료 (상태 코드 1)
+
+validate_dotenv()
 
 # (중요) SessionMiddleWare가 가장 먼저 호출되어야 함.
 class LoginRequiredMiddleware(BaseHTTPMiddleware):

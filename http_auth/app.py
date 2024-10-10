@@ -143,7 +143,7 @@ async def monitoring_env(app: FastAPI):
     # 종료 시 처리할 코드 (필요한 경우)
     logger.info("Shutting down...")
 
-app.add_event_handler("lifespan", monitoring_env)
+app.router.lifespan = monitoring_env
 
 # HTTPException 처리기
 @app.exception_handler(HTTPException)

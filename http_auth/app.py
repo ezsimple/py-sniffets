@@ -252,7 +252,7 @@ async def list_files(request: Request, path: str = ''):
         "has_parent": has_parent,  # 상위 디렉토리가 있는지 여부
     })
 
-def can_display_inline(file_path: str, mime_type: str) -> bool:
+def guess_display_inline(file_path: str, mime_type: str) -> bool:
     if len(mime_type) == 0:
         return False
 
@@ -290,14 +290,12 @@ async def download_file(request: Request, path: str):
     # MIME 타입 자동 설정
     mime = magic.Magic(mime=True)
     mime_type = mime.from_file(file_path)  # 파일의 MIME 타입 확인
-    if mime_type:
-        print(mime_type)
-
-    # 디버깅 정보 로그
-    logger.debug(f"media_type={mime_type or 'application/octet-stream'}, file_path={file_path}, filename={filename}, extension={extension}")
 
     # Content-Disposition 설정
-    disposition = 'inline' if can_display_inline(file_path, mime_type) else 'attachment'
+    disposition = 'inline' if guess_display_inline(file_path, mime_type) else 'attachment'
+
+    # 디버깅 정보 로그
+    logger.debug(f"disposition={disposition}, media_type={mime_type or 'application/octet-stream'}, file_path={file_path}, filename={filename}, extension={extension}")
 
     # 파일 이름을 UTF-8로 인코딩
     encoded_filename = quote(filename.encode('utf-8'))

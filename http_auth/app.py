@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, APIRouter, Form
+from fastapi import FastAPI, Depends, HTTPException, APIRouter, Form, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -89,7 +89,7 @@ class RedirectGetResponse(RedirectResponse):
         # 302: 일시적 리다이렉션, 원래 HTTP 메서드를 유지.
         # 303: 리소스가 다른 URI에 있으며, GET 메서드를 사용하여 요청해야 함.
         # 307 Temporary Redirect: 요청한 리소스가 일시적으로 다른 URI로 이동했으며, 클라이언트는 원래의 HTTP 메서드를 유지해야 합니다. 
-        super().__init__(url=url, status_code=303, **kwargs)
+        super().__init__(url=url, status_code=status.HTTP_303_SEE_OTHER, **kwargs)
 
 class LoginRequiredMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -123,7 +123,7 @@ def check_auth(form: LoginForm):
     correct_password = os.getenv("PASSWORD")
     if form.username == correct_username and form.password == correct_password:
         return True
-    raise HTTPException(status_code=401, detail="Incorrect username or password")
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
 
 # HTTPException 처리기
 @app.exception_handler(HTTPException)
@@ -184,7 +184,7 @@ async def list_files(request: Request, path: str = ''):
     directory_path = os.path.join(root_dir, path.lstrip("/")).rstrip("/")  # 선행 슬래시 제거 및 마지막 슬래시 제거
 
     if not os.path.isdir(directory_path):
-        raise HTTPException(status_code=404, detail="Directory not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Directory not found")
 
     files = os.listdir(directory_path)
     ignore_file_path = os.path.join(directory_path, '.ignorefiles')
@@ -254,7 +254,7 @@ async def download_file(request: Request, path: str):
     # 직접 경로 생성
     file_path = os.path.join(root_dir, path.lstrip('/'))  # 선행 슬래시 제거
     if not os.path.isfile(file_path):
-        raise HTTPException(status_code=404, detail="File not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
 
     # file 객체 생성
     file = Path(file_path)

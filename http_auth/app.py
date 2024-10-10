@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 # from fastapi.security import HTTPBasic, HTTPBasicCredentials
+import magic
 import os
 import re
 from dotenv import load_dotenv
@@ -13,6 +14,7 @@ import logging
 from urllib.parse import unquote, quote
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware import Middleware
 from starlette.responses import RedirectResponse, FileResponse, HTMLResponse
 from starlette.requests import Request
 import platform
@@ -25,58 +27,75 @@ if platform.system() == 'Darwin':  # Mac OS
 else:  # Linux 및 기타 운영 체제는 기본 .env 파일 로드
     load_dotenv()
 
-app = FastAPI()
+PREFIX = os.getenv("PREFIX", '').rstrip('/')
+if not PREFIX.startswith('/'): # 반드시 '/'로 시작하도록 설정
+    PREFIX = '/' + PREFIX
+
+# (중요) SessionMiddleWare가 가장 먼저 호출되어야 함.
+class LoginRequiredMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # 로그인 페이지 요청은 무시
+        if request.url.path.startswith(f"{PREFIX}/login") \
+                or request.url.path.startswith("/static/"):
+            response = await call_next(request)
+            return response
+
+        # 세션에서 로그인 상태 확인
+        is_logined = "username" in request.session
+        
+        # 로그인하지 않은 경우 리다이렉트
+        if not is_logined:
+            return RedirectGetResponse(url=f"{PREFIX}/login")
+
+        # 다음 미들웨어 또는 요청 처리기로 넘어감
+        response = await call_next(request)
+        return response
 
 # 세션 미들웨어 추가 (비밀키 설정 필요)
-session_key = os.getenv("SESSION_KEY")
-if not session_key:
+SESSION_KEY = os.getenv("SESSION_KEY")
+if len(SESSION_KEY) == 0:
     raise ValueError("SESSION_KEY must be set in environment variables")
-app.add_middleware(SessionMiddleware, secret_key=session_key)
 
-# get_session, set_session 함수들은 FastAPI 애플리케이션의 엔드포인트로 정의되어 있습니다.
-@app.get("/set_session")
-async def set_session(request: Request, username: str):
-    # 세션에 값 저장
-    request.session["username"] = username
-    return {"message": "세션에 username 저장 완료"}
+# 순서중요합니다. SessionMiddleWare가 항상 먼저 와야함.
+middleware = [
+    Middleware(SessionMiddleware, secret_key=SESSION_KEY),
+    Middleware(LoginRequiredMiddleware),
+    Middleware(
+      CORSMiddleware,
+      allow_origins=["*"],  # 모든 도메인 허용, 필요에 따라 수정
+      allow_credentials=True,
+      allow_methods=["*"],
+      allow_headers=["*"],
+    )
+]
 
-@app.get("/get_session")
-async def get_session(request: Request):
-    username = request.session.get("username")
-    if username:
-        return {"username": username}
-    return {"message": "세션에 username이 없습니다."}
+app = FastAPI(middleware=middleware)
 
-# 로그 디렉토리 생성
+# 로깅 설정 (파일에 기록)
 log_dir = "log"
 os.makedirs(log_dir, exist_ok=True)  # log 디렉토리가 없으면 생성
 
-# 로깅 설정 (파일에 기록)
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s',
+    format='%(asctime)s - %(levelname)s - %(name)s - %(filename)s - %(message)s',
     handlers=[
         logging.FileHandler(os.path.join(log_dir, "app.log")),  # 로그를 log/app.log 파일에 기록
         logging.StreamHandler()  # 콘솔에도 로그 출력
     ]
 )
+
+# 기본 로깅 설정
+logging.getLogger("starlette").setLevel(logging.WARNING)
+logging.getLogger("fastapi").setLevel(logging.WARNING)
+logging.getLogger("multipart.multipart").setLevel(logging.WARNING)  # form 데이트 로깅방지
 logger = logging.getLogger(__name__)
 
-# CORS 설정
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # 모든 도메인 허용, 필요에 따라 수정
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# 모든 요청에 대해 타임스탬프를 전달하는 라우터
+# 템플릿, static 경로 지정
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # security = HTTPBasic()
-router = APIRouter(prefix="/v1")  # /v1 경로를 prefix로 설정
+router = APIRouter(prefix=PREFIX)  
 
 # Pydantic 모델 정의
 class LoginForm(BaseModel):
@@ -90,22 +109,6 @@ class RedirectGetResponse(RedirectResponse):
         # 303: 리소스가 다른 URI에 있으며, GET 메서드를 사용하여 요청해야 함.
         # 307 Temporary Redirect: 요청한 리소스가 일시적으로 다른 URI로 이동했으며, 클라이언트는 원래의 HTTP 메서드를 유지해야 합니다. 
         super().__init__(url=url, status_code=303, **kwargs)
-
-class LoginRequiredMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        # 세션에서 로그인 상태 확인
-        is_logined = "username" in request.session
-        
-        # 로그인하지 않은 경우 리다이렉트
-        if not is_logined:
-            return RedirectGetResponse(url="/v1/login")
-
-        # 다음 미들웨어 또는 요청 처리기로 넘어감
-        response = await call_next(request)
-        return response
-
-# 로그인 미들웨어 등록
-app.add_middleware(LoginRequiredMiddleware)
 
 class CustomTemplateResponse(HTMLResponse):
     def __init__(self, template_name: str, context: dict):
@@ -130,22 +133,22 @@ def check_auth(form: LoginForm):
 async def http_exception_handler(request: Request, exc: HTTPException):
     # 예외 로그 기록
     logger.error(f"HTTPException occurred: {exc.detail}, Status code: {exc.status_code}, Path: {request.url.path}")
-    return RedirectGetResponse(url="/v1/login")
+    return RedirectGetResponse(url=f"{PREFIX}/login")
 
 # ValueError 처리기
 @app.exception_handler(ValueError)
 async def value_error_handler(request: Request, exc: ValueError):
     # 예외 로그 기록
     logger.error(f"ValueError occurred: {exc}, Path: {request.url.path}")
-    return RedirectGetResponse(url="/v1/login") # 추후 에러페이지로
+    return RedirectGetResponse(url=f"{PREFIX}/login") # 추후 에러페이지로
 
 @router.get("/login")
 async def get_login(request: Request):
-
-    # LoginRequiredMiddleware 에서 처리
-    # is_logined = 'username' in request.session
-    # if is_logined:
-    #     return RedirectGetResponse(url="/v1/dl")
+    
+    # Middleware의 예외상황 처리
+    is_logined = "username" in request.session
+    if is_logined:
+        return RedirectGetResponse(url=f"{PREFIX}/dl")
 
     return CustomTemplateResponse("login.html", {"request": request})
 
@@ -160,25 +163,19 @@ async def login(request: Request, username: str = Form(...), password: str = For
 
     # 303 응답 코드로 GET 요청으로 리다이렉트
     # (주의) status_code=307을 사용하면 POST 요청으로 리다이렉트됨
-    return RedirectGetResponse(url="/v1/dl/")
+    return RedirectGetResponse(url=f"{PREFIX}/dl/")
 
 @router.api_route("/logout", methods=["GET", "POST"], response_class=RedirectResponse)
 async def logout(request: Request):
     request.session.pop('username', None)
-    return RedirectGetResponse(url="/v1")
+    return RedirectGetResponse(url=f"{PREFIX}")
 
 @router.get("/", response_class=RedirectResponse)
 async def redirect_to_dl():
-    return RedirectGetResponse(url="/v1/dl/")
+    return RedirectGetResponse(url=f"{PREFIX}/dl/")
 
 @router.get("/dl/{path:path}", response_class=HTMLResponse)
 async def list_files(request: Request, path: str = ''):
-
-    # 로그인 상태 체크
-    # LoginRequiredMiddleware 에서 처리
-    # is_logined = 'username' in request.session
-    # if not is_logined:
-    #     return RedirectGetResponse(url="/v1/login")
 
     root_dir = os.getenv("ROOT_DIR")
     directory_path = os.path.join(root_dir, path.lstrip("/")).rstrip("/")  # 선행 슬래시 제거 및 마지막 슬래시 제거
@@ -237,6 +234,15 @@ async def list_files(request: Request, path: str = ''):
         "has_parent": has_parent,  # 상위 디렉토리가 있는지 여부
     })
 
+def can_display_inline(file_path: str, mime_type: str) -> bool:
+    if len(mime_type) == 0:
+        return False
+
+    # MIME 타입이 inline으로 열 수 있는지 확인 (추가적인 라이브러리 필요 없음)
+    return mime_type.startswith('image/') or \
+           mime_type.startswith('text/') or \
+           mime_type in ['application/pdf', 'application/xhtml+xml']
+
 @router.get("/download/{path:path}", response_class=FileResponse)
 async def download_file(request: Request, path: str):
 
@@ -247,8 +253,6 @@ async def download_file(request: Request, path: str):
     # request.session.get("session_id") 이거 왜 안되지???? 값이 None으로 나와
 
     path = unquote(path)  # URL 인코딩된 문자열을 디코딩
-    logger.debug(f"path=/v1/download/{path}")
-
     root_dir = os.getenv("ROOT_DIR")
 
     # 직접 경로 생성
@@ -266,15 +270,16 @@ async def download_file(request: Request, path: str):
     extension = file.suffix
 
     # MIME 타입 자동 설정
-    mime_type, _ = mimetypes.guess_type(file_path)
+    mime = magic.Magic(mime=True)
+    mime_type = mime.from_file(file_path)  # 파일의 MIME 타입 확인
+    if mime_type:
+        print(mime_type)
 
     # 디버깅 정보 로그
     logger.debug(f"media_type={mime_type or 'application/octet-stream'}, file_path={file_path}, filename={filename}, extension={extension}")
 
     # Content-Disposition 설정
-    disposition = 'attachment'  # default : 다운로드할 파일
-    if extension in ['.pdf', '.txt', '.jpg', '.jpeg', '.png', '.gif']:  # 직접 열 수 있는 파일 형식
-        disposition = 'inline'
+    disposition = 'inline' if can_display_inline(file_path, mime_type) else 'attachment'
 
     # 파일 이름을 UTF-8로 인코딩
     encoded_filename = quote(filename.encode('utf-8'))

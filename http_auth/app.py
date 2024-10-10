@@ -37,7 +37,7 @@ def validate_dotenv():
     ROOT_DIR = os.getenv("ROOT_DIR", '').rstrip('/')
     if not ROOT_DIR or not os.path.exists(ROOT_DIR):
         print(f"Error: The specified ROOT_DIR '{ROOT_DIR}' does not exist.")
-        sys.exit(1)  # 프로그램 종료 (상태 코드 1)
+        raise SystemExit(1)  # SystemExit 예외 발생
 
 validate_dotenv()
 

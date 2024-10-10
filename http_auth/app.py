@@ -130,15 +130,12 @@ def check_auth(form: LoginForm):
         return True
     raise HTTPException(status_code=401, detail="Incorrect username or password")
 
-@app.lifespan
+@app.on_event("startup")
 async def validate_dotenv_variables(app: FastAPI):
     ROOT_DIR = os.getenv("ROOT_DIR")
     if not ROOT_DIR or not os.path.exists(ROOT_DIR):
         print(f"Error: The specified ROOT_DIR '{ROOT_DIR}' does not exist.")
         os._exit(1)  # 강제 종료
-
-    logger.debug("call yield??")
-    yield  # 애플리케이션이 실행되는 동안 지속
 
 # HTTPException 처리기
 @app.exception_handler(HTTPException)

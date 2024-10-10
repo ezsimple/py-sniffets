@@ -1,16 +1,17 @@
 import os
 import re
 import magic
-from fastapi import FastAPI, HTTPException, APIRouter, Form, status
+from fastapi import FastAPI, HTTPException, APIRouter, Form, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from pathlib import Path
-from urllib.parse import unquote, quote
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware import Middleware
 from starlette.responses import RedirectResponse, FileResponse, HTMLResponse
 from starlette.requests import Request
-from core.config import PREFIX, SESSION_KEY, logger
+from datetime import timedelta
+from pathlib import Path
+from urllib.parse import unquote, quote
+from core.config import PREFIX, SESSION_KEY, logger, create_access_token, verify_token, oauth2_scheme, ACCESS_TOKEN_EXPIRE_MINUTES
 from core.model import LoginForm, LoginRequiredMiddleware, CustomTemplateResponse, RedirectGetResponse
 
 # 순서중요합니다. SessionMiddleWare가 항상 먼저 와야함.
@@ -36,6 +37,24 @@ def check_auth(form: LoginForm):
     if form.username == correct_username and form.password == correct_password:
         return True
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
+
+@router.post("/login")
+async def login(request: Request, username: str = Form(...), password: str = Form(...)):
+    correct_username = os.getenv("USERNAME")
+    correct_password = os.getenv("PASSWORD")
+    if username != correct_username or password != correct_password:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
+
+    # JWT 토큰 생성
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(data={"sub": username}, expires_delta=access_token_expires)
+
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/users/me")
+async def read_users_me(token: str = Depends(oauth2_scheme)):
+    username = verify_token(token)
+    return {"username": username}
 
 # HTTPException 처리기
 @app.exception_handler(HTTPException)
@@ -63,16 +82,20 @@ async def login_view(request: Request):
 
 @router.post("/login")
 async def login(request: Request, username: str = Form(...), password: str = Form(...)):
-    # 폼객체로 변환
-    form = LoginForm(username=username, password=password)
-    check_auth(form)
+    correct_username = os.getenv("USERNAME")
+    correct_password = os.getenv("PASSWORD")
+    if username != correct_username or password != correct_password:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
 
-    # 세션에 사용자 정보 저장
-    request.session['username'] = form.username
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(data={"sub": username}, expires_delta=access_token_expires)
 
-    # 303 응답 코드로 GET 요청으로 리다이렉트
-    # (주의) status_code=307을 사용하면 POST 요청으로 리다이렉트됨
-    return RedirectGetResponse(url=f"{PREFIX}/dl/")
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/users/me")
+async def read_users_me(token: str = Depends(oauth2_scheme)):
+    username = verify_token(token)
+    return {"username": username}
 
 @router.api_route("/logout", methods=["GET", "POST"], response_class=RedirectResponse)
 async def logout(request: Request):

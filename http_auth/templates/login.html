@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <link rel="stylesheet" href="{{ url_for('static', path='login.css') }}?_={{ timestamp }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/login.css') }}?_={{ timestamp }}">
     <div class="login-container">
         <h1>로그인</h1>
         <div class="form-box">
@@ -23,7 +23,7 @@
             const formData = new FormData(this);
             const response = await fetch('{{ url_for("login") }}', {
                 method: 'POST',
-                body: formData,
+                body: formData
             });
 
             if (response.ok) {
@@ -33,11 +33,24 @@
                 // JWT를 로컬 스토리지에 저장
                 localStorage.setItem('access_token', token);
 
+                // 쿠키에 저장
+                document.cookie = "access_token=" + token + "; path=/;";
+                console.log(`성공: token=${token}`);
+
                 // 로그인 후 리다이렉트 (예: 대시보드 페이지)
-                window.location.href = '{{ url_for("/") }}';  // 원하는 페이지로 변경
+                const file_path = ''
+                window.location.href = '{{ url_for("list_files", path=file_path) }}';
             } else {
-                const errorData = await response.json();
-                alert('로그인 실패: ' + errorData.detail);
+                console.error('로그인 실패');
+                // const errorData = await response.json();
+                // console.error('로그인 실패: ' + errorData.detail);
+                const loginContainer = document.querySelector('.login-container');
+                loginContainer.classList.add('shake'); // 흔들림 클래스 추가
+
+                // 애니메이션이 끝난 후 클래스 제거
+                setTimeout(() => {
+                    loginContainer.classList.remove('shake');
+                }, 500); // 애니메이션 지속 시간과 동일하게 설정
             }
         };
     </script>

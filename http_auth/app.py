@@ -13,6 +13,7 @@ from pathlib import Path
 from urllib.parse import unquote, quote
 from core.config import PREFIX, SESSION_KEY, logger, create_access_token, verify_token, oauth2_scheme, ACCESS_TOKEN_EXPIRE_MINUTES
 from core.model import LoginForm, LoginRequiredMiddleware, CustomTemplateResponse, RedirectGetResponse
+from core.exception import http_exception_handler, value_error_handler
 
 # 순서중요합니다. SessionMiddleWare가 항상 먼저 와야함.
 middleware = [
@@ -31,6 +32,15 @@ app = FastAPI(middleware=middleware)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 router = APIRouter(prefix=PREFIX)  
 
+# 예외 처리기 등록
+@app.exception_handler(HTTPException)
+async def handle_http_exception(request: Request, exc: HTTPException):
+    return await http_exception_handler(request, exc)
+
+@app.exception_handler(ValueError)
+async def handle_value_error(request: Request, exc: ValueError):
+    return await value_error_handler(request, exc)
+
 def check_auth(form: LoginForm):
     correct_username = os.getenv("USERNAME")
     correct_password = os.getenv("PASSWORD")
@@ -40,39 +50,28 @@ def check_auth(form: LoginForm):
 
 @router.post("/login")
 async def login(request: Request, username: str = Form(...), password: str = Form(...)):
-    correct_username = os.getenv("USERNAME")
-    correct_password = os.getenv("PASSWORD")
-    if username != correct_username or password != correct_password:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
+
+    # 인증 체크
+    form = LoginForm(username=username, password=password)
+    check_auth(form)
 
     # JWT 토큰 생성
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data={"sub": username}, expires_delta=access_token_expires)
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    # 세선에 저장
+    request.session["username"] = username
+    logger.debug(f"앱:세션에 저장된 데이터: {request.session}")
+
+    return {"access_token": access_token, "token_type": "bearer"}, status.HTTP_200_OK
 
 @router.get("/users/me")
 async def read_users_me(token: str = Depends(oauth2_scheme)):
     username = verify_token(token)
     return {"username": username}
 
-# HTTPException 처리기
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request: Request, exc: HTTPException):
-    # 예외 로그 기록
-    logger.error(f"HTTPException occurred: {exc.detail}, Status code: {exc.status_code}, Path: {request.url.path}")
-    return RedirectGetResponse(url=f"{PREFIX}/login")
-
-# ValueError 처리기
-@app.exception_handler(ValueError)
-async def value_error_handler(request: Request, exc: ValueError):
-    # 예외 로그 기록
-    logger.error(f"ValueError occurred: {exc}, Path: {request.url.path}")
-    return RedirectGetResponse(url=f"{PREFIX}/login") # 추후 에러페이지로
-
 @router.get("/login")
 async def login_view(request: Request):
-
     # Middleware에서 처리할 수 없는, 예외상황
     is_logined = "username" in request.session
     if is_logined:
@@ -87,30 +86,37 @@ async def login(request: Request, username: str = Form(...), password: str = For
     if username != correct_username or password != correct_password:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
 
+    request.session["username"] = username
+    logger.debug(f"세션에 저장된 데이터: {request.session}")
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data={"sub": username}, expires_delta=access_token_expires)
 
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.get("/users/me")
+@router.get("/users/me", name="read_users_me")
 async def read_users_me(token: str = Depends(oauth2_scheme)):
     username = verify_token(token)
     return {"username": username}
 
 @router.api_route("/logout", methods=["GET", "POST"], response_class=RedirectResponse)
 async def logout(request: Request):
-    request.session.pop('username', None)
-    return RedirectGetResponse(url=f"{PREFIX}")
+    response = RedirectGetResponse(url=f"{PREFIX}")
+    await LoginRequiredMiddleware.clear_session(request, response)
+    return response
 
-@router.get("/", response_class=RedirectResponse)
-async def redirect_to_dl():
+@router.get("/", name='redirect_to_dl', response_class=RedirectResponse)
+async def redirect_to_dl(request: Request):
+    is_logined = "username" in request.session
+    if not is_logined:
+        return RedirectGetResponse(url=f"{PREFIX}/login")
     return RedirectGetResponse(url=f"{PREFIX}/dl/")
 
-@router.get("/dl/{path:path}", response_class=HTMLResponse)
+@router.get("/dl/{path:path}", name="list_files", response_class=HTMLResponse)
 async def list_files(request: Request, path: str = ''):
-
     root_dir = os.getenv("ROOT_DIR")
     directory_path = os.path.join(root_dir, path.lstrip("/")).rstrip("/")  # 선행 슬래시 제거 및 마지막 슬래시 제거
+
+    logger.debug(directory_path)
 
     if not os.path.isdir(directory_path):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Directory not found")
@@ -160,7 +166,7 @@ async def list_files(request: Request, path: str = ''):
         "request": request,
         "file_info": file_info,
         "readme_content": readme_content,
-        "current_path": path.lstrip('/').rstrip('/'),
+        "current_path": current_path,
         "parent_path": parent_path,
         "is_root": (path == ''),  # 최상위 경로인지 여부
         "has_parent": has_parent,  # 상위 디렉토리가 있는지 여부
@@ -175,14 +181,8 @@ def guess_display_inline(file_path: str, mime_type: str) -> bool:
            mime_type.startswith('text/') or \
            mime_type in ['application/pdf', 'application/xhtml+xml']
 
-@router.get("/download/{path:path}", response_class=FileResponse)
+@router.get("/download/{path:path}", name='download_file', response_class=FileResponse)
 async def download_file(request: Request, path: str):
-
-    # pdb.set_trace()
-    # session_id = request.session.get("session_id")
-    # logger.debug(f"Session ID from request.session.get(session_id): {session_id}")
-    # 세션ID를 알수가 없네.. 뭐지????
-    # request.session.get("session_id") 이거 왜 안되지???? 값이 None으로 나와
 
     path = unquote(path)  # URL 인코딩된 문자열을 디코딩
     root_dir = os.getenv("ROOT_DIR")

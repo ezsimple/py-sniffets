@@ -4,7 +4,7 @@ document.getElementById("loginForm").addEventListener("submit", async (event) =>
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
-    const response = await fetch("/v2/token", {
+    const response = await fetch("/v3/token", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",

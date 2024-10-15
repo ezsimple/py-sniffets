@@ -1,7 +1,7 @@
 window.onload = function() {
     const token = localStorage.getItem("token");
     if (!token) {
-        window.location.href = "/v2/login"; // 토큰이 없으면 로그인 페이지로 리다이렉트
+        window.location.href = "/v3/login"; // 토큰이 없으면 로그인 페이지로 리다이렉트
     }
 };
 

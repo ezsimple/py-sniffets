@@ -14,6 +14,3 @@ class Settings:
     PORT: int = int(os.getenv("PORT"))
 
 settings = Settings()
-
-def print_host_port():
-    print(settings.HOST, settings.PORT)

@@ -24,13 +24,13 @@ FastAPI, pydantic, google oAuth2
 │       └── common.js # 링크클릭시 header, token 정보를 제공하는 공통 기능
 └── templates
     ├── base.html
-    ├── index.html
+    ├── list.html
     └── login.html
 
 
 .env
 --
-PREFIX=/v2
+PREFIX=/v3
 JWT_SECRET=ss3OnFDJVmTsb3Cf
 JWT_EXPIRATION=5 # 5분
 USERNAME=yoon
@@ -39,8 +39,166 @@ ROOT_DIR=/Users/mkeasy/Downloads
 HOST=0.0.0.0
 PORT=3334
 
+
 config.py
 --
-.env정보를 시동시 loading해서 다른 .py에서 사용
+load_dotenv()
+
+class Settings:
+    PREFIX: str = os.getenv("PREFIX")
+    JWT_SECRET: str = os.getenv("JWT_SECRET")
+    JWT_EXPIRATION: int = int(os.getenv("JWT_EXPIRATION"))
+    USERNAME: str = os.getenv("USERNAME")
+    PASSWORD: str = os.getenv("PASSWORD")
+    ROOT_DIR: str = os.getenv("ROOT_DIR")
+    HOST: str = os.getenv("HOST")
+    PORT: int = int(os.getenv("PORT"))
+
+settings = Settings()
 
 
+auth.py
+---
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+def verify_token(token: str):
+    try:
+        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])
+        return payload
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+
+exception.py
+--
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+    )
+
+
+model.py
+--
+class User(BaseModel):
+    username: str
+    email: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: str
+
+
+route.py
+--
+router = APIRouter()
+
+@router.post("/token")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    return await login_service.login(form_data.username, form_data.password)
+
+@router.get("/files")
+async def get_files(token: str = Depends(verify_token)):
+    return await list_service.get_file_list()
+
+@router.post("/download/{file_name}")
+async def download_file(file_name: str, token: str = Depends(verify_token)):
+    return await download_service.download_file(file_name)
+
+
+
+download_service.py
+--
+async def download_file(file_name: str):
+    file_path = os.path.join(settings.ROOT_DIR, file_name)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found")
+    return {"file_path": file_path}
+
+
+
+list_service.py
+--
+async def get_file_list():
+    try:
+        files = os.listdir(settings.ROOT_DIR)
+        return {"files": files}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+login_service.py
+--
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+async def login(username: str, password: str):
+    if username != settings.USERNAME or not verify_password(password, settings.PASSWORD):
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+
+    # JWT 토큰 생성
+    expiration = datetime.datetime.utcnow() + datetime.timedelta(minutes=settings.JWT_EXPIRATION)
+    token = jwt.encode({"sub": username, "exp": expiration}, settings.JWT_SECRET, algorithm="HS256")
+
+    return {"access_token": token, "token_type": "bearer"}
+
+
+
+base.html
+--
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <title>{% block title %}Document{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <h1>파일 다운로드 시스템</h1>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <script src="/static/js/common.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
+
+
+
+login.html
+--
+{% extends "base.html" %}
+
+{% block title %}로그인{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <h2>로그인</h2>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="사용자 이름" required>
+        <input type="password" id="password" placeholder="비밀번호" required>
+        <button type="submit">로그인</button>
+    </form>
+</div>
+{% endblock %}
+
+
+
+list.html (다운로드 겸용)
+--
+구현 필요
+
+
+로그인 기능을 구현해줘.
+- login_

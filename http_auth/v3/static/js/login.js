@@ -18,7 +18,7 @@ document.getElementById("loginForm").addEventListener("submit", async (event) =>
     if (response.ok) {
         const data = await response.json();
         localStorage.setItem("token", data.access_token);
-        window.location.href = "/v2/index"; // 로그인 성공 시 이동
+        window.location.href = "/v3/files"; // 로그인 성공 시 이동
     } else {
         alert("로그인 실패: 사용자 이름 또는 비밀번호가 잘못되었습니다.");
     }

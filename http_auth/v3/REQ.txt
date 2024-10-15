@@ -201,4 +201,6 @@ list.html (다운로드 겸용)
 
 
 로그인 기능을 구현해줘.
-- login_
+- login_service와 LoginMiddleWare를 이용해서 
+html login form 을 submit에 성공하면 
+/files 의 내용을 처리하고 list.html에서 파일목록을 보이게 해줘.

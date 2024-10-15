@@ -1,0 +1,46 @@
+FastAPI, pydantic, google oAuth2
+파일 다운로드 프로젝트 구성
+.
+├── app.py
+├── core
+│   ├── __init__.py
+│   ├── auth.py # JWT, oAuth2 인증처리
+│   ├── config.py # .env 환경설정
+│   ├── exception.py # exception handler
+│   ├── model.py # class 정의 (class LoginMiddleWare ... )
+│   └── route.py # get, post route 모음
+├── service
+│   ├── __init__.py
+│   ├── download_service.py #파일다운로드 서비스
+│   ├── list_service.py # 파일목록 서비스
+│   └── login_service.py # 로그인 서버스
+├── static
+│   ├── css
+│   │   ├── login.css # login 창스타일
+│   │   └── style.css # 파일목록 등 공통 스타일
+│   ├── image
+│   └── js
+│       ├── login.js # 로그인 요청, 완료후 / 페이지로 token 헤더를 가지고 페이지 이동(GET)하는 스크립트
+│       └── common.js # 링크클릭시 header, token 정보를 제공하는 공통 기능
+└── templates
+    ├── base.html
+    ├── index.html
+    └── login.html
+
+
+.env
+--
+PREFIX=/v2
+JWT_SECRET=ss3OnFDJVmTsb3Cf
+JWT_EXPIRATION=5 # 5분
+USERNAME=yoon
+PASSWORD=dbsl2Qh
+ROOT_DIR=/Users/mkeasy/Downloads
+HOST=0.0.0.0
+PORT=3334
+
+config.py
+--
+.env정보를 시동시 loading해서 다른 .py에서 사용
+
+

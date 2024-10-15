@@ -1,23 +1,45 @@
 {% extends "base.html" %}
 
-{% block title %}파일 목록{% endblock %}
-
 {% block content %}
-<div class="container">
-    <h2>파일 목록</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>파일 이름</th>
-                <th>다운로드</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- 파일 목록을 여기에 동적으로 추가합니다 -->
-        </tbody>
-    </table>
-</div>
-<script>
-    // 파일 목록을 가져오는 코드 추가
-</script>
+    <div class="header">
+        <h1>파일 목록</h1>
+        {% if is_logined %}
+        <div class="logout-form">
+            <form action="{{ url_for('logout') }}" method="post">
+                <button type="submit" class="logout-button">로그아웃</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if readme_content %}
+    <div class="readme-box">
+        <div>{{ readme_content | safe }}</div>
+    </div>
+    {% endif %}
+
+    <ul>
+        {% if has_parent %}
+        <li class="back-to-parent">
+            <a href="{{ url_for('list_files', path=parent_path) }}" class="directory">
+                <i class="fas fa-arrow-up"></i> .. (상위로 가기)
+            </a>
+        </li>
+        {% endif %}
+        {% for file, is_dir in file_info %}
+            <li>
+                {% if is_dir %}
+                    <a href="{{ url_for('list_files', path=(current_path + '/' + file) if current_path else file) }}" class="directory">{{ file }}/</a>
+                {% else %}
+                    <a href="{{ url_for('download_file', path=(current_path + '/' + file) if current_path else file) }}">{{ file }}</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    
+    {% if not is_root %}
+    <a href="{{ url_for('redirect_to_dl') }}" class="back-to-top">
+        <i class="fas fa-arrow-up"></i> 첫페이지로 바로가기
+    </a>
+    {% endif %}
 {% endblock %}

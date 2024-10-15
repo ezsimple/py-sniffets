@@ -1,46 +1,16 @@
-FastAPI, pydantic, google oAuth2
-파일 다운로드 프로젝트 구성
-.
-├── app.py
-├── core
-│   ├── __init__.py
-│   ├── auth.py # JWT, oAuth2 인증처리
-│   ├── config.py # .env 환경설정
-│   ├── exception.py # exception handler
-│   ├── model.py # class 정의 (class LoginMiddleWare ... )
-│   └── route.py # get, post route 모음
-├── service
-│   ├── __init__.py
-│   ├── download_service.py #파일다운로드 서비스
-│   ├── list_service.py # 파일목록 서비스
-│   └── login_service.py # 로그인 서버스
-├── static
-│   ├── css
-│   │   ├── login.css # login 창스타일
-│   │   └── style.css # 파일목록 등 공통 스타일
-│   ├── image
-│   └── js
-│       ├── login.js # 로그인 요청, 완료후 / 페이지로 token 헤더를 가지고 페이지 이동(GET)하는 스크립트
-│       └── common.js # 링크클릭시 header, token 정보를 제공하는 공통 기능
-└── templates
-    ├── base.html
-    ├── index.html
-    └── login.html
+FastAPI를 통한 파일 다운로드 서버임.
+- 로그인 해야 파일목록 보기&다운로드 가능
 
+1. 삼성브라우저에서 로그인 완료
 
-.env
---
-PREFIX=/v2
-JWT_SECRET=ss3OnFDJVmTsb3Cf
-JWT_EXPIRATION=5 # 5분
-USERNAME=yoon
-PASSWORD=dbsl2Qh
-ROOT_DIR=/Users/mkeasy/Downloads
-HOST=0.0.0.0
-PORT=3334
+2024-10-10 22:49:07,199 - DEBUG - __main__ - app.py - disposition=inline, media_type=application/pdf, file_path=/home/ubuntu/dl/파이썬/Python Design Patterns.pdf, filename=Python Design Patterns.pdf, extension=.pdf
+INFO:     116.34.248.173:0 - "GET /v1/download/%ED%8C%8C%EC%9D%B4%EC%8D%AC/Python%20Design%20Patterns.pdf HTTP/1.1" 200 OK <= 2. 삼성브라우저로 pdf파일을 클릭&다운로드됨.
 
-config.py
---
-.env정보를 시동시 loading해서 다른 .py에서 사용
+2024-10-10 22:49:19,936 - WARNING - __main__ - app.py - Unauthorized access attempt: /v1/download/파이썬/Python Design Patterns.pdf
+<= 2. 삼성브라우저에서, 구글드라이버로 열기팝업창 버튼을 클릭하면, 재다운로드 됨. (왜? 두번의 트래픽을 발생시키는지? , 그리고 로그인 세션공유 안됨)
 
+3. 그러나 앱이 다르므로, 인증오류로 인해 접근불가 발생
+INFO:     116.34.248.173:0 - "GET /v1/download/%ED%8C%8C%EC%9D%B4%EC%8D%AC/Python%20Design%20Patterns.pdf HTTP/1.1" 303 See Other
+INFO:     116.34.248.173:0 - "GET /v1/login HTTP/1.1" 200 OK
 
+질문: 삼성브라우저에서 구글드라이브로 앱이 변경되어도 인증이 유지될 수 있는 방법을 알려줘.

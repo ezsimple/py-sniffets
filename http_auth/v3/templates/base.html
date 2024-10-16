@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}?_={{ timestamp }}">
     <title>{% block title %}Document{% endblock %}</title>
 </head>
 <body>
@@ -13,8 +13,7 @@
     <main>
         {% block content %}{% endblock %}
     </main>
-    <script src="/static/js/common.js"></script>
-    <script src="/static/js/login.js"></script>
+    <script src="{{ url_for('static', path='js/common.js') }}?_={{ timestamp }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

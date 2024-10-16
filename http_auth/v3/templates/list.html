@@ -10,8 +10,8 @@
 </div>
 <script>
     async function fetchFileList() {
-        const response = await fetch('/files', {
-            method: 'GET',
+        const response = await fetch('/v3/files', {
+            method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
@@ -29,7 +29,6 @@
             fileList.appendChild(li);
         });
     }
-
     window.onload = fetchFileList;
 </script>
 {% endblock %}

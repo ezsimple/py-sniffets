@@ -1,11 +1,31 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware import Middleware
 from core import route, exception
 from core.config import settings
 from core.model import LoginMiddleWare
 
-app = FastAPI()
+'''
+순서가 중요합니다. SessionMiddleWare가 항상 먼저 와야합니다.
+'''
+middleware = [
+    Middleware(SessionMiddleware, secret_key=settings.JWT_SECRET),
+    Middleware(LoginMiddleWare),
+    Middleware(
+      CORSMiddleware,
+      allow_origins=["*"],  # 모든 도메인 허용, 필요에 따라 수정
+      allow_credentials=True,
+      allow_methods=["*"],
+      allow_headers=["*"],
+    )
+]
 
-app.add_middleware(LoginMiddleWare)
+app = FastAPI(middleware=middleware)
+
+# 정적 파일 디렉토리 설정
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # 예외 핸들러 등록
 app.add_exception_handler(HTTPException, exception.http_exception_handler)

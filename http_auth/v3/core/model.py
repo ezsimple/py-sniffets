@@ -84,20 +84,15 @@ class LoginMiddleWare(BaseHTTPMiddleware):
         except JWTError:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
-    @staticmethod
-    async def clear_session(request: Request, response: Response):
-        '''
-        세션 클리어 로직을 여기에 구현
-        '''
-        request.session.pop('username', None)
-        response.delete_cookie("token")
 
 class RedirectGetResponse(RedirectResponse):
     def __init__(self, url: str, **kwargs):
-        # status_code를 303으로 설정
-        # 302: 일시적 리다이렉션, 원래 HTTP 메서드를 유지.
-        # 303: 리소스가 다른 URI에 있으며, GET 메서드를 사용하여 요청해야 함.
-        # 307 Temporary Redirect: 요청한 리소스가 일시적으로 다른 URI로 이동했으며, 클라이언트는 원래의 HTTP 메서드를 유지해야 합니다. 
+        '''
+        status_code를 303으로 설정
+        302: 일시적 리다이렉션, 원래 HTTP 메서드를 유지.
+        303: 리소스가 다른 URI에 있으며, GET 메서드를 사용하여 요청해야 함.
+        307 Temporary Redirect: 요청한 리소스가 일시적으로 다른 URI로 이동했으며, 클라이언트는 원래의 HTTP 메서드를 유지해야 합니다. 
+        '''
         super().__init__(url=url, status_code=status.HTTP_303_SEE_OTHER, **kwargs)
 
 class CustomTemplateResponse(HTMLResponse):
@@ -106,7 +101,7 @@ class CustomTemplateResponse(HTMLResponse):
         context["timestamp"] = datetime.now().timestamp() 
 
         # 로그인 상태 확인
-        # is_logined = "username" in context.get("request").session
-        # context["is_logined"] = is_logined 
+        is_logined = "username" in context.get("request").session
+        context["is_logined"] = is_logined 
 
         super().__init__(content=templates.get_template(template_name).render(context))

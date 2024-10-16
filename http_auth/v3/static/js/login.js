@@ -17,6 +17,7 @@ document.getElementById("loginForm").addEventListener("submit", async (event) =>
 
     if (response.ok) {
         const data = await response.json();
+        console.log("로그인 성공:", data.access_token);
         localStorage.setItem("token", data.access_token);
         // window.location.href = "/v3/files"; // 로그인 성공 시 이동
     } else {

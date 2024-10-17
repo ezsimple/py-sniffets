@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from service import download_service, list_service, login_service
-from .auth import verify_token
-from .config import settings, templates
-from .model import LoginMiddleWare, CustomTemplateResponse, RedirectGetResponse
+from common.auth import verify_token
+from common.config import settings, templates
+from model.model import LoginMiddleWare, CustomTemplateResponse, RedirectGetResponse
 
 router = APIRouter(prefix=settings.PREFIX)
 

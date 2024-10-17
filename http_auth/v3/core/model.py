@@ -24,6 +24,9 @@ class LoginMiddleWare(BaseHTTPMiddleware):
         if request.url.path == "/v3/files":
             pass
 
+        if request.url.path.__contains__("/v3/login"):
+            pass
+
         # 요청 경로 확인
         if await self.verify_ignored_paths(request):
             return await call_next(request)

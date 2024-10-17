@@ -18,6 +18,7 @@ def get_password_hash(password):
 async def login(username: str, password: str):
     hashed_password = settings.PASSWORD  # 데이터베이스에서 가져온 해시된 비밀번호
     if username != settings.USERNAME or not verify_password(password, hashed_password):
+        # 로그인 시도시 400 오류를 누가 처리할래?
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
     # JWT 토큰 생성

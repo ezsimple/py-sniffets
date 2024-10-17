@@ -9,11 +9,11 @@ from .model import LoginMiddleWare, CustomTemplateResponse, RedirectGetResponse
 router = APIRouter(prefix=settings.PREFIX)
 
 @router.get("/login", response_class=HTMLResponse)
-async def view_login(request: Request):
+async def view_login(request: Request) -> HTMLResponse:
     return CustomTemplateResponse("login.html", {"request": request})
 
 @router.post("/login", response_class=HTMLResponse)
-async def ok_login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
+async def ok_login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()) -> HTMLResponse:
 
     token = await login_service.login(form_data.username, form_data.password)
     if token:
@@ -27,15 +27,15 @@ async def ok_login(request: Request, form_data: OAuth2PasswordRequestForm = Depe
     return CustomTemplateResponse("login.html", {"request": request, "error": "Invalid credentials"})
 
 @router.post("/token")
-async def token(form_data: OAuth2PasswordRequestForm = Depends()):
+async def token(form_data: OAuth2PasswordRequestForm = Depends()) -> dict:
     return await login_service.login(form_data.username, form_data.password)
 
 @router.get("/files")
-async def view_files(request: Request):
+async def view_files(request: Request) -> HTMLResponse:
     return CustomTemplateResponse("list.html", {"request": request })
 
 @router.post("/files")
-async def list_files(token: str = Depends(verify_token)):
+async def list_files(token: str = Depends(verify_token)) -> dict:
     return await list_service.get_file_list()
 
 @router.post("/download/{file_name}")

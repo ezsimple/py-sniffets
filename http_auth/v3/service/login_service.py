@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from core.config import settings, pwd_context
+from common.config import settings, pwd_context
 from jose import jwt
 import datetime
 

@@ -5,8 +5,7 @@ from fastapi import Request, Response, HTTPException,status
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import RedirectResponse, HTMLResponse
 from jose import JWTError, jwt
-from .config import settings
-from .route import templates
+from common.config import settings, templates
 
 class User(BaseModel):
     username: str

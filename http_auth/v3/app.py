@@ -3,9 +3,10 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
-from core import route, exception
-from core.config import settings
-from core.model import LoginMiddleWare
+from common import exception
+from common.config import settings
+from control import route
+from model.model import LoginMiddleWare
 
 '''
 순서가 중요합니다. SessionMiddleWare가 항상 먼저 와야합니다.

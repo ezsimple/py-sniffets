@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request, Response
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from service import download_service, list_service, login_service
+from service import download_service, files_service, login_service
 from common.auth import verify_token
 from common.config import settings, templates
 from model.model import LoginMiddleWare, CustomTemplateResponse, RedirectGetResponse
@@ -26,24 +26,28 @@ async def ok_login(request: Request, form_data: OAuth2PasswordRequestForm = Depe
         
     return CustomTemplateResponse("login.html", {"request": request, "error": "Invalid credentials"})
 
+@router.api_route("/logout", methods=["GET", "POST"], response_class=HTMLResponse)
+async def logout(request: Request, response: Response):
+    response = RedirectGetResponse(url=f"{settings.PREFIX}/login")
+    response.delete_cookie('token')
+    return response
+
+@router.get("/", response_class=RedirectResponse)
+async def redirect_to_files():
+    return RedirectGetResponse(url=f"{settings.PREFIX}/files")
+
 @router.post("/token")
 async def token(form_data: OAuth2PasswordRequestForm = Depends()) -> dict:
     return await login_service.login(form_data.username, form_data.password)
 
 @router.get("/files")
 async def view_files(request: Request) -> HTMLResponse:
-    return CustomTemplateResponse("list.html", {"request": request })
+    return CustomTemplateResponse("files.html", {"request": request })
 
-@router.post("/files")
-async def list_files(token: str = Depends(verify_token)) -> dict:
-    return await list_service.get_file_list()
+# @router.post("/files")
+# async def list_files(token: str = Depends(verify_token)) -> dict:
+#     return await files_service.get_file_list()
 
-@router.post("/download/{file_name}")
-async def download_file(file_name: str, token: str = Depends(verify_token)):
-    return await download_service.download_file(file_name)
-
-@router.api_route("/logout", methods=["GET", "POST"], response_class=HTMLResponse)
-async def logout(request: Request, response: Response):
-    response = RedirectGetResponse(url=f"{settings.PREFIX}/login")
-    response.delete_cookie('token')
-    return response
+@router.post("/download/{path: path}", response_class=FileResponse)
+async def download_file(request: Request, path: str, token: str = Depends(verify_token)):
+    return await download_service.download_file(request, path)

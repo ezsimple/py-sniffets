@@ -7,9 +7,13 @@
 <div class="login-container">
     <h2>로그인</h2>
     <form id="loginForm" action="{{ url_for('ok_login') }}" method="post" enctype="application/x-www-form-urlencoded">
-        <input type="text" name="username" placeholder="사용자 이름" value="yoon" required>
-        <input type="password" name="password" placeholder="비밀번호" value="3134" required>
+        <input type="text" id="username" name="username" placeholder="사용자 이름" value="yoon" required>
+        <input type="password" id="password" name="password" placeholder="비밀번호" value="3134" required>
         <button type="submit">로그인</button>
     </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/login.js') }}?_={{ timestamp }}"></script>
 {% endblock %}

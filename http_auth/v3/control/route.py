@@ -17,9 +17,7 @@ async def ok_login(request: Request, form_data: OAuth2PasswordRequestForm = Depe
 
     token = await login_service.login(form_data.username, form_data.password)
     if token:
-        '''
-        POST -> Rediect -> GET
-        '''
+        # POST -> Rediect -> GET
         response = RedirectGetResponse(url=f"{settings.PREFIX}/files")
         response.set_cookie(key="token", value=token)  # 토큰을 쿠키에 저장
         return response
@@ -34,20 +32,16 @@ async def logout(request: Request, response: Response):
 
 @router.get("/", response_class=RedirectResponse)
 async def redirect_to_files():
-    return RedirectGetResponse(url=f"{settings.PREFIX}/files")
+    return RedirectResponse(url=f"{settings.PREFIX}/files")
 
 @router.post("/token")
 async def token(form_data: OAuth2PasswordRequestForm = Depends()) -> dict:
     return await login_service.login(form_data.username, form_data.password)
 
-@router.get("/files")
-async def view_files(request: Request) -> HTMLResponse:
-    return CustomTemplateResponse("files.html", {"request": request })
+@router.get("/files/{path:path}")
+async def list_files(request: Request, path: str = "") -> HTMLResponse:
+    return await files_service.get_file_list(request, path)
 
-# @router.post("/files")
-# async def list_files(token: str = Depends(verify_token)) -> dict:
-#     return await files_service.get_file_list()
-
-@router.post("/download/{path: path}", response_class=FileResponse)
-async def download_file(request: Request, path: str, token: str = Depends(verify_token)):
+@router.get("/download/{path:path}", response_class=FileResponse)
+async def download_file(request: Request, path: str):
     return await download_service.download_file(request, path)

@@ -9,7 +9,6 @@
 # bot.send_message("이것은 테스트 메시지입니다.")
 
 import requests
-from LogUtil import LogUtil
 
 class TelegramSimpleBot:
     def __init__(self):
@@ -17,7 +16,6 @@ class TelegramSimpleBot:
         CHAT_ID = '918743728'
         self._token = TOKEN
         self._chat_id = CHAT_ID
-        self._logging = LogUtil('TELEGRAM_BOT')
 
     def send_message(self, text):
         url = f"https://api.telegram.org/bot{self._token}/sendMessage"
@@ -25,9 +23,7 @@ class TelegramSimpleBot:
             "chat_id": self._chat_id,
             "text": text,
         }
-
         resp = requests.get(url, params=params)
-        self._logging.debug(text)
 
         # Throw an exception if Telegram API fails
         resp.raise_for_status()

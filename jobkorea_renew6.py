@@ -3,6 +3,7 @@ import os
 import json
 import traceback
 import logging
+from datetime import datetime
 from playwright.sync_api import sync_playwright
 from TelegramSimpleBot import TelegramSimpleBot
 
@@ -20,22 +21,21 @@ class AutoJobkoreaProfileUpdate:
         log_dir = "log"
         os.makedirs(log_dir, exist_ok=True)  # log 디렉토리가 없으면 생성
 
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        log_file_name = f"app-{current_date}.log"  # 로그 파일 이름 생성
+
         logging.basicConfig(
             level=logging.DEBUG,
-            format='%(asctime)s - %(levelname)s - %(name)s - %(filename)s - %(message)s',
+            format='%(asctime)s - %(levelname)s - %(name)s - %(filename)s - line:%(lineno)d - %(message)s',
             handlers=[
-                logging.FileHandler(os.path.join(log_dir, "app.log")),  # 로그를 log/app.log 파일에 기록
+                logging.FileHandler(os.path.join(log_dir, log_file_name)),  # 로그를 log/app.log 파일에 기록
                 logging.StreamHandler()  # 콘솔에도 로그 출력
             ]
         )
-        # 비활성화할 로거 리스트
-        loggers_to_disable = [
-            "starlette",
-            "fastapi",
-            "multipart.multipart",  # form 데이터 로깅 방지
-            "urllib3"
-        ]
-        [logging.getLogger(logger_name).setLevel(logging.WARNING) for logger_name in loggers_to_disable]
+        logging.getLogger("starlette").setLevel(logging.WARNING)
+        logging.getLogger("fastapi").setLevel(logging.WARNING)
+        logging.getLogger("multipart.multipart").setLevel(logging.WARNING)  # form 데이트 로깅방지
+        logging.getLogger("urllib3").setLevel(logging.WARNING)
         self.logger = logging.getLogger(__name__)
 
     def send_telegram(self, message=f"이력서 업데이트 실패"):

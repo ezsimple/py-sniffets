@@ -50,7 +50,6 @@ class AutoJobkoreaProfileUpdate:
         self.logger.debug(msg)
 
     def do_login(self, page):
-        self.STATE = "로그인 시도"
         page.get_by_role("link", name="개인회원").click()
         page.wait_for_selector("button >> text='로그인'").click()
         page.fill('input[name="M_ID"]', self.LOGIN_ID)
@@ -62,7 +61,7 @@ class AutoJobkoreaProfileUpdate:
             self.STATE = "캡챠로 인한 로그인 불가"
             raise Exception(self.STATE)
 
-        page.get_by_role("button", name="로그인").click()
+        page.locator('.login-button').click()  # 로그인버튼 클릭
 
     def page_goto(self, page, url):
         state = self.STATE

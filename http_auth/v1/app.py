@@ -10,12 +10,17 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware import Middleware
 from starlette.responses import RedirectResponse, FileResponse, HTMLResponse
 from starlette.requests import Request
-from core.config import PREFIX, SESSION_KEY, logger
+from core.config import PREFIX, SESSION_SERVER, SECRET_KEY, logger
 from core.model import LoginForm, LoginRequiredMiddleware, CustomTemplateResponse, RedirectGetResponse
+import aioredis
+import uuid
+
+# Redis 클라이언트 초기화
+redis_client = aioredis.from_url(SESSION_SERVER)
 
 # 순서중요합니다. SessionMiddleWare가 항상 먼저 와야함.
 middleware = [
-    Middleware(SessionMiddleware, secret_key=SESSION_KEY),
+    Middleware(SessionMiddleware, secret_key=SECRET_KEY),
     Middleware(LoginRequiredMiddleware),
     Middleware(
       CORSMiddleware,
@@ -53,11 +58,12 @@ async def value_error_handler(request: Request, exc: ValueError):
 
 @router.get("/login")
 async def login_view(request: Request):
-
-    # Middleware에서 처리할 수 없는, 예외상황
-    is_logined = "username" in request.session
-    if is_logined:
-        return RedirectGetResponse(url=f"{PREFIX}/dl")
+    # Redis에서 로그인 상태 확인
+    session_id = request.session.get("session_id")
+    if session_id:
+        username = await redis_client.get(f"session:{session_id}")
+        if username:
+            return RedirectGetResponse(url=f"{PREFIX}/dl")
 
     return CustomTemplateResponse("login.html", {"request": request})
 
@@ -67,8 +73,10 @@ async def login(request: Request, username: str = Form(...), password: str = For
     form = LoginForm(username=username, password=password)
     check_auth(form)
 
-    # 세션에 사용자 정보 저장
-    request.session['username'] = form.username
+    # Redis에 사용자 정보 저장
+    session_id = str(uuid.uuid4())  # 새로운 세션 ID 생성
+    request.session['session_id'] = session_id  # 세션에 세션 ID 저장
+    await redis_client.set(f"session:{session_id}", form.username)
 
     # 303 응답 코드로 GET 요청으로 리다이렉트
     # (주의) status_code=307을 사용하면 POST 요청으로 리다이렉트됨
@@ -76,12 +84,18 @@ async def login(request: Request, username: str = Form(...), password: str = For
 
 @router.api_route("/logout", methods=["GET", "POST"], response_class=RedirectResponse)
 async def logout(request: Request):
-    request.session.pop('username', None)
-    return RedirectGetResponse(url=f"{PREFIX}")
+    session_id = request.session.get("session_id")
+    if session_id:
+        await redis_client.delete(f"session:{session_id}")
+    request.session.pop('session_id', None)  # 세션에서 세션 ID 삭제
+    return RedirectGetResponse(url=f"{PREFIX}/login")
 
 @router.get("/", response_class=RedirectResponse)
-async def redirect_to_dl():
-    return RedirectGetResponse(url=f"{PREFIX}/dl/")
+async def redirect_to_dl(request: Request):
+    session_id = request.session.get("session_id")
+    if session_id:
+        return RedirectGetResponse(url=f"{PREFIX}/dl/")
+    return RedirectGetResponse(url=f"{PREFIX}/login")
 
 @router.get("/dl/{path:path}", response_class=HTMLResponse)
 async def list_files(request: Request, path: str = ''):

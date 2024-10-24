@@ -14,9 +14,13 @@ PREFIX = os.getenv("PREFIX", '').rstrip('/')
 if not PREFIX.startswith('/'): # 반드시 '/'로 시작하도록 설정
     PREFIX = '/' + PREFIX
 
-SESSION_KEY = os.getenv("SESSION_KEY")
-if len(SESSION_KEY) == 0:
-    raise ValueError("SESSION_KEY must be set in environment variables")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if len(SECRET_KEY) == 0:
+    raise ValueError("SECRET_KEY must be set in environment variables")
+
+SESSION_SERVER = os.getenv("SESSION_SERVER")
+if len(SESSION_SERVER) == 0:
+    raise ValueError("SESSION_SERVER must be set in environment variables")
 
 # 로깅 설정 (파일에 기록)
 log_dir = "log"

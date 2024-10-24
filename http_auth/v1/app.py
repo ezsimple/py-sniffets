@@ -10,7 +10,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware import Middleware
 from starlette.responses import RedirectResponse, FileResponse, HTMLResponse
 from starlette.requests import Request
-from core.config import PREFIX, SESSION_SERVER, SECRET_KEY, logger
+from core.config import PREFIX, SESSION_SERVER, SESSION_TIMEOUT, SECRET_KEY, logger
 from core.model import LoginForm, LoginRequiredMiddleware, CustomTemplateResponse, RedirectGetResponse
 import aioredis
 import uuid
@@ -59,7 +59,7 @@ async def value_error_handler(request: Request, exc: ValueError):
 @router.get("/login")
 async def login_view(request: Request):
     # Redis에서 로그인 상태 확인
-    session_id = request.session.get("session_id")
+    session_id = request.cookies.get("session_id")
     if session_id:
         username = await redis_client.get(f"session:{session_id}")
         if username:
@@ -69,37 +69,34 @@ async def login_view(request: Request):
 
 @router.post("/login")
 async def login(request: Request, username: str = Form(...), password: str = Form(...)):
-    # 폼객체로 변환
     form = LoginForm(username=username, password=password)
     check_auth(form)
 
-    # Redis에 사용자 정보 저장
     session_id = str(uuid.uuid4())  # 새로운 세션 ID 생성
-    request.session['session_id'] = session_id  # 세션에 세션 ID 저장
-    await redis_client.set(f"session:{session_id}", form.username)
+    await redis_client.set(f"session:{session_id}", form.username, ex=SESSION_TIMEOUT)  # 1분 타임아웃 설정
+    response = RedirectGetResponse(url=f"{PREFIX}/dl/")
+    response.set_cookie("session_id", session_id, httponly=True, max_age=SESSION_TIMEOUT)  # 세션 ID를 쿠키에 저장
 
-    # 303 응답 코드로 GET 요청으로 리다이렉트
-    # (주의) status_code=307을 사용하면 POST 요청으로 리다이렉트됨
-    return RedirectGetResponse(url=f"{PREFIX}/dl/")
+    return response
 
 @router.api_route("/logout", methods=["GET", "POST"], response_class=RedirectResponse)
 async def logout(request: Request):
-    session_id = request.session.get("session_id")
+    session_id = request.cookies.get("session_id")
     if session_id:
         await redis_client.delete(f"session:{session_id}")
-    request.session.pop('session_id', None)  # 세션에서 세션 ID 삭제
-    return RedirectGetResponse(url=f"{PREFIX}/login")
+    response = RedirectGetResponse(url=f"{PREFIX}/login")
+    response.delete_cookie("session_id")  # 쿠키 삭제
+    return response
 
 @router.get("/", response_class=RedirectResponse)
 async def redirect_to_dl(request: Request):
-    session_id = request.session.get("session_id")
+    session_id = request.cookies.get("session_id")
     if session_id:
         return RedirectGetResponse(url=f"{PREFIX}/dl/")
     return RedirectGetResponse(url=f"{PREFIX}/login")
 
 @router.get("/dl/{path:path}", response_class=HTMLResponse)
 async def list_files(request: Request, path: str = ''):
-
     root_dir = os.getenv("ROOT_DIR")
     directory_path = os.path.join(root_dir, path.lstrip("/")).rstrip("/")  # 선행 슬래시 제거 및 마지막 슬래시 제거
 
@@ -168,13 +165,6 @@ def guess_display_inline(file_path: str, mime_type: str) -> bool:
 
 @router.get("/download/{path:path}", response_class=FileResponse)
 async def download_file(request: Request, path: str):
-
-    # pdb.set_trace()
-    # session_id = request.session.get("session_id")
-    # logger.debug(f"Session ID from request.session.get(session_id): {session_id}")
-    # 세션ID를 알수가 없네.. 뭐지????
-    # request.session.get("session_id") 이거 왜 안되지???? 값이 None으로 나와
-
     path = unquote(path)  # URL 인코딩된 문자열을 디코딩
     root_dir = os.getenv("ROOT_DIR")
 

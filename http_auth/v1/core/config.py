@@ -22,6 +22,8 @@ SESSION_SERVER = os.getenv("SESSION_SERVER")
 if len(SESSION_SERVER) == 0:
     raise ValueError("SESSION_SERVER must be set in environment variables")
 
+SESSION_TIMEOUT = int(os.getenv("SESSION_TIMEOUT", 60))
+
 # 로깅 설정 (파일에 기록)
 log_dir = "log"
 os.makedirs(log_dir, exist_ok=True)  # log 디렉토리가 없으면 생성

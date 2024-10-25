@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', path='login.css') }}?_={{ timestamp }}">
+    <div class="login-container">
+        <h1>로그인</h1>
+        <div class="form-box">
+            <form id="loginForm" action="{{ url_for('login') }}" method="post">
+                <div class="input-box">
+                    <input type="text" name="username" placeholder="사용자명" required>
+                </div>
+                <div class="input-box">
+                    <input type="password" name="password" placeholder="비밀번호" required>
+                </div>
+                <button type="submit">확인</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('loginForm').onsubmit = function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                alert('잠시만')
+                if (response.ok) {
+                    window.location.href = "/v1/login";
+                } else {
+                    alert('로그인 실패');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        };
+    </script>
+{% endblock %}

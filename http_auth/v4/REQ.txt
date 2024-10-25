@@ -1,0 +1,16 @@
+FastAPI를 통한 파일 다운로드 서버임.
+- 로그인 해야 파일목록 보기&다운로드 가능
+
+1. 삼성브라우저에서 로그인 완료
+
+2024-10-10 22:49:07,199 - DEBUG - __main__ - app.py - disposition=inline, media_type=application/pdf, file_path=/home/ubuntu/dl/파이썬/Python Design Patterns.pdf, filename=Python Design Patterns.pdf, extension=.pdf
+INFO:     116.34.248.173:0 - "GET /v1/download/%ED%8C%8C%EC%9D%B4%EC%8D%AC/Python%20Design%20Patterns.pdf HTTP/1.1" 200 OK <= 2. 삼성브라우저로 pdf파일을 클릭&다운로드됨.
+
+2024-10-10 22:49:19,936 - WARNING - __main__ - app.py - Unauthorized access attempt: /v1/download/파이썬/Python Design Patterns.pdf
+<= 2. 삼성브라우저에서, 구글드라이버로 열기팝업창 버튼을 클릭하면, 재다운로드 됨. (왜? 두번의 트래픽을 발생시키는지? , 그리고 로그인 세션공유 안됨)
+
+3. 그러나 앱이 다르므로, 인증오류로 인해 접근불가 발생
+INFO:     116.34.248.173:0 - "GET /v1/download/%ED%8C%8C%EC%9D%B4%EC%8D%AC/Python%20Design%20Patterns.pdf HTTP/1.1" 303 See Other
+INFO:     116.34.248.173:0 - "GET /v1/login HTTP/1.1" 200 OK
+
+질문: 삼성브라우저에서 구글드라이브로 앱이 변경되어도 인증이 유지될 수 있는 방법을 알려줘.

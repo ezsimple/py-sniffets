@@ -67,7 +67,11 @@ class CustomTemplateResponse(HTMLResponse):
         context["timestamp"] = datetime.now().timestamp() 
 
         # 로그인 상태 확인
-        is_logined = "session_id" in context.get("request").cookies
-        context["is_logined"] = is_logined 
+        is_logined = False
+        request = context.get("request")
+        if request:
+            is_logined = hasattr(request.state, 'user') and request.state.user is not None
 
+        # 로그인을 해야 사용할 수 있는 서비스 이므로
+        context["is_logined"] = is_logined
         super().__init__(content=templates.get_template(template_name).render(context))

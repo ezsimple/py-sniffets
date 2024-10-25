@@ -24,39 +24,42 @@ redis_client = aioredis.from_url(SESSION_SERVER)
 
 class LoginRequiredMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        # 쿠키에서 access_token 가져오기
+        access_token = request.cookies.get("access_token")
 
-        if request.url.path.startswith(f"{PREFIX}/login") \
-                or request.url.path.startswith(f"{PREFIX}/token") \
+        # 특정경로 인증 생략
+        if request.url.path.startswith(f"{PREFIX}/token") \
                 or request.url.path.startswith("/static/"):
             response = await call_next(request)
             return response
 
-        # 쿠키에서 session_id 가져오기
-        is_logined = False
-        session_id = request.cookies.get("session_id")
-        if session_id and await redis_client.exists(f"session:{session_id}"):
-            try:
-                access_token = request.session["access_token"]
+        # 로그인 페이지 접근시
+        if request.url.path.startswith(f"{PREFIX}/login"):
+            if access_token:
+                try:
+                    payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
+                    request.state.user = User(username=payload["sub"])  # 사용자 정보 설정
+                except jwt.PyJWTError:
+                    pass
 
-                # 질문1 : 이게  session_id, access_token 을 refresh 해주는 코드가 맞나???
-                await redis_client.expire(f"session:{session_id}", SESSION_TIMEOUT)
-                await redis_client.expire(access_token, SESSION_TIMEOUT)  # 세션 연장
+            response = await call_next(request)
+            return response
 
-                # 이 코드는 필요가 없어 보임
-                # payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
-                # username = payload.get("sub")
-                # request.state.user = User(username=username)    
+        # 로그인 페이지가 아닌 다른 경로 접근시
+        if not access_token:
+            return RedirectGetResponse(url=f"{PREFIX}/login")
 
-                is_logined = True
-
-            except jwt.PyJWTError:
-                return RedirectGetResponse(url=f"{PREFIX}/login")
-
-        if not is_logined:
+        try:
+            payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
+            request.state.user = User(username=payload["sub"])  # 사용자 정보 설정
+            # 세션 연장
+            await redis_client.expire(access_token, SESSION_TIMEOUT)
+        except jwt.PyJWTError:
             return RedirectGetResponse(url=f"{PREFIX}/login")
 
         response = await call_next(request)
         return response
+
 
 # 순서중요합니다. SessionMiddleWare가 항상 먼저 와야함.
 middleware = [
@@ -78,25 +81,12 @@ router = APIRouter(prefix=PREFIX)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{PREFIX}/token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# def verify_password(plain_password, hashed_password):
-#     return pwd_context.verify(plain_password, hashed_password)
-
-# def get_password_hash(password):
-#     return pwd_context.hash(password)
-
 def check_auth(form: LoginForm):
     correct_username = os.getenv("USERNAME")
     correct_password = os.getenv("PASSWORD")
     if form.username == correct_username and form.password == correct_password:
         return True
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
-
-# def check_oauth2(form: LoginForm):
-#     correct_username = os.getenv("USERNAME")
-#     correct_password = get_password_hash(os.getenv("PASSWORD"))
-#     if form.username == correct_username and form.password == correct_password:
-#         return True
-#     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
 
 # HTTPException 처리기
 @app.exception_handler(HTTPException)
@@ -123,29 +113,29 @@ async def build_access_token(username: str):
     access_token = jwt.encode(token_data, SECRET_KEY, algorithm="HS256")
     return access_token
 
-async def refresh_access_token(username: str, access_token: str):
-    '''
-    Refresh Redis Access Token
-    '''
-    await redis_client.set(access_token, username, ex=SESSION_TIMEOUT)
-
 @app.post(f"{PREFIX}/token", response_model=Token)
 async def login(request: Request, response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
     form = LoginForm(username=form_data.username, password=form_data.password)
     check_auth(form)
 
-    token_data = {
-        "sub": form.username,
-        "exp": datetime.utcnow() + timedelta(seconds=SESSION_TIMEOUT)
-    }
-    access_token = jwt.encode(token_data, SECRET_KEY, algorithm="HS256")
+    access_token = await build_access_token(form.username)
     await redis_client.set(access_token, form.username, ex=SESSION_TIMEOUT)
 
-    session_id = str(uuid.uuid4())  # 새로운 세션 ID 생성
-    await redis_client.set(f"session:{session_id}", form.username, ex=SESSION_TIMEOUT)  # 1분 타임아웃 설정
-    response.set_cookie("session_id", session_id, httponly=True, max_age=SESSION_TIMEOUT) 
-    request.state.user = User(username=form.username)
-    request.session["access_token"] = access_token 
+    '''
+    JWT를 쿠키에 저장
+    HTTPOnly 속성: 쿠키에 httponly 속성을 설정하면 
+    JavaScript에서 접근할 수 없기 때문에 XSS(교차 사이트 스크립팅) 공격으로부터 
+    보호할 수 있습니다.
+    '''
+    response.set_cookie("access_token", access_token, httponly=True, max_age=SESSION_TIMEOUT)
+
+    '''
+    이 코드에서 request.state.user를 설정하는 부분이 있지만, 
+    이는 요청이 처리된 후 다음 요청에서 사용할 수 없습니다. 
+    이유는 FastAPI의 요청-응답 사이클이 끝나면 
+    request 객체가 소멸되기 때문입니다.
+    '''
+    # request.state.user = User(username=form.username)
 
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -153,51 +143,26 @@ async def login(request: Request, response: Response, form_data: OAuth2PasswordR
 async def read_users_me(request: Request):
     return request.state.user
 
-@app.post("/logout")
-async def logout(request: Request):
-    token = request.cookies.get("access_token")
-    if token:
-        await redis_client.delete(token)
-    return {"msg": "Successfully logged out"}
-
 @router.get("/login")
 async def login_view(request: Request):
-    # Redis에서 로그인 상태 확인
-    session_id = request.cookies.get("session_id")
-    if session_id:
-        username = await redis_client.get(f"session:{session_id}")
-        if username:
-            return RedirectGetResponse(url=f"{PREFIX}/dl")
+    # request.state.user가 설정되어 있지 않으면 로그인 페이지를 렌더링
+    if not hasattr(request.state, 'user') or request.state.user is None:
+        return CustomTemplateResponse("login.html", {"request": request})
 
-    return CustomTemplateResponse("login.html", {"request": request})
-
-@router.post("/login")
-async def login(request: Request, username: str = Form(...), password: str = Form(...)):
-    form = LoginForm(username=username, password=password)
-    check_auth(form)
-
-    session_id = str(uuid.uuid4())  # 새로운 세션 ID 생성
-    await redis_client.set(f"session:{session_id}", form.username, ex=SESSION_TIMEOUT)  # 1분 타임아웃 설정
-    response = RedirectGetResponse(url=f"{PREFIX}/dl/")
-    response.set_cookie("session_id", session_id, httponly=True, max_age=SESSION_TIMEOUT)  # 세션 ID를 쿠키에 저장
-
-    return response
+    # 로그인된 경우
+    return RedirectGetResponse(url=f"{PREFIX}/dl")
 
 @router.api_route("/logout", methods=["GET", "POST"], response_class=RedirectResponse)
 async def logout(request: Request):
-    session_id = request.cookies.get("session_id")
-    if session_id:
-        await redis_client.delete(f"session:{session_id}")
     response = RedirectGetResponse(url=f"{PREFIX}/login")
-    response.delete_cookie("session_id")  # 쿠키 삭제
+    response.delete_cookie("access_token")  # 쿠키 삭제
     return response
 
 @router.get("/", response_class=RedirectResponse)
 async def redirect_to_dl(request: Request):
-    session_id = request.cookies.get("session_id")
-    if session_id:
+    if request.state.user:
         return RedirectGetResponse(url=f"{PREFIX}/dl/")
-    return RedirectGetResponse(url=f"{PREFIX}/login")
+    return RedirectGetResponse(url=f"{PREFIX}/login") 
 
 @router.get("/dl/{path:path}", response_class=HTMLResponse)
 async def list_files(request: Request, path: str = ''):

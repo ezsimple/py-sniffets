@@ -25,7 +25,6 @@
                 body: formData,
             })
             .then(response => {
-                alert('잠시만')
                 if (response.ok) {
                     window.location.href = "/v1/login";
                 } else {

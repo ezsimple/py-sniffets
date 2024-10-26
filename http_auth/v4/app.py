@@ -20,6 +20,7 @@ import aioredis
 import uuid
 import jwt
 import requests
+from user_agents import parse
 
 # Redis 클라이언트 초기화
 redis_client = aioredis.from_url(SESSION_SERVER)
@@ -110,8 +111,14 @@ async def login_view(request: Request, response: Response):
     # request.state.user가 설정되어 있지 않으면 로그인 페이지를 렌더링
     if not hasattr(request.state, 'user') or request.state.user is None:
         return CustomTemplateResponse("login.html", {"request": request})
-    # return RedirectGetResponse(url=f"{PREFIX}/dl")
+    
+    # User-Agent를 확인하여 PC인지 여부 판단
+    user_agent = request.headers.get("user-agent", "")
+    user_agent_parsed = parse(user_agent)
+    if user_agent_parsed.is_pc:
+        return RedirectGetResponse(url=f"{PREFIX}/dl")
 
+    # 모바일에서만 처리  
     # Google oAuth2를 통한 인가 처리
     auth_url = (
         f"{GOOGLE_AUTH_URI}?response_type=code&"
@@ -121,6 +128,7 @@ async def login_view(request: Request, response: Response):
         "scope=https://www.googleapis.com/auth/drive.readonly"
     )
     logger.info(f"Redirecting to Google Auth URL: {auth_url}")
+
     return RedirectResponse(url=auth_url)
 
 

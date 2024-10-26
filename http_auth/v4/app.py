@@ -109,20 +109,23 @@ async def login_view(request: Request, response: Response):
     # request.state.user가 설정되어 있지 않으면 로그인 페이지를 렌더링
     if not hasattr(request.state, 'user') or request.state.user is None:
         return CustomTemplateResponse("login.html", {"request": request})
+    # return RedirectGetResponse(url=f"{PREFIX}/dl")
 
     # Google oAuth2를 통한 인가 처리
-    # auth_url = (
-    #     f"{GOOGLE_AUTH_URI}?response_type=code&"
-    #     f"client_id={GOOGLE_CLIENT_ID}&"
-    #     f"redirect_uri={GOOGLE_REDIRECT_URI}&"
-    #     "scope=https://www.googleapis.com/auth/drive.readonly"
-    # )
-    # return RedirectResponse(url=auth_url)
+    auth_url = (
+        f"{GOOGLE_AUTH_URI}?response_type=code&"
+        f"client_id={GOOGLE_CLIENT_ID}&"
+        f"redirect_uri={GOOGLE_REDIRECT_URI}&"
+        "scope=https://www.googleapis.com/auth/drive.readonly"
+    )
+    return RedirectResponse(url=auth_url)
 
-    return RedirectGetResponse(url=f"{PREFIX}/dl")
 
 @app.get("/auth/callback")
 async def auth_callback(request: Request, response: Response):
+    '''
+    구글 리다이렉션 URI 처리
+    '''
     code = request.query_params.get("code")
     if not code:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Authorization code not found")

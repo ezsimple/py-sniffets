@@ -4,6 +4,7 @@ import platform
 from dotenv import load_dotenv
 from fastapi.templating import Jinja2Templates
 from datetime import datetime
+from logging.handlers import TimedRotatingFileHandler
 
 # 운영 체제에 따라 환경 변수 파일 로드
 if platform.system() == 'Darwin':  # Mac OS
@@ -34,17 +35,21 @@ GOOGLE_AUTH_URI = os.getenv("GOOGLE_AUTH_URI")
 
 # 로깅 설정 (파일에 기록)
 log_dir = "log"
-current_date = datetime.now().strftime("%Y-%m-%d")
-log_file_name = f"app-{current_date}.log"  # 로그 파일 이름 생성
-
 os.makedirs(log_dir, exist_ok=True)  # log 디렉토리가 없으면 생성
 templates = Jinja2Templates(directory="templates")
 
+# TimedRotatingFileHandler 설정
+current_date = datetime.now().strftime("%Y-%m-%d")
+log_file_name = f"app-{current_date}.log"  # 로그 파일 이름 생성
+log_file_path = os.path.join(log_dir, log_file_name)
+
+handler = TimedRotatingFileHandler(log_file_path, when="midnight", interval=1, backupCount=7)
+handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(filename)s - line:%(lineno)d - %(message)s'))
+
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(name)s - %(filename)s - line:%(lineno)d - %(message)s',
     handlers=[
-        logging.FileHandler(os.path.join(log_dir, log_file_name)),  # 로그를 log/app.log 파일에 기록
+        handler,
         logging.StreamHandler()  # 콘솔에도 로그 출력
     ]
 )

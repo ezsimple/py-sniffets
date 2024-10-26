@@ -138,6 +138,7 @@ async def auth_callback(request: Request, response: Response):
         "client_id": GOOGLE_CLIENT_ID,
         "client_secret": GOOGLE_CLIENT_SECRET,
         "redirect_uri": GOOGLE_REDIRECT_URI,
+        "flowName": "GeneralOAuthFlow",
         "grant_type": "authorization_code",
     })
     logger.debug(f"Token response: {token_response.json()}")

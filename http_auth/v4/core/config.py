@@ -24,6 +24,13 @@ if len(SESSION_SERVER) == 0:
 
 SESSION_TIMEOUT = int(os.getenv("SESSION_TIMEOUT", 60))
 
+# Google OAuth2 설정
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
+GOOGLE_TOKEN_URI = os.getenv("GOOGLE_TOKEN_URI")
+GOOGLE_AUTH_URI = os.getenv("GOOGLE_AUTH_URI")
+
 # 로깅 설정 (파일에 기록)
 log_dir = "log"
 os.makedirs(log_dir, exist_ok=True)  # log 디렉토리가 없으면 생성

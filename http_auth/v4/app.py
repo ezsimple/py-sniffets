@@ -13,11 +13,13 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware import Middleware
 from starlette.responses import RedirectResponse, FileResponse, HTMLResponse
 from core.config import PREFIX, SESSION_SERVER, SESSION_TIMEOUT, SECRET_KEY, logger
+from core.config import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI, GOOGLE_TOKEN_URI, GOOGLE_AUTH_URI
 from core.model import User, Token, LoginForm, LoginRequiredMiddleware, CustomTemplateResponse, RedirectGetResponse
 from passlib.context import CryptContext
 import aioredis
 import uuid
 import jwt
+import requests
 
 # Redis 클라이언트 초기화
 redis_client = aioredis.from_url(SESSION_SERVER)
@@ -102,6 +104,44 @@ async def value_error_handler(request: Request, exc: ValueError):
     logger.error(f"ValueError occurred: {exc}, Path: {request.url.path}")
     return RedirectGetResponse(url=f"{PREFIX}/login") # 추후 에러페이지로
 
+@router.get("/login")
+async def login_view(request: Request):
+    # request.state.user가 설정되어 있지 않으면 로그인 페이지를 렌더링
+    # if not hasattr(request.state, 'user') or request.state.user is None:
+    #     return CustomTemplateResponse("login.html", {"request": request})
+
+    # Google oAuth2를 통한 인가 처리
+    auth_url = (
+        f"{GOOGLE_AUTH_URI}?response_type=code&"
+        f"client_id={GOOGLE_CLIENT_ID}&"
+        f"redirect_uri={GOOGLE_REDIRECT_URI}&"
+        "scope=https://www.googleapis.com/auth/drive.readonly"
+    )
+    return RedirectResponse(url=auth_url)
+
+@app.get("/auth/callback")
+async def auth_callback(request: Request, response: Response):
+    code = request.query_params.get("code")
+    if not code:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Authorization code not found")
+
+    # 액세스 토큰 요청
+    token_response = requests.post(GOOGLE_TOKEN_URI, data={
+        "code": code,
+        "client_id": GOOGLE_CLIENT_ID,
+        "client_secret": GOOGLE_CLIENT_SECRET,
+        "redirect_uri": GOOGLE_REDIRECT_URI,
+        "grant_type": "authorization_code",
+    })
+
+    token_data = token_response.json()
+    access_token = token_data.get("access_token")
+
+    # 액세스 토큰을 쿠키에 저장
+    response.set_cookie("access_token", access_token, httponly=True, max_age=SESSION_TIMEOUT, samesite='None', secure=True)
+
+    return RedirectGetResponse(url=f"{PREFIX}/dl")
+
 async def build_access_token(username: str):
     '''
     Build Access Token Data
@@ -138,8 +178,10 @@ async def login(request: Request, response: Response, form_data: OAuth2PasswordR
     이는 요청이 처리된 후 다음 요청에서 사용할 수 없습니다. 
     이유는 FastAPI의 요청-응답 사이클이 끝나면 
     request 객체가 소멸되기 때문입니다.
+
+    request가 소멸되므로, 의미없는 코드 입니다.
+    request.state.user = User(username=form.username) 
     '''
-    # request.state.user = User(username=form.username)
 
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -147,14 +189,6 @@ async def login(request: Request, response: Response, form_data: OAuth2PasswordR
 async def read_users_me(request: Request):
     return request.state.user
 
-@router.get("/login")
-async def login_view(request: Request):
-    # request.state.user가 설정되어 있지 않으면 로그인 페이지를 렌더링
-    if not hasattr(request.state, 'user') or request.state.user is None:
-        return CustomTemplateResponse("login.html", {"request": request})
-
-    # 로그인된 경우
-    return RedirectGetResponse(url=f"{PREFIX}/dl")
 
 @router.api_route("/logout", methods=["GET", "POST"], response_class=RedirectResponse)
 async def logout(request: Request):

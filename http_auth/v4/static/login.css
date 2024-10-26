@@ -90,3 +90,9 @@ button:hover {
 .shake {
     animation: shake 0.5s ease;
 }
+
+.wine {
+    border-color: #722F37 !important; /* 테두리 색상 */
+    background-color: #722F37; /* 버튼 배경색 */
+    color: white; /* 글자 색상 유지 */
+}

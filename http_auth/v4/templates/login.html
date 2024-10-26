@@ -29,16 +29,12 @@
                     window.location.href = "/v1/login";
                 } else {
                     const formBox = document.querySelector('.form-box');
-                    const button = document.querySelector('button');
-
                     formBox.classList.add('shake');
                     formBox.classList.add('wine');
-                    button.classList.add('wine-button');
 
                     setTimeout(() => { 
                         formBox.classList.remove('shake'); 
                         formBox.classList.remove('wine');
-                        button.classList.remove('wine-button');
                     }, 500);
                 }
             })

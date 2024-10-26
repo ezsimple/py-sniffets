@@ -49,4 +49,6 @@ logging.basicConfig(
 logging.getLogger("starlette").setLevel(logging.WARNING)
 logging.getLogger("fastapi").setLevel(logging.WARNING)
 logging.getLogger("multipart.multipart").setLevel(logging.WARNING)  # form 데이트 로깅방지
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("asyncio").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)

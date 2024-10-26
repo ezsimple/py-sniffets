@@ -117,6 +117,7 @@ async def login_view(request: Request, response: Response):
         f"{GOOGLE_AUTH_URI}?response_type=code&"
         f"client_id={GOOGLE_CLIENT_ID}&"
         f"redirect_uri={GOOGLE_REDIRECT_URI}&"
+        "flowName=GeneralOAuthFlow&",
         "scope=https://www.googleapis.com/auth/drive.readonly"
     )
     logger.info(f"Redirecting to Google Auth URL: {auth_url}")
@@ -138,7 +139,6 @@ async def auth_callback(request: Request, response: Response):
         "client_id": GOOGLE_CLIENT_ID,
         "client_secret": GOOGLE_CLIENT_SECRET,
         "redirect_uri": GOOGLE_REDIRECT_URI,
-        "flowName": "GeneralOAuthFlow",
         "grant_type": "authorization_code",
     })
     logger.debug(f"Token response: {token_response.json()}")

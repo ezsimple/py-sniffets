@@ -253,7 +253,7 @@ async def list_files(request: Request, path: str = ''):
 
     # has_parent 결정
     has_parent = bool(remaining_path)  # 남은 스트링이 있으면 True
-    logger.debug(f'has_parent={has_parent}, remaining_path={remaining_path}, full_path={full_path}')
+    # logger.debug(f'has_parent={has_parent}, remaining_path={remaining_path}, full_path={full_path}')
 
     # 파일이 디렉토리인지 여부 확인
     file_info = [(file.lstrip('/'), os.path.isdir(os.path.join(directory_path, file))) for file in filtered_files]

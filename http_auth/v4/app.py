@@ -118,6 +118,7 @@ async def login_view(request: Request, response: Response):
         f"redirect_uri={GOOGLE_REDIRECT_URI}&"
         "scope=https://www.googleapis.com/auth/drive.readonly"
     )
+    logger.info(f"Redirecting to Google Auth URL: {auth_url}")
     return RedirectResponse(url=auth_url)
 
 

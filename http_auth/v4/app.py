@@ -119,7 +119,7 @@ async def login_view(request: Request, response: Response):
     # )
     # return RedirectResponse(url=auth_url)
 
-    return auth_callback(request, response)
+    return RedirectGetResponse(url=f"{PREFIX}/dl")
 
 @app.get("/auth/callback")
 async def auth_callback(request: Request, response: Response):

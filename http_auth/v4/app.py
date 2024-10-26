@@ -3,6 +3,7 @@ import re
 import magic
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Depends, HTTPException, APIRouter, Form, status, Request, Response
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -90,7 +91,8 @@ def check_auth(form: LoginForm):
     correct_password = os.getenv("PASSWORD")
     if form.username == correct_username and form.password == correct_password:
         return True
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
+    # raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
+    return False
 
 # HTTPException 처리기
 @app.exception_handler(HTTPException)
@@ -173,7 +175,8 @@ async def build_access_token(username: str):
 @app.post(f"{PREFIX}/token", response_model=Token)
 async def login(request: Request, response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
     form = LoginForm(username=form_data.username, password=form_data.password)
-    check_auth(form)
+    if not check_auth(form):
+        return JSONResponse(content={"message": "Incorrect username or password"}, status_code=status.HTTP_401_UNAUTHORIZED)    
 
     access_token = await build_access_token(form.username)
     await redis_client.set(access_token, form.username, ex=SESSION_TIMEOUT)

@@ -126,8 +126,12 @@ async def login(request: Request, response: Response, form_data: OAuth2PasswordR
     HTTPOnly 속성: 쿠키에 httponly 속성을 설정하면 
     JavaScript에서 접근할 수 없기 때문에 XSS(교차 사이트 스크립팅) 공격으로부터 
     보호할 수 있습니다.
+    
+    모바일 브라우저에서 쿠키를 설정할 때, 
+    SameSite=None 및 Secure 속성을 설정하여 모바일 앱에서 쿠키를 수용할 수 있도록 합니다.
     '''
-    response.set_cookie("access_token", access_token, httponly=True, max_age=SESSION_TIMEOUT)
+    response.set_cookie("access_token", access_token, httponly=True, max_age=SESSION_TIMEOUT, samesite='None', secure=True)
+
 
     '''
     이 코드에서 request.state.user를 설정하는 부분이 있지만, 

@@ -107,8 +107,8 @@ async def value_error_handler(request: Request, exc: ValueError):
 @router.get("/login")
 async def login_view(request: Request):
     # request.state.user가 설정되어 있지 않으면 로그인 페이지를 렌더링
-    # if not hasattr(request.state, 'user') or request.state.user is None:
-    #     return CustomTemplateResponse("login.html", {"request": request})
+    if not hasattr(request.state, 'user') or request.state.user is None:
+        return CustomTemplateResponse("login.html", {"request": request})
 
     # Google oAuth2를 통한 인가 처리
     auth_url = (

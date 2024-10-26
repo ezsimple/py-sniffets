@@ -123,7 +123,7 @@ async def login_view(request: Request, response: Response):
     return RedirectResponse(url=auth_url)
 
 
-@app.get("/auth/callback")
+@router.get("/auth/callback")
 async def auth_callback(request: Request, response: Response):
     '''
     구글 리다이렉션 URI 처리
@@ -140,6 +140,7 @@ async def auth_callback(request: Request, response: Response):
         "redirect_uri": GOOGLE_REDIRECT_URI,
         "grant_type": "authorization_code",
     })
+    logger.debug(f"Token response: {token_response.json()}")
 
     token_data = token_response.json()
     access_token = token_data.get("access_token")

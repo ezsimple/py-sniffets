@@ -105,19 +105,21 @@ async def value_error_handler(request: Request, exc: ValueError):
     return RedirectGetResponse(url=f"{PREFIX}/login") # 추후 에러페이지로
 
 @router.get("/login")
-async def login_view(request: Request):
+async def login_view(request: Request, response: Response):
     # request.state.user가 설정되어 있지 않으면 로그인 페이지를 렌더링
     if not hasattr(request.state, 'user') or request.state.user is None:
         return CustomTemplateResponse("login.html", {"request": request})
 
     # Google oAuth2를 통한 인가 처리
-    auth_url = (
-        f"{GOOGLE_AUTH_URI}?response_type=code&"
-        f"client_id={GOOGLE_CLIENT_ID}&"
-        f"redirect_uri={GOOGLE_REDIRECT_URI}&"
-        "scope=https://www.googleapis.com/auth/drive.readonly"
-    )
-    return RedirectResponse(url=auth_url)
+    # auth_url = (
+    #     f"{GOOGLE_AUTH_URI}?response_type=code&"
+    #     f"client_id={GOOGLE_CLIENT_ID}&"
+    #     f"redirect_uri={GOOGLE_REDIRECT_URI}&"
+    #     "scope=https://www.googleapis.com/auth/drive.readonly"
+    # )
+    # return RedirectResponse(url=auth_url)
+
+    return auth_callback(request, response)
 
 @app.get("/auth/callback")
 async def auth_callback(request: Request, response: Response):

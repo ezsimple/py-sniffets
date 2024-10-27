@@ -271,7 +271,7 @@ async def list_files(request: Request, path: str = ''):
     # 현재 경로 설정
     current_path = path.lstrip('/').rstrip('/')
 
-    return CustomTemplateResponse("index.html", {
+    return CustomTemplateResponse("files.html", {
         "request": request,
         "file_info": file_info,
         "readme_content": readme_content,

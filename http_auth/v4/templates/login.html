@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <link rel="stylesheet" href="{{ url_for('static', path='login.css') }}?_={{ timestamp }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/login.css') }}?_={{ timestamp }}">
     <div class="login-container">
         <h1>로그인</h1>
         <div class="form-box">
@@ -16,31 +16,5 @@
             </form>
         </div>
     </div>
-    <script>
-        document.getElementById('loginForm').onsubmit = function(event) {
-            event.preventDefault();
-            const formData = new FormData(this);
-            fetch(this.action, {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => {
-                if (response.ok) {
-                    window.location.href = "/v1/login";
-                } else {
-                    const formBox = document.querySelector('.form-box');
-                    formBox.classList.add('shake');
-                    formBox.classList.add('wine');
-
-                    setTimeout(() => { 
-                        formBox.classList.remove('shake'); 
-                        formBox.classList.remove('wine');
-                    }, 500);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        };
-    </script>
+    <script src="{{ url_for('static', path='js/login.js') }}?_={{ timestamp }}"></script>
 {% endblock %}

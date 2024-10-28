@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>명언 챗봇</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome CDN -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff; /* 연한 파란색 배경 */
+            color: #333; /* 기본 텍스트 색상 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0; /* 기본 마진 제거 */
+        }
+
+        h1 {
+            color: #4a90e2; /* 제목 색상 */
+            font-size: 2rem; /* 반응형 제목 크기 */
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #357ABD; /* 버튼 호버 색상 */
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            width: 100%;
+            max-width: 600px; /* 최대 너비 설정 */
+            margin: 0; /* 기본 마진 제거 */
+        }
+
+        li {
+            position: relative; /* 버튼 위치 조정을 위해 relative 설정 */
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            transition: color 0.3s, background-color 0.3s;
+            word-wrap: break-word; /* 긴 단어 줄 바꿈 */
+            display: flex;
+            justify-content: space-between; /* 왼쪽과 오른쪽 영역을 나누기 위해 사용 */
+        }
+
+        .message-container {
+            flex: 1; /* 메시지 영역이 가능한 공간을 차지하도록 설정 */
+            padding-right: 10px; /* 오른쪽 버튼과 간격을 위해 패딩 추가 */
+        }
+
+        .button-container {
+            display: flex; /* 버튼들을 세로로 정렬 */
+            flex-direction: column; /* 세로 방향으로 정렬 */
+            align-items: flex-end; /* 오른쪽 정렬 */
+            gap: 1px; /* 버튼 사이 간격을 1px로 설정 */
+            padding-top: 0; /* 상단 패딩 0으로 설정 */
+        }
+
+        .copy-btn, .delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-top: 0; /* 버튼의 최상단 정렬을 위해 마진 제거 */
+        }
+
+        .copy-btn:hover, .delete-btn:hover {
+            opacity: 0.7; /* 호버 시 투명도 조정 */
+        }
+    </style>
+</head>
+<body>
+    <h1>명언 챗봇</h1>
+    <button onclick="sendMessage()">오늘의 명언</button>
+    <ul id="messages"></ul>
+
+    <script>
+        const socket = new WebSocket("ws://localhost:4444/ws");
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            
+            // 메시지가 비어있지 않은 경우에만 li 요소 생성
+            if (data.msg.trim()) {
+                const li = document.createElement('li');
+
+                // 동적으로 파스텔 색상 배경 생성
+                const pastelColor = generatePastelColor();
+                li.style.backgroundColor = pastelColor;
+
+                // 폰트 색상 조정
+                li.style.color = getFontColor(pastelColor);
+
+                // 메시지 표시용 div
+                const messageContainer = document.createElement('div');
+                messageContainer.className = 'message-container';
+                messageContainer.innerHTML = `${data.msg.replace(/\n/g, '<br>')}`;
+
+                // 버튼 컨테이너 생성
+                const buttonContainer = document.createElement('div');
+                buttonContainer.className = 'button-container';
+
+                // 삭제 버튼
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-btn';
+                deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>'; // 삭제 아이콘
+                deleteButton.onclick = function() {
+                    li.remove();
+                };
+
+                // 클립보드 복사 버튼
+                const copyButton = document.createElement('button');
+                copyButton.className = 'copy-btn';
+                copyButton.innerHTML = '<i class="fas fa-copy"></i>'; // 복사 아이콘
+                copyButton.onclick = function() {
+                    navigator.clipboard.writeText(data.msg).then(() => {
+                        alert('명언이 클립보드에 복사되었습니다.');
+                    });
+                };
+
+                // 버튼 컨테이너에 버튼 추가
+                buttonContainer.appendChild(deleteButton); // 삭제 버튼을 버튼 컨테이너에 추가
+                buttonContainer.appendChild(copyButton); // 복사 버튼을 버튼 컨테이너에 추가
+
+                // li에 메시지와 버튼 컨테이너 추가
+                li.appendChild(messageContainer); // 메시지 영역 추가
+                li.appendChild(buttonContainer); // 버튼 컨테이너 추가
+                document.getElementById('messages').appendChild(li); // li를 메시지 목록에 추가
+            }
+        };
+
+        function sendMessage() {
+            const message = '';
+            socket.send(message);
+        }
+
+        // 파스텔 색상 생성 함수
+        function generatePastelColor() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            return `rgba(${r}, ${g}, ${b}, 0.6)`; // 투명도 0.6
+        }
+
+        // 폰트 색상 결정 함수
+        function getFontColor(backgroundColor) {
+            // RGB 값을 추출
+            const rgb = backgroundColor.match(/\d+/g);
+            const brightness = (parseInt(rgb[0]) * 0.299 + parseInt(rgb[1]) * 0.587 + parseInt(rgb[2]) * 0.114);
+            // 밝은 색상에서는 검은색, 어두운 색상에서는 흰색
+            return brightness > 186 ? 'black' : 'white'; // 밝기 기준 조정
+        }
+    </script>
+</body>
+</html>

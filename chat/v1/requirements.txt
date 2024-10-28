@@ -1,0 +1,4 @@
+fastapi==0.115.4
+httpx==0.27.2
+paho_mqtt==2.1.0
+uvicorn==0.32.0

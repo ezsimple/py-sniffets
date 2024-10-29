@@ -61,13 +61,11 @@
         const socket = new WebSocket("ws://localhost:4444/ws");
 
         socket.onopen = function() {
-            console.log("WebSocket 연결 성공");
             // 페이지가 로드된 후 버튼 클릭
             document.getElementById('quoteButton').click();
         };
 
         socket.onmessage = function(event) {
-            console.log("메시지 수신:", event.data);
             const data = JSON.parse(event.data);
 
             // 메시지가 비어있지 않은 경우에만 li 요소 생성

@@ -89,7 +89,7 @@ async def websocket_endpoint(websocket: WebSocket):
             quote_message_data = {
                 'id': user_id,
                 'user_id': 'server',
-                'msg': f"명언: {quote_content}\n번역: {translated_quote}",
+                'msg': f"명언: {quote_content}\n번역: {translated_quote}\n\n- {quote_author} -",
                 'read': True
             }
             # 서버에서 격언 메시지 전송

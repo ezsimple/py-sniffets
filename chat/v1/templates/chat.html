@@ -61,8 +61,7 @@
         const socket = new WebSocket("ws://localhost:4444/ws");
 
         socket.onopen = function() {
-            // 페이지가 로드된 후 버튼 클릭
-            document.getElementById('quoteButton').click();
+            sendMessage(); // WebSocket이 열릴 때 한 번 호출
         };
 
         socket.onmessage = function(event) {

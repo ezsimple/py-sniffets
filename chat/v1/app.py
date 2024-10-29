@@ -9,7 +9,7 @@ from fastapi import Request
 import paho.mqtt.client as mqtt
 import asyncio
 from kakaotrans import Translator
-import time
+from datetime import datetime
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -63,7 +63,8 @@ async def translate_quote(quote):
 
 @router.get("/")
 async def get(request: Request):
-    return templates.TemplateResponse("chat.html", {"request": request})
+    timestamp = datetime.now().timestamp()  # 현재 시간을 타임스탬프로 변환
+    return templates.TemplateResponse("chat.html", {"request": request, "timestamp": timestamp})
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):

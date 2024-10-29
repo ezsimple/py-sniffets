@@ -5,101 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>명언 챗봇</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/chat.css') }}?_={{ timestamp }}">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f8ff; /* 연한 파란색 배경 */
-            color: #333; /* 기본 텍스트 색상 */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            margin: 0; /* 기본 마진 제거 */
+        /* 부서지는 효과를 위한 CSS */
+        @keyframes shatter {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            30% {
+                transform: scale(1.1) rotate(10deg);
+                opacity: 0.8;
+            }
+            60% {
+                transform: scale(0.9) rotate(-10deg);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(0) rotate(0deg);
+                opacity: 0;
+            }
         }
 
-        h1 {
-            color: #4a90e2; /* 제목 색상 */
-            font-size: 2rem; /* 반응형 제목 크기 */
-            margin-bottom: 20px;
+        .shatter {
+            animation: shatter 0.5s forwards; /* 500ms 동안 애니메이션 효과 */
         }
 
-        button {
-            background-color: #4a90e2;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s, color 0.3s;
+        /* 테두리 애니메이션 */
+        @keyframes fadeOutBorder {
+            0% {
+                border: 1px solid black;
+            }
+            100% {
+                border: none;
+            }
         }
 
-        ul {
-            list-style-type: none;
-            padding: 0;
-            width: 100%;
-            max-width: 600px; /* 최대 너비 설정 */
-            margin: 0; /* 기본 마진 제거 */
+        .border-fade {
+            animation: fadeOutBorder 5s forwards; /* 5초 동안 애니메이션 효과 */
         }
 
         li {
-            position: relative; /* 버튼 위치 조정을 위해 relative 설정 */
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 10px;
-            transition: color 0.3s, background-color 0.3s;
-            word-wrap: break-word; /* 긴 단어 줄 바꿈 */
-            display: flex;
-            justify-content: space-between; /* 왼쪽과 오른쪽 영역을 나누기 위해 사용 */
-        }
-
-        .message-container {
-            flex: 1; /* 메시지 영역이 가능한 공간을 차지하도록 설정 */
-            padding-top: 7px;
-            padding-right: 10px; /* 오른쪽 버튼과 간격을 위해 패딩 추가 */
-        }
-
-        .button-container {
-            display: flex; /* 버튼들을 세로로 정렬 */
-            flex-direction: column; /* 세로 방향으로 정렬 */
-            align-items: flex-end; /* 오른쪽 정렬 */
-            gap: 1px; /* 버튼 사이 간격을 1px로 설정 */
-            padding-top: 0; /* 상단 패딩 0으로 설정 */
-        }
-
-        .copy-btn, .delete-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            margin-top: 0; /* 버튼의 최상단 정렬을 위해 마진 제거 */
-            transition: background-color 0.3s; /* 배경색 변화에 대한 트랜지션 추가 */
-        }
-
-        .copy-btn:hover, .delete-btn:hover {
-            background-color: transparent; /* 호버 시 배경을 투명으로 설정 */
-            color: #000; /* 호버 시 글자색 변경 */
+            transition: border 5s; /* 테두리 변화에 대한 부드러운 전환 */
         }
     </style>
 </head>
 <body>
     <h1>명언 챗봇</h1>
-    <button id="quoteButton" onclick="sendMessage()">오늘의 명언</button>
+    <button id="quoteButton">오늘의 명언 (30s)</button>
     <ul id="messages"></ul>
 
     <script>
-        // 스페이스, 엔터키 입력되면 자동 
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault(); // 기본 동작 방지
-                document.getElementById('quoteButton').click(); // 버튼 클릭
-            }
-        });
-
+        const COUNTDOWN = 30; // 카운트다운 시간 설정
+        const MAX_ROW = 5; // 최대 li 개수 설정
         const socket = new WebSocket("ws://localhost:4444/ws");
 
+        socket.onopen = function() {
+            console.log("WebSocket 연결 성공");
+            // 페이지가 로드된 후 버튼 클릭
+            document.getElementById('quoteButton').click();
+        };
+
         socket.onmessage = function(event) {
+            console.log("메시지 수신:", event.data);
             const data = JSON.parse(event.data);
-            
+
             // 메시지가 비어있지 않은 경우에만 li 요소 생성
             if (data.msg.trim()) {
                 const li = document.createElement('li');
@@ -146,13 +116,66 @@
                 li.appendChild(messageContainer); // 메시지 영역 추가
                 li.appendChild(buttonContainer); // 버튼 컨테이너 추가
                 document.getElementById('messages').appendChild(li); // li를 메시지 목록에 추가
+
+                // 테두리 애니메이션 추가
+                li.classList.add('border-fade'); // 테두리 애니메이션 클래스 추가
+
+                // li 개수 체크 및 초과 시 제거
+                const messagesList = document.getElementById('messages');
+                if (messagesList.children.length > MAX_ROW) {
+                    const firstChild = messagesList.firstChild;
+                    firstChild.classList.add('shatter'); // 부서지는 효과 추가
+                    setTimeout(() => {
+                        messagesList.removeChild(firstChild); // 애니메이션 후 제거
+                    }, 500); // 500ms 후에 제거
+                }
             }
         };
 
-        function sendMessage() {
-            const message = '';
-            socket.send(message);
-        }
+        socket.onerror = function(error) {
+            console.error("WebSocket 오류:", error);
+        };
+
+        // sendMessage 함수 정의
+        const sendMessage = function() {
+            const button = document.getElementById('quoteButton');
+            button.disabled = true;
+            button.style.backgroundColor = 'gray';
+
+            // WebSocket이 열린 경우에만 메시지를 전송
+            if (socket.readyState === WebSocket.OPEN) {
+                const message = ''; // 메시지 내용
+                socket.send(message);
+
+                // 카운트다운 설정
+                let countdown = COUNTDOWN;
+                const interval = setInterval(() => {
+                    button.textContent = `오늘의 명언 (${countdown}s)`;
+                    countdown--;
+
+                    // 카운트다운이 끝나면 원래 상태로 복원
+                    if (countdown < 0) {
+                        clearInterval(interval);
+                        button.textContent = `오늘의 명언 (${COUNTDOWN}s)`;
+                        button.disabled = false;
+                        button.style.backgroundColor = '#4a90e2'; // 원래 색상으로 변경
+                    }
+                }, 1000); // 1초마다 업데이트
+            } else {
+                console.error("WebSocket이 열리지 않았습니다.");
+            }
+        };
+
+        // 스페이스, 엔터키 입력되면 자동
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault(); // 기본 동작 방지
+                document.getElementById('quoteButton').click(); // 버튼 클릭
+            }
+        });
+
+        // 버튼 클릭 이벤트 핸들러 추가
+        document.getElementById('quoteButton').addEventListener('click', sendMessage);
 
         // 파스텔 색상 생성 함수
         function generatePastelColor() {

@@ -58,7 +58,7 @@
     <script>
         const COUNTDOWN = 30; // 카운트다운 시간 설정
         const MAX_ROW = 5; // 최대 li 개수 설정
-        const socket = new WebSocket("ws://localhost:4444/ws");
+        const socket = new WebSocket("ws://localhost:4444/chat/ws");
 
         socket.onopen = function() {
             sendMessage(); // WebSocket이 열릴 때 한 번 호출

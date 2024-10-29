@@ -1,7 +1,7 @@
 import json
 import uuid
 import httpx
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -14,6 +14,8 @@ import time
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
+PREFIX="/chat" 
+router = APIRouter(prefix=PREFIX)
 
 mqtt_broker = "127.0.0.1"
 mqtt_topic = "chat/messages"
@@ -59,11 +61,11 @@ async def translate_quote(quote):
     translated_text = await loop.run_in_executor(None, translator.translate, quote['q'], 'en', 'kr')
     return translated_text
 
-@app.get("/")
+@router.get("/")
 async def get(request: Request):
     return templates.TemplateResponse("chat.html", {"request": request})
 
-@app.websocket("/ws")
+@router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     user_id = str(uuid.uuid4())  # 사용자 ID 생성 (접속후 고정)
     await websocket.accept()
@@ -101,6 +103,8 @@ async def websocket_endpoint(websocket: WebSocket):
     except Exception as e:
         print(f"Error in websocket handling for user {user_id}: {e}")
         del clients[user_id]  # 오류 발생 시 연결 제거
+
+app.include_router(router)  # 라우터 등록
 
 if __name__ == "__main__":
     import uvicorn

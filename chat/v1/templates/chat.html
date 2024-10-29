@@ -127,8 +127,9 @@
                     }, 500); // 500ms 후에 제거
                 }
 
-                // 매 마지막 라인으로 자동 스크롤 다운
-                messagesList.scrollTop = messagesList.scrollHeight; // 스크롤을 가장 아래로 이동
+                setTimeout(() => {
+                    messagesList.scrollTop = messagesList.scrollHeight;
+                }, 1000); // 1초후에 스크롤을 가장 아래로 이동
             }
         };
 

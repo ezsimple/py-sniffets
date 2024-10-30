@@ -10,13 +10,52 @@ import paho.mqtt.client as mqtt
 import asyncio
 from kakaotrans import Translator
 from datetime import datetime
+from dotenv import load_dotenv
+from logging.handlers import TimedRotatingFileHandler
+import logging
+
+import os
+
+load_dotenv()
+WS_SERVER = os.getenv("WS_SERVER", 'ws://localhost:4444/chat/ws')
+
+# 로깅 설정
+log_dir = "log"
+os.makedirs(log_dir, exist_ok=True)  # log 디렉토리가 없으면 생성
+
+current_date = datetime.now().strftime("%Y-%m-%d")
+log_file_name = f"app-{current_date}.log"
+log_file_path = os.path.join(log_dir, log_file_name)
+
+handler = TimedRotatingFileHandler(log_file_path, when="midnight", interval=1, backupCount=7)
+handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(filename)s - line:%(lineno)d - %(message)s'))
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    handlers=[
+        handler,
+        logging.StreamHandler()  # 콘솔에도 로그 출력
+    ]
+)
+logging.getLogger("starlette").setLevel(logging.WARNING)
+logging.getLogger("fastapi").setLevel(logging.WARNING)
+logging.getLogger("multipart.multipart").setLevel(logging.WARNING)  # form 데이트 로깅방지
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("asyncio").setLevel(logging.WARNING)
+logging.getLogger("passlib").setLevel(logging.WARNING)
+logger = logging.getLogger(__name__)
+
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 PREFIX="/chat" 
 router = APIRouter(prefix=PREFIX)
+logger.info(f"WS_SERVER : {WS_SERVER}")
 
+'''
+mosquitto 는 로컬호스트에서만 접근 가능
+'''
 mqtt_broker = "127.0.0.1"
 mqtt_topic = "chat/messages"
 mqtt_client = mqtt.Client()
@@ -64,7 +103,7 @@ async def translate_quote(quote):
 @router.get("/")
 async def get(request: Request):
     timestamp = datetime.now().timestamp()  # 현재 시간을 타임스탬프로 변환
-    return templates.TemplateResponse("chat.html", {"request": request, "timestamp": timestamp})
+    return templates.TemplateResponse("chat.html", {"request": request, "timestamp": timestamp, "WS_SERVER": WS_SERVER})
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):

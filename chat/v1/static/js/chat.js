@@ -1,4 +1,4 @@
-const COUNTDOWN = 30; // 카운트다운 시간 설정
+const COUNTDOWN = 5; // 카운트다운 시간 설정
 const MAX_ROW = 5; // 최대 li 개수 설정
 const socket = new WebSocket(WS_SERVER);
 

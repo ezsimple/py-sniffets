@@ -13,11 +13,11 @@ from datetime import datetime
 from dotenv import load_dotenv
 from logging.handlers import TimedRotatingFileHandler
 import logging
-
 import os
 
 load_dotenv()
-WS_SERVER = os.getenv("WS_SERVER", 'ws://localhost:4444/chat/ws')
+PREFIX="/chat" 
+WS_SERVER = os.getenv("WS_SERVER", f'ws://localhost:4444{PREFIX}/ws')
 
 # 로깅 설정
 log_dir = "log"
@@ -37,29 +37,15 @@ logging.basicConfig(
         logging.StreamHandler()  # 콘솔에도 로그 출력
     ]
 )
-logging.getLogger("starlette").setLevel(logging.WARNING)
-logging.getLogger("fastapi").setLevel(logging.WARNING)
-logging.getLogger("multipart.multipart").setLevel(logging.WARNING)  # form 데이트 로깅방지
-logging.getLogger("urllib3").setLevel(logging.WARNING)
-logging.getLogger("asyncio").setLevel(logging.WARNING)
-logging.getLogger("passlib").setLevel(logging.WARNING)
-logging.getLogger("httpx").setLevel(logging.WARNING)
-logging.getLogger("httpcore").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
-
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
-PREFIX="/chat" 
 router = APIRouter(prefix=PREFIX)
 logger.info(f"WS_SERVER : {WS_SERVER}")
 
-'''
-mosquitto 는 로컬호스트에서만 접근 가능
-'''
 mqtt_broker = "127.0.0.1"
-mqtt_topic = "chat/messages"
 mqtt_client = mqtt.Client()
 
 # WebSocket 연결 관리
@@ -68,31 +54,23 @@ clients = {}
 # MQTT 메시지 수신 콜백
 def on_message(client, userdata, message):
     message_data = json.loads(message.payload.decode())
-
-    # 모든 WebSocket 클라이언트에 메시지 전송
-    # asyncio.run(send_message_to_clients(message_data))
-
-    # 사용자 ID가 포함된 메시지인 경우 해당 사용자에게만 전송
     user_id = message_data.get('user_id')
+    
     if user_id in clients:
         asyncio.run(send_message_to_clients(message_data, user_id))
 
 mqtt_client.on_message = on_message
 mqtt_client.connect(mqtt_broker)
-# mqtt_client.subscribe(mqtt_topic)
 mqtt_client.loop_start()  # MQTT 클라이언트 시작
 
-async def send_message_to_clients(message_data):
-    for client in clients.values():
-        try:
-            await client['websocket'].send_json(message_data)
-        except Exception as e:
-            logger.error(f"Error sending message to client: {e}")
+async def send_message_to_clients(message_data, user_id):
+    client = clients[user_id]['websocket']
+    try:
+        await client.send_json(message_data)
+    except Exception as e:
+        logger.error(f"Error sending message to client: {e}")
 
 async def get_random_quote():
-    '''
-    격언 API
-    '''
     async with httpx.AsyncClient() as client:
         response = await client.get("https://zenquotes.io/api/random")
         if response.status_code == 200:
@@ -100,9 +78,6 @@ async def get_random_quote():
         return {"content": "격언을 가져오는 데 실패했습니다.", "author": "알 수 없음"}
 
 async def translate_quote(quote):
-    '''
-    카카오 번역
-    '''
     translator = Translator()
     loop = asyncio.get_event_loop()
     translated_text = await loop.run_in_executor(None, translator.translate, quote['q'], 'en', 'kr')
@@ -115,7 +90,7 @@ async def get(request: Request):
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    user_id = str(uuid.uuid4())  # 사용자 ID 생성 (접속후 고정)
+    user_id = str(uuid.uuid4())  # 사용자 ID 생성
     mqtt_topic = f"chat/messages/{user_id}"  # 사용자별 MQTT 토픽 생성
     mqtt_client.subscribe(mqtt_topic)  # 사용자별 MQTT 토픽 구독
     logger.debug(f"Subscribed to MQTT topic: {mqtt_topic}")
@@ -126,22 +101,16 @@ async def websocket_endpoint(websocket: WebSocket):
 
     try:
         while True:
-            data = await websocket.receive_text()
-            message_id = str(uuid.uuid4())
-            message_data = {'id': message_id, 'user_id': user_id, 'msg': data, 'read': False}
-
-            # 메시지를 MQTT에 전송
-            mqtt_client.publish(mqtt_topic, json.dumps(message_data))
-            logger.debug(f'Sent message: {message_data}')
+            await websocket.receive_text()
 
             # 랜덤한 격언 선택
             quote_data = await get_random_quote()
-            quote_content = quote_data[0]['q']
-            quote_author = quote_data[0]['a']
-            translated_quote = await translate_quote(quote_data[0])
+            quote_content = quote_data[0]['q']  # 격언 내용
+            quote_author = quote_data[0]['a']    # 격언 저자
+            translated_quote = await translate_quote(quote_data[0])  # 격언 번역
             quote_message_data = {
-                'id': user_id,
-                'user_id': 'server',
+                'id': 'server', # from
+                'user_id': f'{user_id}', # to
                 'msg': f"명언: {quote_content}\n번역: {translated_quote}\n\n- {quote_author} -",
                 'read': True
             }

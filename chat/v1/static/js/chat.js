@@ -134,5 +134,5 @@ function getFontColor(backgroundColor) {
     const rgb = backgroundColor.match(/\d+/g);
     const brightness = (parseInt(rgb[0]) * 0.299 + parseInt(rgb[1]) * 0.587 + parseInt(rgb[2]) * 0.114);
     // 밝은 색상에서는 검은색, 어두운 색상에서는 흰색
-    return brightness > 186 ? 'black' : 'white'; // 밝기 기준 조정
+    return brightness > 120 ? 'black' : 'white'; // 밝기 기준 조정
 }

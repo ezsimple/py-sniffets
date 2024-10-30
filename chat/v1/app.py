@@ -68,8 +68,14 @@ clients = {}
 # MQTT 메시지 수신 콜백
 def on_message(client, userdata, message):
     message_data = json.loads(message.payload.decode())
+
     # 모든 WebSocket 클라이언트에 메시지 전송
-    asyncio.run(send_message_to_clients(message_data))
+    # asyncio.run(send_message_to_clients(message_data))
+
+    # 사용자 ID가 포함된 메시지인 경우 해당 사용자에게만 전송
+    user_id = message_data.get('user_id')
+    if user_id in clients:
+        asyncio.run(send_message_to_clients(message_data, user_id))
 
 mqtt_client.on_message = on_message
 mqtt_client.connect(mqtt_broker)
@@ -110,13 +116,11 @@ async def get(request: Request):
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     user_id = str(uuid.uuid4())  # 사용자 ID 생성 (접속후 고정)
-
     mqtt_topic = f"chat/messages/{user_id}"  # 사용자별 MQTT 토픽 생성
     mqtt_client.subscribe(mqtt_topic)  # 사용자별 MQTT 토픽 구독
     logger.debug(f"Subscribed to MQTT topic: {mqtt_topic}")
 
     await websocket.accept()
-
     clients[user_id] = {'websocket': websocket}  # 사용자 ID와 WebSocket 연결 저장
     logger.debug(f"User connected: {user_id}")
 

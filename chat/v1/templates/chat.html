@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>세계의 명언</title>
+    <title>세계의 명언 카드</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="{{ url_for('static', path='css/chat.css') }}?_={{ timestamp }}">
 </head>
 <body>
-    <h1>세계의 명언</h1>
+    <h1>세계의 명언 카드</h1>
     <button id="quoteButton">오늘의 명언 (5s)</button>
     <ul id="messages"></ul>
     <script>const WS_SERVER = "{{ WS_SERVER }}"</script>

@@ -73,7 +73,7 @@ def on_message(client, userdata, message):
 
 mqtt_client.on_message = on_message
 mqtt_client.connect(mqtt_broker)
-mqtt_client.subscribe(mqtt_topic)
+# mqtt_client.subscribe(mqtt_topic)
 mqtt_client.loop_start()  # MQTT 클라이언트 시작
 
 async def send_message_to_clients(message_data):
@@ -81,7 +81,7 @@ async def send_message_to_clients(message_data):
         try:
             await client['websocket'].send_json(message_data)
         except Exception as e:
-            print(f"Error sending message to client: {e}")
+            logger.error(f"Error sending message to client: {e}")
 
 async def get_random_quote():
     '''
@@ -110,10 +110,15 @@ async def get(request: Request):
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     user_id = str(uuid.uuid4())  # 사용자 ID 생성 (접속후 고정)
+
+    mqtt_topic = f"chat/messages/{user_id}"  # 사용자별 MQTT 토픽 생성
+    mqtt_client.subscribe(mqtt_topic)  # 사용자별 MQTT 토픽 구독
+    logger.debug(f"Subscribed to MQTT topic: {mqtt_topic}")
+
     await websocket.accept()
 
     clients[user_id] = {'websocket': websocket}  # 사용자 ID와 WebSocket 연결 저장
-    print(f"User connected: {user_id}")
+    logger.debug(f"User connected: {user_id}")
 
     try:
         while True:
@@ -123,7 +128,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # 메시지를 MQTT에 전송
             mqtt_client.publish(mqtt_topic, json.dumps(message_data))
-            print(f'Sent message: {message_data}')
+            logger.debug(f'Sent message: {message_data}')
 
             # 랜덤한 격언 선택
             quote_data = await get_random_quote()
@@ -138,12 +143,12 @@ async def websocket_endpoint(websocket: WebSocket):
             }
             # 서버에서 격언 메시지 전송
             mqtt_client.publish(mqtt_topic, json.dumps(quote_message_data))
-            print(f'Sent quote: {quote_message_data}')
+            logger.debug(f'Sent quote: {quote_message_data}')
     except WebSocketDisconnect:
-        print(f"User disconnected: {user_id}")
+        logger.error(f"User disconnected: {user_id}")
         del clients[user_id]  # 사용자 ID로 연결 제거
     except Exception as e:
-        print(f"Error in websocket handling for user {user_id}: {e}")
+        logger.error(f"Error in websocket handling for user {user_id}: {e}")
         del clients[user_id]  # 오류 발생 시 연결 제거
 
 app.include_router(router)  # 라우터 등록

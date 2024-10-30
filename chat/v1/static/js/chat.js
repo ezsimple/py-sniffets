@@ -54,24 +54,24 @@ socket.onmessage = function(event) {
         // li에 메시지와 버튼 컨테이너 추가
         li.appendChild(messageContainer); // 메시지 영역 추가
         li.appendChild(buttonContainer); // 버튼 컨테이너 추가
-        document.getElementById('messages').appendChild(li); // li를 메시지 목록에 추가
-
-        // 테두리 애니메이션 추가
-        li.classList.add('border-fade'); // 테두리 애니메이션 클래스 추가
+        
+        const messagesList = document.getElementById('messages');
+        
+        // 최신 li를 맨 앞에 추가
+        messagesList.insertBefore(li, messagesList.firstChild); // 최신 메시지를 가장 위에 추가
 
         // li 개수 체크 및 초과 시 제거
-        const messagesList = document.getElementById('messages');
         if (messagesList.children.length > MAX_ROW) {
-            const firstChild = messagesList.firstChild;
-            firstChild.classList.add('shatter'); // 부서지는 효과 추가
+            const lastChild = messagesList.lastChild; // 마지막 li 요소
+            lastChild.classList.add('shatter'); // 부서지는 효과 추가
             setTimeout(() => {
-                messagesList.removeChild(firstChild); // 애니메이션 후 제거
+                messagesList.removeChild(lastChild); // 애니메이션 후 제거
             }, 500); // 500ms 후에 제거
         }
 
         setTimeout(() => {
             messagesList.scrollTop = messagesList.scrollHeight;
-        }, 1000); // 1초후에 스크롤을 가장 아래로 이동
+        }, 1000); // 1초 후에 스크롤을 가장 아래로 이동
     }
 };
 

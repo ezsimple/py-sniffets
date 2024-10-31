@@ -15,13 +15,15 @@ from logging.handlers import TimedRotatingFileHandler
 import logging
 import os
 from cryptography.fernet import Fernet
+import base64
 
 load_dotenv()
-PREFIX="/chat" 
+PREFIX = os.getenv("PREFIX","/chat")
 WS_SERVER = os.getenv("WS_SERVER", f'ws://localhost:4444{PREFIX}/ws')
 
-# 암호화 키 생성 (실제 애플리케이션에서는 안전한 방법으로 관리해야 함)
-SECRET_KEY = os.getenv("SECRET_KEY", Fernet.generate_key())
+# Fernet key must be 32 url-safe base64-encoded bytes.
+# SECRET_KEY = Fernet.generate_key().decode()  # 바이트를 문자열로 변환
+SECRET_KEY = os.getenv("SECRET_KEY", "aEmolOFPK86VSPXrIkDHEQZRgjAjRXZuqt_N7Hi9wQ8=")
 cipher = Fernet(SECRET_KEY)
 
 # 로깅 설정
@@ -46,7 +48,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) # 현재 파일만 디버그 레벨로 설정
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/chat/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 router = APIRouter(prefix=PREFIX)
 logger.info(f"WS_SERVER : {WS_SERVER}")

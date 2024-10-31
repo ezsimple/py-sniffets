@@ -113,6 +113,10 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Cookie(None)):
         user_id = cipher.decrypt(user_id.encode()).decode()  # 복호화
     except Exception as e:
         logger.error(f"Decryption error: {e}")
+        # 쿠키 제거
+        response = HTMLResponse()
+        response.set_cookie(key="user_id", value="", expires=0)  # 쿠키 제거
+        await websocket.close(code=4000)  # 원하는 종료 코드로 웹소켓 종료
         raise HTTPException(status_code=400, detail="Invalid user ID")
 
     mqtt_topic = f"chat/messages/{user_id}"  # 사용자별 MQTT 토픽 생성

@@ -1,11 +1,11 @@
 import json
 import uuid
 import httpx
-from fastapi import FastAPI, APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi import Request
+from fastapi import Request, Cookie
 import paho.mqtt.client as mqtt
 import asyncio
 from kakaotrans import Translator
@@ -14,10 +14,15 @@ from dotenv import load_dotenv
 from logging.handlers import TimedRotatingFileHandler
 import logging
 import os
+from cryptography.fernet import Fernet
 
 load_dotenv()
 PREFIX="/chat" 
 WS_SERVER = os.getenv("WS_SERVER", f'ws://localhost:4444{PREFIX}/ws')
+
+# 암호화 키 생성 (실제 애플리케이션에서는 안전한 방법으로 관리해야 함)
+SECRET_KEY = os.getenv("SECRET_KEY", Fernet.generate_key())
+cipher = Fernet(SECRET_KEY)
 
 # 로깅 설정
 log_dir = "log"
@@ -85,13 +90,29 @@ async def translate_quote(quote):
     return translated_text
 
 @router.get("/")
-async def get(request: Request):
+async def get(request: Request, user_id: str = Cookie(None)):
+
     timestamp = datetime.now().timestamp()  # 현재 시간을 타임스탬프로 변환
-    return templates.TemplateResponse("chat.html", {"request": request, "timestamp": timestamp, "WS_SERVER": WS_SERVER})
+    response = templates.TemplateResponse("chat.html", {"request": request, "timestamp": timestamp, "WS_SERVER": WS_SERVER})
+
+    if user_id is None:
+        user_id = str(uuid.uuid4())
+        encrypted_user_id = cipher.encrypt(user_id.encode()).decode()
+        response.set_cookie(key="user_id", value=encrypted_user_id)  # 쿠키에 user_id 저장
+
+    return response
 
 @router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    user_id = str(uuid.uuid4())  # 사용자 ID 생성
+async def websocket_endpoint(websocket: WebSocket, user_id: str = Cookie(None)):
+    if user_id is None:
+        raise HTTPException(status_code=403, detail="User ID not provided")
+
+    try:
+        user_id = cipher.decrypt(user_id.encode()).decode()  # 복호화
+    except Exception as e:
+        logger.error(f"Decryption error: {e}")
+        raise HTTPException(status_code=400, detail="Invalid user ID")
+
     mqtt_topic = f"chat/messages/{user_id}"  # 사용자별 MQTT 토픽 생성
     mqtt_client.subscribe(mqtt_topic)  # 사용자별 MQTT 토픽 구독
     logger.debug(f"Subscribed to MQTT topic: {mqtt_topic}")

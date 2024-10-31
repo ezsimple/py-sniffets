@@ -1,5 +1,5 @@
-const COUNTDOWN = 5; // 카운트다운 시간 설정
-const MAX_ROW = 5; // 최대 li 개수 설정
+const COUNTDOWN = 3; // 카운트다운 시간 설정
+const MAX_ROW = 3; // 최대 li 개수 설정
 const socket = new WebSocket(WS_SERVER);
 const HEARTBEAT_INTERVAL = 30000; // 30초마다 heartbeat 체크
 const PING_TIMEOUT = 5000; // 5초 동안 응답이 없으면 연결 끊김으로 간주
@@ -107,8 +107,8 @@ const sendMessage = function() {
 
     // WebSocket이 열린 경우에만 메시지를 전송
     if (socket.readyState === WebSocket.OPEN) {
-        const message = ''; // 메시지 내용
-        socket.send(message);
+        const liCount = document.querySelectorAll('#messages li').length;
+        socket.send(liCount);
 
         // 카운트다운 설정
         let countdown = COUNTDOWN;

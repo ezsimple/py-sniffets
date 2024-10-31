@@ -15,7 +15,7 @@ from logging.handlers import TimedRotatingFileHandler
 import logging
 import os
 from cryptography.fernet import Fernet
-import base64
+from crawling import add_quote
 
 load_dotenv()
 PREFIX = os.getenv("PREFIX","/chat")
@@ -82,7 +82,9 @@ async def get_random_quote():
     async with httpx.AsyncClient() as client:
         response = await client.get("https://zenquotes.io/api/random")
         if response.status_code == 200:
-            return response.json()
+            data = response.json()
+            add_quote(data[0])
+            return data
         return {"content": "격언을 가져오는 데 실패했습니다.", "author": "알 수 없음"}
 
 async def translate_quote(quote):

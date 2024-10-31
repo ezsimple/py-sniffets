@@ -8,11 +8,32 @@ socket.onopen = function() {
     sendMessage(); // WebSocket이 열릴 때 한 번 호출
 };
 
+// heartbeat 시작
+let heartbeatInterval;
+function sendPing() {
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: 'ping' }));
+        // console.log('Ping sent to server.');
+    }
+}
+
+function startHeartbeat() {
+    clearInterval(heartbeatInterval);
+    heartbeatInterval = setInterval(() => {
+        sendPing();
+    }, HEARTBEAT_INTERVAL);
+}
+
 socket.onmessage = function(event) {
     const data = JSON.parse(event.data);
 
+    if (data.type === 'heartbeat') {
+        startHeartbeat();
+        return;
+    }
+
     // 메시지가 비어있지 않은 경우에만 li 요소 생성
-    if (data.msg.trim()) {
+    if (data.msg && data.msg.trim()) {
         const li = document.createElement('li');
 
         // 동적으로 파스텔 색상 배경 생성
@@ -71,21 +92,18 @@ socket.onmessage = function(event) {
             }, 500); // 500ms 후에 제거
         }
 
-        setTimeout(() => {
-            messagesList.scrollTop = messagesList.scrollHeight;
-        }, 1000); // 1초 후에 스크롤을 가장 아래로 이동
     }
 };
 
 socket.onerror = function(error) {
     console.error("WebSocket 오류:", error);
+    clearInterval(heartbeatInterval);
+    disableQuoteButton();
 };
 
 // sendMessage 함수 정의
 const sendMessage = function() {
-    const button = document.getElementById('quoteButton');
-    button.disabled = true;
-    button.style.backgroundColor = 'gray';
+    const button = disableQuoteButton();
 
     // WebSocket이 열린 경우에만 메시지를 전송
     if (socket.readyState === WebSocket.OPEN) {
@@ -111,47 +129,6 @@ const sendMessage = function() {
     }
 };
 
-// heartbeat 시작
-let heartbeatInterval; // heartbeat interval
-function startHeartbeat() {
-    heartbeatInterval = setInterval(() => {
-        if (socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({ type: 'ping' })); // ping 메시지 전송
-        }
-    }, HEARTBEAT_INTERVAL);
-
-    // 응답 타임아웃 설정
-    setTimeout(() => {
-        if (socket.readyState === WebSocket.OPEN) {
-            console.log('서버 응답 없음. 연결 종료.');
-            socket.close(); // 응답이 없으면 연결 종료
-        }
-    }, PING_TIMEOUT);
-}
-
-// heartbeat 응답 처리
-function resetHeartbeat() {
-    clearTimeout(heartbeatTimeout);
-    heartbeatTimeout = setTimeout(() => {
-        console.log('서버 응답 없음. 연결 종료.');
-        socket.close(); // 응답이 없으면 연결 종료
-    }, PING_TIMEOUT);
-}
-
-// 재연결 시도
-function reconnect() {
-    setTimeout(() => {
-        const newSocket = new WebSocket('ws://your-websocket-url'); // 새 WebSocket 연결
-        newSocket.onopen = function() {
-            console.log('WebSocket 재연결 완료.');
-            socket = newSocket; // 새 소켓으로 교체
-            startHeartbeat(); // 새로운 heartbeat 시작
-        };
-        newSocket.onmessage = socket.onmessage; // 기존 onmessage 핸들러 재설정
-        newSocket.onclose = socket.onclose; // 기존 onclose 핸들러 재설정
-        newSocket.onerror = socket.onerror; // 기존 onerror 핸들러 재설정
-    }, 5000); // 5초 후에 재연결 시도
-}
 
 // 스페이스, 엔터키 입력되면 자동
 document.addEventListener('keydown', function(event) {
@@ -168,6 +145,14 @@ document.addEventListener('dblclick', function() {
 
 // 버튼 클릭 이벤트 핸들러 추가
 document.getElementById('quoteButton').addEventListener('click', sendMessage);
+
+// 오늘의 명언버튼 비활성화
+function disableQuoteButton() {
+    const button = document.getElementById('quoteButton');
+    button.disabled = true;
+    button.style.backgroundColor = 'gray';
+    return button;
+}
 
 // 파스텔 색상 생성 함수
 function generatePastelColor() {

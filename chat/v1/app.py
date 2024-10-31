@@ -98,11 +98,16 @@ async def websocket_endpoint(websocket: WebSocket):
 
     await websocket.accept()
     clients[user_id] = {'websocket': websocket}  # 사용자 ID와 WebSocket 연결 저장
+    await websocket.send_text(json.dumps({"type": "heartbeat"})) # 소켓연결 후 바로 하트비트 전결
     logger.debug(f"User connected: {user_id}")
 
     try:
         while True:
-            await websocket.receive_text()
+            message = await websocket.receive_text()
+            # logger.debug(f"Received message from {user_id}: {message}")
+            if "ping" in message:
+                await websocket.send_text(json.dumps({"type": "heartbeat"})) 
+                continue
 
             # 랜덤한 격언 선택
             quote_data = await get_random_quote()

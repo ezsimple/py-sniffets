@@ -1,6 +1,8 @@
 const COUNTDOWN = 5; // 카운트다운 시간 설정
 const MAX_ROW = 5; // 최대 li 개수 설정
 const socket = new WebSocket(WS_SERVER);
+const HEARTBEAT_INTERVAL = 30000; // 30초마다 heartbeat 체크
+const PING_TIMEOUT = 5000; // 5초 동안 응답이 없으면 연결 끊김으로 간주
 
 socket.onopen = function() {
     sendMessage(); // WebSocket이 열릴 때 한 번 호출
@@ -109,12 +111,59 @@ const sendMessage = function() {
     }
 };
 
+// heartbeat 시작
+let heartbeatInterval; // heartbeat interval
+function startHeartbeat() {
+    heartbeatInterval = setInterval(() => {
+        if (socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ type: 'ping' })); // ping 메시지 전송
+        }
+    }, HEARTBEAT_INTERVAL);
+
+    // 응답 타임아웃 설정
+    setTimeout(() => {
+        if (socket.readyState === WebSocket.OPEN) {
+            console.log('서버 응답 없음. 연결 종료.');
+            socket.close(); // 응답이 없으면 연결 종료
+        }
+    }, PING_TIMEOUT);
+}
+
+// heartbeat 응답 처리
+function resetHeartbeat() {
+    clearTimeout(heartbeatTimeout);
+    heartbeatTimeout = setTimeout(() => {
+        console.log('서버 응답 없음. 연결 종료.');
+        socket.close(); // 응답이 없으면 연결 종료
+    }, PING_TIMEOUT);
+}
+
+// 재연결 시도
+function reconnect() {
+    setTimeout(() => {
+        const newSocket = new WebSocket('ws://your-websocket-url'); // 새 WebSocket 연결
+        newSocket.onopen = function() {
+            console.log('WebSocket 재연결 완료.');
+            socket = newSocket; // 새 소켓으로 교체
+            startHeartbeat(); // 새로운 heartbeat 시작
+        };
+        newSocket.onmessage = socket.onmessage; // 기존 onmessage 핸들러 재설정
+        newSocket.onclose = socket.onclose; // 기존 onclose 핸들러 재설정
+        newSocket.onerror = socket.onerror; // 기존 onerror 핸들러 재설정
+    }, 5000); // 5초 후에 재연결 시도
+}
+
 // 스페이스, 엔터키 입력되면 자동
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault(); // 기본 동작 방지
-        document.getElementById('quoteButton').click(); // 버튼 클릭
+        sendMessage(); // 메시지 전송 함수 호출
     }
+});
+
+// 두번 클릭하면 자동 명언 생성
+document.addEventListener('dblclick', function() {
+    sendMessage(); // 메시지 전송 함수 호출
 });
 
 // 버튼 클릭 이벤트 핸들러 추가

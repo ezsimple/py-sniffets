@@ -31,13 +31,14 @@ handler = TimedRotatingFileHandler(log_file_path, when="midnight", interval=1, b
 handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(filename)s - line:%(lineno)d - %(message)s'))
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.WARNING, # 기본 로킹레벨을 WARNING로
     handlers=[
         handler,
         logging.StreamHandler()  # 콘솔에도 로그 출력
     ]
 )
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG) # 현재 파일만 디버그 레벨로 설정
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")

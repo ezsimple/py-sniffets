@@ -139,7 +139,8 @@ document.addEventListener('keydown', function(event) {
 });
 
 // 두 번 클릭하면 자동 명언 생성
-document.addEventListener('dblclick', function() {
+document.addEventListener('dblclick', function(event) {
+    event.preventDefault(); // 기본 동작 방지 (텍스트 선택 방지)
     sendMessage(); // 메시지 전송 함수 호출
 });
 

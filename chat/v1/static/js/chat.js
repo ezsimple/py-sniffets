@@ -113,13 +113,13 @@ const sendMessage = function() {
         // 카운트다운 설정
         let countdown = COUNTDOWN;
         const interval = setInterval(() => {
-            button.textContent = `오늘의 명언 (${countdown}s)`;
+            button.textContent = `오늘의 띵언 (${countdown}s)`;
             countdown--;
 
             // 카운트다운이 끝나면 원래 상태로 복원
             if (countdown < 0) {
                 clearInterval(interval);
-                button.textContent = `오늘의 명언 (${COUNTDOWN}s)`;
+                button.textContent = `오늘의 띵언 (${COUNTDOWN}s)`;
                 button.disabled = false;
                 button.style.backgroundColor = '#4a90e2'; // 원래 색상으로 변경
             }

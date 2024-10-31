@@ -1,0 +1,1 @@
+../../../../chat/v1/static/js/chat.js

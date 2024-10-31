@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 import httpx
 from dotenv import load_dotenv
 import os
+import asyncio
 
 '''
 명언 카드는 포트폴리오 개념의 서비스이므로,
@@ -62,4 +63,4 @@ async def ask_quote():
         return {"content": "격언을 가져오는 데 실패했습니다.", "author": "알 수 없음"}
 
 if __name__ == "__main__":
-    ask_quote()
+    asyncio.run(ask_quote())

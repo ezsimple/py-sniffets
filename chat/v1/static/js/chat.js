@@ -138,6 +138,11 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
+// 전체 문서에서 텍스트 선택 방지
+document.addEventListener('selectstart', function(event) {
+    event.preventDefault(); // 텍스트 선택 방지
+});
+
 // 두 번 클릭하면 자동 명언 생성
 document.addEventListener('dblclick', function(event) {
     event.preventDefault(); // 기본 동작 방지 (텍스트 선택 방지)

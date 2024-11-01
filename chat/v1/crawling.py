@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Text, Integer, DateTime, func, Index, Sequence, UniqueConstraint
+from sqlalchemy import create_engine, Column, Text, Integer, DateTime, func, Index, Sequence, UniqueConstraint, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import exc
@@ -76,6 +76,12 @@ def add_quote(data):
         session.add(new_quote)
         session.commit()
         logger.debug("Quote added successfully.")
+
+        # 시퀀스를 현재 최대 id 값으로 재설정
+        max_id_query = text('SELECT MAX(id) FROM "MinoQuotes"') 
+        max_id = session.execute(max_id_query).scalar() or 0
+        reset_sequence_query = text(f"SELECT setval('minoquote_id_seq', {max_id})")
+        session.execute(reset_sequence_query)
     except exc.IntegrityError:
         session.rollback()
         logger.warning(f"Quote already exists, skipping... {data['q']}")

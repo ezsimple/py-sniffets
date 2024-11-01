@@ -51,8 +51,14 @@ try:
                 
                 # 중복 row skip 기능
                 insert_stmt = insert(MinoQuote).values(q=q_value, a=a_value, h=h_value)
-                insert_stmt = insert_stmt.on_conflict_do_nothing(index_elements=['q', 'a'])
+                insert_stmt = insert_stmt.on_conflict_do_nothing(index_elements=['q', 'a']) # 충돌시 Sequence 증가되 버림
                 connection.execute(insert_stmt)
+
+            # 시퀀스를 현재 최대 id 값으로 재설정
+            max_id_query = text('SELECT MAX(id) FROM "MinoQuotes"') 
+            max_id = connection.execute(max_id_query).scalar() or 0
+            reset_sequence_query = text(f"SELECT setval('minoquote_id_seq', {max_id})")
+            connection.execute(reset_sequence_query)
 
             # 커넥션을 통해 커밋
             connection.commit()

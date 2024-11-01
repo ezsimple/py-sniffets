@@ -1,3 +1,4 @@
 pip install fastapi uvicorn paho-mqtt python-socketio\[asyncio\]
 # brew install postgresql 을 먼저 설치해야 가능
 pip install sqlalchemy psycopg2
+pip install alembic

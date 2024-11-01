@@ -1,10 +1,12 @@
-from sqlalchemy import create_engine, Column, Text, exc
+from sqlalchemy import create_engine, Column, Text, Integer, DateTime, func, Index, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import exc
 import httpx
 from dotenv import load_dotenv
 import os
 import asyncio
+from models.models import MinoQuote, Base
 
 '''
 명언 카드는 포트폴리오 개념의 서비스이므로,
@@ -21,10 +23,19 @@ Base = declarative_base()
 
 class MinoQuote(Base):
     __tablename__ = 'MinoQuotes'
+    
+    id = Column(Integer, Sequence('minoquote_id_seq'), nullable=False)  # 자동 번호 생성
+    # 복합 기본 키 설정
+    q = Column(Text, primary_key=True, nullable=False)  # 명언
+    a = Column(Text, primary_key=True, nullable=False)  # 저자
+    h = Column(Text)  # 주제
+    reg_date = Column(DateTime, server_default=func.now())  # 저장일시
 
-    q = Column(Text, primary_key=True)
-    a = Column(Text, primary_key=True)
-    h = Column(Text)
+    # 인덱스 생성
+    __table_args__ = (
+        Index('idx_minoquote_id', 'id'),  # 인덱스 생성
+    )
+
 
 # 데이터베이스 연결
 engine = create_engine(DATABASE_URL)

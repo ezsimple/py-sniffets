@@ -1,31 +1,110 @@
 const COUNTDOWN = 3; // 카운트다운 시간 설정
 const MAX_ROW = 3; // 최대 li 개수 설정
-const socket = new WebSocket(WS_SERVER);
 const HEARTBEAT_INTERVAL = 30000; // 30초마다 heartbeat 체크
 const PING_TIMEOUT = 5000; // 5초 동안 응답이 없으면 연결 끊김으로 간주
 
+let socket;
 let heartbeatInterval;
 
-function reconnectWebsocket() {
-    console.warn("WebSocket 재연결 시도...");
-    const newSocket = new WebSocket(WS_SERVER);
-    newSocket.onopen = function() {
-        socket = newSocket;
+function connectSocket() {
+    socket = new WebSocket(WS_SERVER);
+
+    socket.onopen = function() {
         sendMessage();
+        startHeartbeat();
     };
-    newSocket.onmessage = socket.onmessage;
-    newSocket.onerror = socket.onerror;
-    socket = newSocket;
+
+    socket.onmessage = function(event) {
+        handleIncomingMessage(event);
+    };
+
+    socket.onerror = function(error) {
+        console.error("WebSocket 오류:", error);
+        clearInterval(heartbeatInterval);
+        disableQuoteButton();
+    };
+
+    socket.onclose = function() {
+        console.warn("WebSocket 연결 종료");
+        reconnectSocket();
+    };
 }
 
-socket.onopen = function() {
-    sendMessage();
-};
+function reconnectSocket() {
+    console.warn("WebSocket 재연결 시도...");
+    setTimeout(() => {
+        connectSocket();
+    }, 1000); // 1초 후 재연결 시도
+}
+
+function handleIncomingMessage(event) {
+    const data = JSON.parse(event.data);
+    if (data.type === 'heartbeat') {
+        startHeartbeat();
+        return;
+    }
+
+    // 메시지가 비어있지 않은 경우에만 li 요소 생성
+    if (data.msg && data.msg.trim()) {
+        createMessageElement(data.msg);
+    }
+}
+
+function createMessageElement(message) {
+    const li = document.createElement('li');
+    const pastelColor = generatePastelColor();
+    li.style.backgroundColor = pastelColor;
+    li.style.color = getFontColor(pastelColor);
+
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'message-container';
+    messageContainer.innerHTML = `${message.replace(/\n/g, '<br>')}`;
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container';
+
+    // 삭제 버튼
+    const deleteButton = createButton('delete-btn', '<i class="fas fa-trash-alt"></i>', () => {
+        li.remove();
+    });
+
+    // 클립보드 복사 버튼
+    const copyButton = createButton('copy-btn', '<i class="fas fa-copy"></i>', () => {
+        navigator.clipboard.writeText(message).then(() => {
+            alert('명언이 클립보드에 복사되었습니다.');
+        });
+    });
+
+    buttonContainer.appendChild(deleteButton);
+    buttonContainer.appendChild(copyButton);
+
+    li.appendChild(messageContainer);
+    li.appendChild(buttonContainer);
+    
+    const messagesList = document.getElementById('messages');
+    messagesList.insertBefore(li, messagesList.firstChild);
+
+    // li 개수 체크 및 초과 시 제거
+    if (messagesList.children.length > MAX_ROW) {
+        const lastChild = messagesList.lastChild;
+        lastChild.classList.add('shatter');
+        setTimeout(() => {
+            messagesList.removeChild(lastChild);
+        }, 500);
+    }
+}
+
+function createButton(className, innerHTML, onClick) {
+    const button = document.createElement('button');
+    button.className = className;
+    button.innerHTML = innerHTML;
+    button.onclick = onClick;
+    return button;
+}
 
 // heartbeat 시작
 function sendPing() {
-    if (socket.readyState !== WebSocket.OPEN)
-        return;
+    if (socket.readyState !== WebSocket.OPEN) return;
     socket.send(JSON.stringify({ type: 'ping' }));
 }
 
@@ -36,77 +115,10 @@ function startHeartbeat() {
     }, HEARTBEAT_INTERVAL);
 }
 
-socket.onmessage = function(event) {
-    const data = JSON.parse(event.data);
-    if (data.type === 'heartbeat') {
-        startHeartbeat();
-        return;
-    }
-
-    // 메시지가 비어있지 않은 경우에만 li 요소 생성
-    if (data.msg && data.msg.trim()) {
-        const li = document.createElement('li');
-        const pastelColor = generatePastelColor();
-        li.style.backgroundColor = pastelColor;
-        li.style.color = getFontColor(pastelColor);
-
-        const messageContainer = document.createElement('div');
-        messageContainer.className = 'message-container';
-        messageContainer.innerHTML = `${data.msg.replace(/\n/g, '<br>')}`;
-
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = 'button-container';
-
-        // 삭제 버튼
-        const deleteButton = document.createElement('button');
-        deleteButton.className = 'delete-btn';
-        deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>'; // 삭제 아이콘
-        deleteButton.onclick = function() {
-            li.remove();
-        };
-
-        // 클립보드 복사 버튼
-        const copyButton = document.createElement('button');
-        copyButton.className = 'copy-btn';
-        copyButton.innerHTML = '<i class="fas fa-copy"></i>'; // 복사 아이콘
-        copyButton.onclick = function() {
-            navigator.clipboard.writeText(data.msg).then(() => {
-                alert('명언이 클립보드에 복사되었습니다.');
-            });
-        };
-
-        buttonContainer.appendChild(deleteButton);
-        buttonContainer.appendChild(copyButton);
-
-        li.appendChild(messageContainer);
-        li.appendChild(buttonContainer);
-        
-        const messagesList = document.getElementById('messages');
-        messagesList.insertBefore(li, messagesList.firstChild);
-
-        // li 개수 체크 및 초과 시 제거
-        if (messagesList.children.length > MAX_ROW) {
-            const lastChild = messagesList.lastChild;
-            lastChild.classList.add('shatter');
-            setTimeout(() => {
-                messagesList.removeChild(lastChild);
-            }, 500);
-        }
-    }
-};
-
-socket.onerror = function(error) {
-    console.error("WebSocket 오류:", error);
-    clearInterval(heartbeatInterval);
-    disableQuoteButton();
-};
-
 // sendMessage 함수 정의
 const sendMessage = function() {
-    const button = disableQuoteButton();
-
     if (socket.readyState !== WebSocket.OPEN) {
-        reconnectWebsocket();
+        reconnectSocket();
         return;
     }
 
@@ -116,6 +128,7 @@ const sendMessage = function() {
 
     // 카운트다운 설정
     let countdown = COUNTDOWN;
+    const button = disableQuoteButton();
     const interval = setInterval(() => {
         button.textContent = `오늘의 띵언 (${countdown}s)`;
         countdown--;
@@ -130,27 +143,26 @@ const sendMessage = function() {
     }, 1000);
 };
 
-// 스페이스, 엔터키 입력되면 자동
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault(); // 기본 동작 방지
+// UI 관련 설정
+function setupUIHandlers() {
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault(); // 기본 동작 방지
+            sendMessage(); // 메시지 전송 함수 호출
+        }
+    });
+
+    document.addEventListener('selectstart', function(event) {
+        event.preventDefault(); // 텍스트 선택 방지
+    });
+
+    document.addEventListener('dblclick', function(event) {
+        event.preventDefault(); // 기본 동작 방지 (텍스트 선택 방지)
         sendMessage(); // 메시지 전송 함수 호출
-    }
-});
+    });
 
-// 전체 문서에서 텍스트 선택 방지
-document.addEventListener('selectstart', function(event) {
-    event.preventDefault(); // 텍스트 선택 방지
-});
-
-// 두 번 클릭하면 자동 명언 생성
-document.addEventListener('dblclick', function(event) {
-    event.preventDefault(); // 기본 동작 방지 (텍스트 선택 방지)
-    sendMessage(); // 메시지 전송 함수 호출
-});
-
-// 버튼 클릭 이벤트 핸들러 추가
-document.getElementById('quoteButton').addEventListener('click', sendMessage);
+    document.getElementById('quoteButton').addEventListener('click', sendMessage);
+}
 
 // 오늘의 명언 버튼 비활성화
 function disableQuoteButton() {
@@ -174,3 +186,7 @@ function getFontColor(backgroundColor) {
     const brightness = (parseInt(rgb[0]) * 0.299 + parseInt(rgb[1]) * 0.587 + parseInt(rgb[2]) * 0.114);
     return brightness > 120 ? 'black' : 'white'; // 밝기 기준 조정
 }
+
+// 초기화
+setupUIHandlers();
+connectSocket();

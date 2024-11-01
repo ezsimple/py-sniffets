@@ -99,7 +99,7 @@ async def ask_quote():
                 logger.warning(f'Warning: {data[0]}')
                 return data
 
-            # add_quote(data[0])
+            add_quote(data[0])
             return data
         return {"content": "격언을 가져오는 데 실패했습니다.", "author": "알 수 없음"}
 

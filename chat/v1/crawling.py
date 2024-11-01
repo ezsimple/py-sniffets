@@ -6,7 +6,9 @@ import httpx
 from dotenv import load_dotenv
 import os
 import asyncio
-from models.models import MinoQuote, Base
+import logging
+from logging.handlers import TimedRotatingFileHandler
+from datetime import datetime
 
 '''
 명언 카드는 포트폴리오 개념의 서비스이므로,
@@ -17,6 +19,25 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL is None:
     raise ValueError("DATABASE_URL is not set in the environment variables.")
+
+log_dir = "log"
+os.makedirs(log_dir, exist_ok=True)  # log 디렉토리가 없으면 생성
+current_date = datetime.now().strftime("%Y-%m-%d")
+log_file_name = f"{__file__}-{current_date}.log"
+log_file_path = os.path.join(log_dir, log_file_name)
+handler = TimedRotatingFileHandler(log_file_path, when="midnight", interval=1, backupCount=7)
+handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(filename)s - line:%(lineno)d - %(message)s'))
+
+logging.basicConfig(
+    level=logging.WARNING, # 기본 로킹레벨을 WARNING로
+    handlers=[
+        handler,
+        logging.StreamHandler()  # 콘솔에도 로그 출력
+    ]
+)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG) # 현재 파일만 디버그 레벨로 설정
+
 
 # SQLAlchemy ORM 설정
 Base = declarative_base()
@@ -49,10 +70,10 @@ def add_quote(data):
     try:
         session.add(new_quote)
         session.commit()
-        print("Quote added successfully.")
+        logger.debug("Quote added successfully.")
     except exc.IntegrityError:
         session.rollback()
-        print("Quote already exists, skipping...")
+        logger.warning("Quote already exists, skipping...")
     finally:
         session.close()
 

@@ -127,7 +127,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Cookie(None)):
 
     await websocket.accept()
     clients[user_id] = {'websocket': websocket}  # 사용자 ID와 WebSocket 연결 저장
-    await websocket.send_text(json.dumps({"type": "heartbeat"})) # 소켓연결 후 바로 하트비트 전결
+    # await websocket.send_text(json.dumps({"type": "heartbeat"})) # 소켓연결 후 바로 하트비트 전결
     logger.debug(f"User connected: {user_id}")
 
     try:
@@ -140,6 +140,10 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Cookie(None)):
 
             # 랜덤한 격언 선택
             quote_data = await get_random_quote()
+            if quote_data[0]['a'] == 'zenquotes.io':
+                logger.warning(f'Warning: {quote_data[0]["q"]}')
+                continue
+
             quote_content = quote_data[0]['q']  # 격언 내용
             quote_author = quote_data[0]['a']    # 격언 저자
             translated_quote = await translate_quote(quote_data[0])  # 격언 번역

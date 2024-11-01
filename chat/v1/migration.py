@@ -49,6 +49,7 @@ try:
                 
                 print(f"Inserting: q='{q_value}', a='{a_value}', h='{h_value}'")  # 로그 추가
                 
+                # 중복 row skip 기능
                 insert_stmt = insert(MinoQuote).values(q=q_value, a=a_value, h=h_value)
                 insert_stmt = insert_stmt.on_conflict_do_nothing(index_elements=['q', 'a'])
                 connection.execute(insert_stmt)

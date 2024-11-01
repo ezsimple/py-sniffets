@@ -67,3 +67,30 @@ try:
 
 except Exception as e:
     print(f"오류 발생: {e}")
+
+'''
+-- 참고 쿼리
+SELECT id, COUNT(*) as cnt
+FROM "MinoQuotes" a
+GROUP BY id 
+having count(id) > 1
+ORDER BY id ;
+
+SELECT *
+FROM information_schema.table_constraints
+WHERE constraint_name = 'idx_minoquote_id';
+
+CREATE TABLE MinoQuotes_copy AS
+SELECT *
+from public."MinoQuotes" mq ;
+
+WITH RECURSIVE id_series AS (
+    SELECT generate_series(1, (select MAX(id) FROM "MinoQuotes")) AS id
+)
+SELECT id_series.id
+FROM id_series
+LEFT JOIN "MinoQuotes" ON id_series.id = "MinoQuotes".id
+WHERE "MinoQuotes".id IS NULL;
+
+DROP SEQUENCE IF EXISTS minoquote_id_seq;
+'''

@@ -78,7 +78,7 @@ def add_quote(data):
         logger.debug("Quote added successfully.")
     except exc.IntegrityError:
         session.rollback()
-        logger.warning("Quote already exists, skipping...")
+        logger.warning(f"Quote already exists, skipping... {data['q']}")
     finally:
         session.close()
 
@@ -95,7 +95,11 @@ async def ask_quote():
         response = await client.get("https://zenquotes.io/api/random")
         if response.status_code == 200:
             data = response.json()
-            add_quote(data[0])
+            if 'zenquotes.io' in data[0]['a']:
+                logger.warning(f'Warning: {data[0]}')
+                return data
+
+            # add_quote(data[0])
             return data
         return {"content": "격언을 가져오는 데 실패했습니다.", "author": "알 수 없음"}
 

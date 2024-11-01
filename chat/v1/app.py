@@ -83,6 +83,10 @@ async def get_random_quote():
         response = await client.get("https://zenquotes.io/api/random")
         if response.status_code == 200:
             data = response.json()
+            if 'zenquotes.io' in data[0]['a']:
+                logger.warning(f'Warning: {data[0]}')
+                return data
+
             add_quote(data[0])
             return data
         return {"content": "격언을 가져오는 데 실패했습니다.", "author": "알 수 없음"}
@@ -140,10 +144,6 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Cookie(None)):
 
             # 랜덤한 격언 선택
             quote_data = await get_random_quote()
-            if quote_data[0]['a'] == 'zenquotes.io':
-                logger.warning(f'Warning: {quote_data[0]["q"]}')
-                continue
-
             quote_content = quote_data[0]['q']  # 격언 내용
             quote_author = quote_data[0]['a']    # 격언 저자
             translated_quote = await translate_quote(quote_data[0])  # 격언 번역

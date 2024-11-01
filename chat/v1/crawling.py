@@ -20,13 +20,17 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL is None:
     raise ValueError("DATABASE_URL is not set in the environment variables.")
 
-log_dir = "log"
+current_dir = os.path.dirname(os.path.abspath(__file__))
+log_dir = os.path.join(current_dir, "log")
 os.makedirs(log_dir, exist_ok=True)  # log 디렉토리가 없으면 생성
+
 current_date = datetime.now().strftime("%Y-%m-%d")
-log_file_name = f"{__file__}-{current_date}.log"
+log_file_name = f"{os.path.basename(__file__)}-{current_date}.log"
 log_file_path = os.path.join(log_dir, log_file_name)
 handler = TimedRotatingFileHandler(log_file_path, when="midnight", interval=1, backupCount=7)
 handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(filename)s - line:%(lineno)d - %(message)s'))
+
+print(log_file_path)
 
 logging.basicConfig(
     level=logging.WARNING, # 기본 로킹레벨을 WARNING로

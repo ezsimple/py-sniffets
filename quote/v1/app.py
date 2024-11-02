@@ -9,6 +9,7 @@ from logging.handlers import TimedRotatingFileHandler
 import logging
 from datetime import datetime
 import os, sys
+from fastapi.middleware.cors import CORSMiddleware
 
 # 현재 스크립트의 경로를 기준으로 PYTHONPATH 추가
 current_dir = os.path.dirname(os.path.abspath(__file__))  # 현재 파일의 절대 경로
@@ -55,24 +56,32 @@ logger.setLevel(logging.DEBUG) # 현재 파일만 디버그 레벨로 설정
 
 # FastAPI 인스턴스 생성
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 필요에 따라 도메인 설정
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 router = APIRouter(prefix=PREFIX)
 
 @router.get("/")
 async def get_random_quote():
     async with async_session() as session:
-        # 총 인용구 개수 조회
-        total_quotes_query = select(func.count(MinoQuote.id))
-        total_quotes = await session.execute(total_quotes_query)
-        total_count = total_quotes.scalar() or 0
+        # 총 인용구 ID 목록 조회
+        total_quotes_query = select(MinoQuote.id)
+        result = await session.execute(total_quotes_query)
+        quote_ids = result.scalars().all()  # 모든 ID를 리스트로 가져옴
 
-        if total_count == 0:
+        if not quote_ids:
             raise HTTPException(status_code=404, detail="No quotes available.")
 
         # 랜덤 인덱스 생성
-        random_index = random.randint(0, total_count - 1)
+        random_index = random.randint(0, len(quote_ids) - 1)
+        random_quote_id = quote_ids[random_index]  # 랜덤하게 선택된 ID
 
         # 랜덤 인용구 조회
-        random_quote_query = select(MinoQuote).offset(random_index).limit(1)
+        random_quote_query = select(MinoQuote).where(MinoQuote.id == random_quote_id)
         logger.debug(str(random_quote_query))
         result = await session.execute(random_quote_query)
         quote = result.scalar_one_or_none()
@@ -83,7 +92,6 @@ async def get_random_quote():
         # 응답 포맷팅
         res = [{"q": quote.q, "a": quote.a, "h": quote.h}]
         return res
-
 
 app.include_router(router)
 

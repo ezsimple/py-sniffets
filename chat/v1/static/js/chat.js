@@ -6,6 +6,12 @@ const PING_TIMEOUT = 5000; // 5초 동안 응답이 없으면 연결 끊김으�
 let socket;
 let heartbeatInterval;
 
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
 function connectSocket() {
     socket = new WebSocket(WS_SERVER);
 
@@ -32,9 +38,15 @@ function connectSocket() {
 
 function reconnectSocket() {
     console.warn("WebSocket 재연결 시도...");
-    setTimeout(() => {
-        connectSocket();
-    }, 1000); // 1초 후 재연결 시도
+    let delay = 1000
+    const attemptReconnect = setInterval(() => {
+        if (socket.readyState === WebSocket.CLOSED) {
+            connectSocket();
+            delay *= 2; // 지연 시간 두 배 증가
+        } else {
+            clearInterval(attemptReconnect); // 성공적으로 연결되면 인터벌 정지
+        }
+    }, delay);
 }
 
 function handleIncomingMessage(event) {

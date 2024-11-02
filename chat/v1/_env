@@ -1,4 +1,5 @@
 PREFIX=/chat
+API_SERVER=https://a1.mkeasy.kro.kr/quotes
 SECRET_KEY=aEmolOFPK86VSPXrIkDHEQZRgjAjRXZuqt_N7Hi9wQ8=
 HOST=0.0.0.0
 PORT=4444

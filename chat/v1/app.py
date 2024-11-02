@@ -20,7 +20,7 @@ from crawling import add_quote
 load_dotenv()
 PREFIX = os.getenv("PREFIX","/chat")
 WS_SERVER = os.getenv("WS_SERVER", f'ws://localhost:4444{PREFIX}/ws')
-
+API_SERVER = os.getenv("API_SERVER", 'https://zenquotes.io/api/random')
 # Fernet key must be 32 url-safe base64-encoded bytes.
 # SECRET_KEY = Fernet.generate_key().decode()  # 바이트를 문자열로 변환
 SECRET_KEY = os.getenv("SECRET_KEY", "aEmolOFPK86VSPXrIkDHEQZRgjAjRXZuqt_N7Hi9wQ8=")
@@ -80,7 +80,7 @@ async def send_message_to_clients(message_data, user_id):
 
 async def get_random_quote():
     async with httpx.AsyncClient() as client:
-        response = await client.get("https://zenquotes.io/api/random")
+        response = await client.get(API_SERVER)
         if response.status_code == 200:
             data = response.json()
             if 'zenquotes.io' in data[0]['a']:
@@ -106,12 +106,13 @@ async def get(request: Request, user_id: str = Cookie(None)):
     if user_id is None:
         user_id = str(uuid.uuid4())
         encrypted_user_id = cipher.encrypt(user_id.encode()).decode()
-        response.set_cookie(key="user_id", value=encrypted_user_id)  # 쿠키에 user_id 저장
+        response.set_cookie(key="user_id", value=encrypted_user_id, path='/')
 
     return response
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket, user_id: str = Cookie(None)):
+    logger.debug(f"WebSocket connection established for user_id: {user_id}")
     if user_id is None:
         raise HTTPException(status_code=403, detail="User ID not provided")
 

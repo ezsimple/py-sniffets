@@ -65,7 +65,7 @@ app.add_middleware(
 )
 router = APIRouter(prefix=PREFIX)
 
-@router.get("/")
+@router.get("/random")
 async def get_random_quote():
     async with async_session() as session:
         # 총 인용구 ID 목록 조회

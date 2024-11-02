@@ -16,11 +16,13 @@ import logging
 import os
 from cryptography.fernet import Fernet
 from crawling import add_quote
+import pdb
 
 load_dotenv()
 PREFIX = os.getenv("PREFIX","/chat")
 WS_SERVER = os.getenv("WS_SERVER", f'ws://localhost:4444{PREFIX}/ws')
 API_SERVER = os.getenv("API_SERVER", 'https://zenquotes.io/api/random')
+API_SERVER = 'https://zenquotes.io/api/random'
 # Fernet key must be 32 url-safe base64-encoded bytes.
 # SECRET_KEY = Fernet.generate_key().decode()  # 바이트를 문자열로 변환
 SECRET_KEY = os.getenv("SECRET_KEY", "aEmolOFPK86VSPXrIkDHEQZRgjAjRXZuqt_N7Hi9wQ8=")
@@ -159,6 +161,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Cookie(None)):
                 continue
 
             # 랜덤한 격언 선택
+            pdb.set_trace()
             quote_data = await get_random_quote()
             quote_content = quote_data[0]['q']  # 격언 내용
             quote_author = quote_data[0]['a']    # 격언 저자

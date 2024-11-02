@@ -13,7 +13,8 @@ function getCookie(name) {
 }
 
 function connectSocket() {
-    socket = new WebSocket(WS_SERVER);
+    const user_id = getCookie('user_id');
+    socket = new WebSocket(WS_SERVER + '?user_id='+user_id);
 
     socket.onopen = function() {
         sendMessage();

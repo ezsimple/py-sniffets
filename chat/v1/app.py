@@ -1,7 +1,7 @@
 import json
 import uuid
 import httpx
-from fastapi import FastAPI, APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException
+from fastapi import FastAPI, APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, Query
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -113,8 +113,12 @@ async def get(request: Request, user_id: str = Cookie(None)):
     return response
 
 @router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket, user_id: str = Cookie(None)):
-    logger.debug(f"WebSocket connection established for user_id: {user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None)):
+    '''
+    WebSocket에서는 Cookie를 읽지 못하는 경우가 있음.
+    그러므로 먼저 /에서 쿠키를 생성하고, 클라이언트에서 쿠키를 읽어서, 쿼리 파라미터로 전달하는 방식을 사용.
+    '''
+    # == start : websocket handshake
     if user_id is None:
         raise HTTPException(status_code=403, detail="User ID not provided")
 
@@ -131,6 +135,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Cookie(None)):
     mqtt_topic = f"chat/messages/{user_id}"  # 사용자별 MQTT 토픽 생성
     mqtt_client.subscribe(mqtt_topic)  # 사용자별 MQTT 토픽 구독
     logger.debug(f"Subscribed to MQTT topic: {mqtt_topic}")
+    # == end : websocket handshake
 
     await websocket.accept()
     clients[user_id] = {'websocket': websocket}  # 사용자 ID와 WebSocket 연결 저장

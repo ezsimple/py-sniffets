@@ -137,10 +137,19 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Cookie(None)):
     try:
         while True:
             message = await websocket.receive_text()
-            # logger.debug(f"Received message from {user_id}: {message}")
+            if not isinstance(message, str):
+                continue  # 문자열이 아닐 경우 다음 루프로 진행
+
             if "ping" in message:
                 await websocket.send_text(json.dumps({"type": "heartbeat"})) 
                 continue
+
+            logger.debug(f"Received message from {user_id}: {message}")
+            data = json.loads(message)
+            max_row = data.get("MAX_ROW")
+            li_count = data.get('liCount')
+            if int(li_count) > max_row: # js 재연결 오류 발생시, 부하 방지
+                 continue
 
             # 랜덤한 격언 선택
             quote_data = await get_random_quote()

@@ -124,7 +124,8 @@ const sendMessage = function() {
 
     // WebSocket이 열린 경우에만 메시지를 전송
     const liCount = document.querySelectorAll('#messages li').length;
-    socket.send(liCount.toString()); // liCount를 문자열로 변환하여 전송
+    const reqMessage = {'MAX_ROW': MAX_ROW, 'liCount' : liCount.toString()}
+    socket.send(JSON.stringify(reqMessage)); // liCount를 문자열로 변환하여 전송
 
     // 카운트다운 설정
     let countdown = COUNTDOWN;

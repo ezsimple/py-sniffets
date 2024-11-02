@@ -144,12 +144,18 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Cookie(None)):
                 await websocket.send_text(json.dumps({"type": "heartbeat"})) 
                 continue
 
-            logger.debug(f"Received message from {user_id}: {message}")
-            data = json.loads(message)
-            max_row = data.get("MAX_ROW")
-            li_count = data.get('liCount')
-            if int(li_count) > max_row: # js 재연결 오류 발생시, 부하 방지
-                 continue
+            try:
+                logger.debug(f"Received message from {user_id}: {message}")
+                data = json.loads(message)
+                max_row = data.get("MAX_ROW")
+                li_count = data.get('liCount')
+                if int(li_count) > max_row: # js 재연결 오류 발생시, 부하 방지
+                    logger.warning(f"Too many messages: {li_count}")
+                    continue
+
+            except json.JSONDecodeError:
+                logger.error(f"Invalid JSON format: {message}")
+                continue
 
             # 랜덤한 격언 선택
             quote_data = await get_random_quote()

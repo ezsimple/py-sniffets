@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# 1. .env 파일에서 환경 변수 로드
+# 1. 현재 스크립트의 디렉토리로 이동
+cd "$(dirname "$0")" || exit 1  # 스크립트가 위치한 디렉토리로 이동
+
+# 2. .env 파일에서 환경 변수 로드
 if [ -f .env ]; then
     export $(grep -v '^#' .env | xargs)
 else
@@ -9,7 +12,7 @@ else
 fi
 
 # 2. 기존 프로세스를 찾아서 kill
-PORT=$(echo $PORT)  # 환경 변수에서 포트 가져오기
+PORT=$(echo $PORT:-4444)  # 환경 변수에서 포트 가져오기
 
 # 기존 프로세스 찾기
 PIDS=$(lsof -t -i:$PORT)

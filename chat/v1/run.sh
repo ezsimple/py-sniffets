@@ -11,8 +11,8 @@ else
     exit 1
 fi
 
-# 2. 기존 프로세스를 찾아서 kill
-PORT=$(echo $PORT:-4444)  # 환경 변수에서 포트 가져오기
+# 3. 기존 프로세스를 찾아서 kill
+PORT=${PORT:-4444}  # 환경 변수에서 포트 가져오기
 
 # 기존 프로세스 찾기
 PIDS=$(lsof -t -i:$PORT)
@@ -27,13 +27,13 @@ else
 fi
 
 
-# 3. nohup.out 존재하면 삭제
+# 4. nohup.out 존재하면 삭제
 if [ -f nohup.out ]; then
     echo "nohup.out 파일을 삭제합니다."
     rm nohup.out
 fi
 
-# 4. nohup을 이용하여 FastAPI 애플리케이션 실행
+# 5. nohup을 이용하여 FastAPI 애플리케이션 실행
 echo "FastAPI 애플리케이션을 nohup으로 실행합니다."
 # --reload 옵션은 python -m multiprocess를 실행시켜 서브프로세스를 따로 생성시킴
 nohup python -m uvicorn app:app --host $HOST --port $PORT > nohup.out 2>&1 &

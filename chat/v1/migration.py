@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, Text, DateTime, Sequence,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import insert
 from dotenv import load_dotenv
+from models.models import MinoQuote, Base
 import os
 
 # 환경 변수 로드
@@ -9,23 +10,6 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL is None:
     raise ValueError("DATABASE_URL is not set in the environment variables.")
-
-Base = declarative_base()
-
-# MinoQuote 클래스 정의
-class MinoQuote(Base):
-    __tablename__ = 'MinoQuotes'
-    
-    id = Column(Integer, Sequence('minoquote_id_seq'), primary_key=True, nullable=False)
-    q = Column(Text, nullable=False)
-    a = Column(Text, nullable=False)
-    h = Column(Text)
-    reg_date = Column(DateTime, server_default=func.now())
-
-    __table_args__ = (
-        Index('idx_minoquote_id', 'id'),
-        UniqueConstraint('q', 'a', name='uq_minoquote_q_a')
-    )
 
 # 데이터베이스 엔진 생성
 engine = create_engine(DATABASE_URL)

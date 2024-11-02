@@ -1,0 +1,7 @@
+FastAPI 를 이용한 quote restful api 서버
+
+GET /api/quote/random 으로 접근하면
+랜덤하게 하나의 데이타만 응답
+
+응답 포맷 : json array 포맷임.
+[{ "q": "quote", "a": "author", "h": "html코드" }]

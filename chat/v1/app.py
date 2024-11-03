@@ -99,11 +99,20 @@ async def translate_quote(quote):
     translated_text = await loop.run_in_executor(None, translator.translate, quote['q'], 'en', 'kr')
     return translated_text
 
+def get_readme_content(path):
+    readme_path = os.path.join(path, '.README')
+    if os.path.isfile(readme_path):
+        with open(readme_path, 'r') as f:
+            content = f.readlines()
+        return '<br>'.join(line.strip() for line in content if not line.startswith('#'))
+    return ""
+
 @router.get("/")
 async def get(request: Request, user_id: str = Cookie(None)):
 
+    readme_content = get_readme_content(current_dir)
     timestamp = datetime.now().timestamp()  # 현재 시간을 타임스탬프로 변환
-    response = templates.TemplateResponse("chat.html", {"request": request, "timestamp": timestamp, "WS_SERVER": WS_SERVER})
+    response = templates.TemplateResponse("chat.html", {"request": request, "timestamp": timestamp, "WS_SERVER": WS_SERVER, "readme_content": readme_content})
 
     if user_id is None:
         user_id = str(uuid.uuid4())

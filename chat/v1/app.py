@@ -16,6 +16,7 @@ import logging
 import os
 from cryptography.fernet import Fernet
 from crawling import add_quote
+from deep_translator import GoogleTranslator
 import pdb
 
 load_dotenv()
@@ -93,11 +94,19 @@ async def get_random_quote():
             return data
         return {"content": "격언을 가져오는 데 실패했습니다.", "author": "알 수 없음"}
 
+# async def translate_quote(quote):
+#     translator = Translator()
+#     loop = asyncio.get_event_loop()
+#     translated_text = await loop.run_in_executor(None, translator.translate, quote['q'], 'en', 'kr')
+#     return translated_text
+
 async def translate_quote(quote):
-    translator = Translator()
-    loop = asyncio.get_event_loop()
-    translated_text = await loop.run_in_executor(None, translator.translate, quote['q'], 'en', 'kr')
-    return translated_text
+    '''
+    deep-L 라이브러리를 사용하여 번역하는 함수
+    좀 더 자연어에 가까운 번역결과를 보여줌 
+    '''
+    translated_text = await asyncio.to_thread(GoogleTranslator(source='en', target='ko').translate, quote['q'])
+    return translated_text  # 번역된 텍스트 반환
 
 def get_readme_content(path):
     readme_path = os.path.join(path, '.README')

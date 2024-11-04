@@ -89,3 +89,31 @@ async def ask_quote():
 
 if __name__ == "__main__":
     asyncio.run(ask_quote())
+
+'''
+일일 명언  수집 통계
+- total_count : 전체 명언수
+- today_add_count : 금일 추가된 명언수
+- today_add_ratio : 금일 추가된 요청 대비  명언 효율
+WITH yesterday AS (
+    SELECT 
+        max(id) AS max_id,
+        min(id) as min_id
+    FROM 
+        "MinoQuotes"
+    WHERE 
+        reg_date::date = CURRENT_DATE - INTERVAL '1 day'  -- 어제의 날짜
+),
+today AS (
+    SELECT 
+        count(*) AS total_count
+    FROM 
+        "MinoQuotes"
+    WHERE 
+        reg_date::date = CURRENT_DATE  -- 오늘의 날짜
+)
+SELECT 
+    coalesce((SELECT count(*) FROM "MinoQuotes" mq1 ))AS total_count,
+    COALESCE((SELECT total_count FROM today), 0) AS today_add_count,
+    COALESCE((SELECT total_count FROM today), 0) * 100.0 / NULLIF((SELECT (max_id - min_id) FROM yesterday), 0) AS today_add_ratio
+'''

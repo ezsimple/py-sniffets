@@ -15,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 current_dir = os.path.dirname(os.path.abspath(__file__))  # 현재 파일의 절대 경로
 parent_dir = os.path.abspath(os.path.join(current_dir, '../../'))  # 부모 디렉토리 경로
 sys.path.append(parent_dir)  # PYTHONPATH에 추가
-from chat.v1.models.models import MinoQuote
+from chat.v1.models.models import MinoQuote2
 
 # 환경 변수 로드
 load_dotenv()
@@ -69,7 +69,7 @@ router = APIRouter(prefix=PREFIX)
 async def get_random_quote():
     async with async_session() as session:
         # 총 인용구 ID 목록 조회
-        total_quotes_query = select(MinoQuote.id)
+        total_quotes_query = select(MinoQuote2.id)
         result = await session.execute(total_quotes_query)
         quote_ids = result.scalars().all()  # 모든 ID를 리스트로 가져옴
 
@@ -81,7 +81,7 @@ async def get_random_quote():
         random_quote_id = quote_ids[random_index]  # 랜덤하게 선택된 ID
 
         # 랜덤 인용구 조회
-        random_quote_query = select(MinoQuote).where(MinoQuote.id == random_quote_id)
+        random_quote_query = select(MinoQuote2).where(MinoQuote2.id == random_quote_id)
         logger.debug(str(random_quote_query))
         result = await session.execute(random_quote_query)
         quote = result.scalar_one_or_none()
@@ -90,7 +90,7 @@ async def get_random_quote():
             raise HTTPException(status_code=404, detail="Quote not found.")
 
         # 응답 포맷팅
-        res = [{"q": quote.q, "a": quote.a, "h": quote.h}]
+        res = [{"q": quote.q, "a": quote.a, "t": quote.t}]
         return res
 
 app.include_router(router)

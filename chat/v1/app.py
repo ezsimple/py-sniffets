@@ -15,6 +15,11 @@ from logging.handlers import TimedRotatingFileHandler
 import logging
 import os
 from cryptography.fernet import Fernet
+
+'''
+주의: crontab에서 크롤링중인 메소드를 사용중
+테이블변경시 참고 필요
+'''
 from crawling import add_quote
 from deep_translator import GoogleTranslator
 import pdb

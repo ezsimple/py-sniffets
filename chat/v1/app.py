@@ -15,6 +15,7 @@ from logging.handlers import TimedRotatingFileHandler
 import logging
 import os
 from cryptography.fernet import Fernet
+import time
 
 '''
 주의: crontab에서 크롤링중인 메소드를 사용중
@@ -65,6 +66,9 @@ mqtt_client = mqtt.Client()
 
 # WebSocket 연결 관리
 clients = {}
+
+# 마지막 요청 시간을 저장할 딕셔너리
+last_request_time = {}
 
 # MQTT 메시지 수신 콜백
 def on_message(client, userdata, message):
@@ -173,6 +177,15 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None)):
             if "ping" in message:
                 await websocket.send_text(json.dumps({"type": "heartbeat"})) 
                 continue
+
+            current_time = time.time()
+            # 3초 이내에 들어온 요청인지 확인
+            if current_time - last_request_time[user_id] < 3:
+                logger.warning(f"Request from {user_id} ignored due to guard time.")
+                continue
+
+            # 마지막 요청 시간 업데이트
+            last_request_time[user_id] = current_time
 
             try:
                 logger.debug(f"Received message from {user_id}: {message}")

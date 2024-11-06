@@ -179,23 +179,23 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None)):
                 await websocket.send_text(json.dumps({"type": "heartbeat"})) 
                 continue
 
-            current_time = time.time()
-            # 3초 이내에 들어온 요청인지 확인
-            if current_time - last_request_time[user_id] < 3:
-                logger.warning(f"Request from {user_id} ignored due to guard time.")
-                continue
-
-            # 마지막 요청 시간 업데이트
-            last_request_time[user_id] = current_time
 
             try:
                 logger.debug(f"Received message from {user_id}: {message}")
                 data = json.loads(message)
                 max_row = data.get("MAX_ROW")
-                li_count = data.get('liCount')
-                if int(li_count) > max_row: # js 재연결 오류 발생시, 부하 방지
+                li_count = int(data.get('liCount'))
+                if li_count > max_row: # js 재연결 오류 발생시, 부하 방지
                     logger.warning(f"Too many messages: {li_count}")
                     continue
+
+                current_time = time.time()
+                if ((current_time - last_request_time[user_id] < 3) and (li_count >= max_row)):
+                    logger.warning(f"Request from {user_id} ignored due to guard time.")
+                    continue
+
+                # 마지막 요청 시간 업데이트
+                last_request_time[user_id] = current_time
 
             except json.JSONDecodeError:
                 logger.error(f"Invalid JSON format: {message}")

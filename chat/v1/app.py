@@ -165,6 +165,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None)):
 
     await websocket.accept()
     clients[user_id] = {'websocket': websocket}  # 사용자 ID와 WebSocket 연결 저장
+    last_request_time[user_id] = time.time()  # 초기화
     # await websocket.send_text(json.dumps({"type": "heartbeat"})) # 소켓연결 후 바로 하트비트 전결
     logger.debug(f"User connected: {user_id}")
 

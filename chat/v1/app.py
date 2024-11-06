@@ -23,7 +23,6 @@ load_dotenv()
 PREFIX = os.getenv("PREFIX","/chat")
 WS_SERVER = os.getenv("WS_SERVER", f'ws://localhost:4444{PREFIX}/ws')
 API_SERVER = os.getenv("API_SERVER", 'https://zenquotes.io/api/random')
-API_SERVER = 'https://zenquotes.io/api/random'
 # Fernet key must be 32 url-safe base64-encoded bytes.
 # SECRET_KEY = Fernet.generate_key().decode()  # 바이트를 문자열로 변환
 SECRET_KEY = os.getenv("SECRET_KEY", "aEmolOFPK86VSPXrIkDHEQZRgjAjRXZuqt_N7Hi9wQ8=")
@@ -86,11 +85,11 @@ async def get_random_quote():
         response = await client.get(API_SERVER)
         if response.status_code == 200:
             data = response.json()
-            if 'zenquotes.io' in data[0]['a']:
-                logger.warning(f'Warning: {data[0]}')
-                return data
-
-            add_quote(data[0])
+            if "zenquotes" in API_SERVER:
+                if 'zenquotes.io' in data[0]['a']:
+                    logger.warning(f'Warning: {data[0]}')
+                    return data
+                add_quote(data[0])
             return data
         return {"content": "격언을 가져오는 데 실패했습니다.", "author": "알 수 없음"}
 

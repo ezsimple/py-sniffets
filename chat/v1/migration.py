@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, Text, DateTime, Sequence,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import insert
 from dotenv import load_dotenv
-from models.models import MinoQuote, Base
+from models.models import MinoQuote2, Base
 import os
 
 # 환경 변수 로드
@@ -34,7 +34,7 @@ try:
                 print(f"Inserting: q='{q_value}', a='{a_value}', h='{h_value}'")  # 로그 추가
                 
                 # 중복 row skip 기능
-                insert_stmt = insert(MinoQuote).values(q=q_value, a=a_value, h=h_value)
+                insert_stmt = insert(MinoQuote2).values(q=q_value, a=a_value, h=h_value)
                 insert_stmt = insert_stmt.on_conflict_do_nothing(index_elements=['q', 'a']) # 충돌시 Sequence 증가되 버림
                 connection.execute(insert_stmt)
 

@@ -9,7 +9,7 @@ import asyncio
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime
-from models.models import MinoQuote, Base
+from models.models import MinoQuote2, Base
 
 '''
 명언 카드는 포트폴리오 개념의 서비스이므로,
@@ -48,7 +48,7 @@ Session = sessionmaker(bind=engine)
 
 def add_quote(data):
     session = Session()
-    new_quote = MinoQuote(q=data['q'], a=data['a'], h=data['h'])
+    new_quote = MinoQuote2(q=data['q'], a=data['a'], h=data['h'])
     
     try:
         session.add(new_quote)

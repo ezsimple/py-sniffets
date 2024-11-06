@@ -48,7 +48,7 @@ Session = sessionmaker(bind=engine)
 
 def add_quote(data):
     session = Session()
-    new_quote = MinoQuote(q=data['q'], a=data['a'], h=data['h'])
+    new_quote = MinoQuote(q=data['q'], a=data['a'], t=data['h'])
     
     try:
         session.add(new_quote)

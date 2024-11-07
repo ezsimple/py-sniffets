@@ -89,28 +89,6 @@ function createMessageElement(message, quoteId) {
         });
     });
 
-    // 좋아요 버튼
-    const likeButton = createButton('like-btn', '<i class="fas fa-thumbs-up"></i>', async () => {
-        // alert('좋아요! 이 명언을 좋아합니다.');
-        // 추가적인 로직을 여기에 구현할 수 있습니다.
-        const response = await fetch('/chat/like', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ quote_id: quoteId })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            alert(`좋아요 클릭 완료! 현재 좋아요 수: ${data.like_count}`);
-        } else {
-            const errorData = await response.json();
-            console.error(errorData.detail)
-            // alert(`좋아요 클릭 실패: ${errorData.detail}`);
-        }
-    });
-
     // 공유 버튼
     const shareButton = createButton('share-btn', '<i class="fas fa-share-square"></i>', () => {
         if (navigator.share) {
@@ -128,10 +106,61 @@ function createMessageElement(message, quoteId) {
         }
     });
 
+    // 좋아요 버튼
+    const likeButton = createButton('like-btn', '<i class="fas fa-thumbs-up"></i>', async () => {
+        // alert('좋아요! 이 명언을 좋아합니다.');
+        // 추가적인 로직을 여기에 구현할 수 있습니다.
+        const response = await fetch('/chat/like', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ quote_id: quoteId })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            showLikeNotification(`👍 좋아요! 현재 좋아요: ${data.like_count} 개`, likeButton);
+        } else {
+            const errorData = await response.json();
+            console.error(errorData.detail)
+        }
+    });
+
+    // 좋아요 알림 메시지 표시 함수
+    function showLikeNotification(message, buttonElement) {
+        // 알림 요소가 이미 존재하는지 확인
+        let notification = document.getElementById('like-notification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'like-notification';
+            document.body.appendChild(notification);
+        }
+
+        // 메시지 설정
+        notification.innerText = message;
+        notification.style.display = 'block';  // 표시
+        notification.style.opacity = '1';  // 완전 불투명
+
+        // 버튼의 위치 계산
+        const rect = buttonElement.getBoundingClientRect();
+        notification.style.position = 'fixed';
+        notification.style.top = `${rect.top - 40}px`; // 버튼의 위쪽에서 40px 위에 위치
+        notification.style.right = `${window.innerWidth - rect.right + 10}px`; // 버튼의 오른쪽에서 10px 떨어진 위치
+
+        // 3초 후에 사라지도록 설정
+        setTimeout(() => {
+            notification.style.opacity = '0';  // 점점 투명해짐
+            setTimeout(() => {
+                notification.style.display = 'none';  // 숨김
+            }, 500);  // 투명해지는 시간과 동일
+        }, 3000);  // 3초 후
+    }
+
     // buttonContainer.appendChild(deleteButton);
     // buttonContainer.appendChild(copyButton);
-    buttonContainer.appendChild(likeButton);
     buttonContainer.appendChild(shareButton);
+    buttonContainer.appendChild(likeButton);
 
     li.appendChild(messageContainer);
     li.appendChild(buttonContainer);

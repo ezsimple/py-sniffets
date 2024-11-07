@@ -8,11 +8,8 @@ from fastapi.templating import Jinja2Templates
 from fastapi import Request, Cookie
 import paho.mqtt.client as mqtt
 import asyncio
-from kakaotrans import Translator
 from datetime import datetime
 from dotenv import load_dotenv
-from logging.handlers import TimedRotatingFileHandler
-import logging
 import os
 from cryptography.fernet import Fernet
 import time
@@ -21,11 +18,10 @@ import time
 주의: crontab에서 크롤링중인 메소드를 사용중
 테이블변경시 참고 필요
 '''
-import pdb
 from deep_translator import GoogleTranslator
 from fastapi import APIRouter, HTTPException, Cookie, Depends
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+from datetime import datetime
 from models.models import MinoLike, MinoQuote  # 모델 가져오기
 from database import SessionLocal  # 데이터베이스 세션을 가져오는 방법
 from logger import LoggerSetup

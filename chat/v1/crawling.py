@@ -17,30 +17,20 @@ logger_setup = LoggerSetup()
 logger = logger_setup.get_logger()
 
 def add_quote(data):
-    session = SessionLocal()
-    new_quote = MinoQuote(q=data['q'], a=data['a'], t=data['h'])
-    
-    try:
-        session.add(new_quote)
-        session.commit()
-        logger.debug("Quote added successfully.")
-
-        # 시퀀스를 현재 최대 id 값으로 재설정
-        max_id_query = text('SELECT MAX(id) FROM "MinoQuotes"') 
-        max_id = session.execute(max_id_query).scalar() or 0
-        reset_sequence_query = text(f"SELECT setval('minoquote_id_seq', {max_id})")
-        session.execute(reset_sequence_query)
-
-        # 새로 추가된 quote의 ID 반환
-        return new_quote
-    except exc.IntegrityError:
-        session.rollback()
-        # 이미 존재한다면 존재하는 데이터의 ID 반환
-        logger.warning(f"Quote already exists, skipping... {data['q']}")
-        existing_quote = session.query(MinoQuote).filter_by(q=data['q'], a=data['a']).first()
-        return existing_quote  # 기존 명언 반환
-    finally:
-        session.close()
+    # with 문을 사용하여 세션 관리
+    with SessionLocal() as session:
+        new_quote = MinoQuote(q=data['q'], a=data['a'], t=data['h'])
+        try:
+            session.add(new_quote)
+            session.commit()
+            logger.debug("Quote added successfully.")
+            return new_quote
+        except exc.IntegrityError:
+            session.rollback()  # 오류 발생 시 롤백
+            logger.warning(f"Quote already exists, skipping... {data['q']}")
+            # 이미 존재하는 경우 None 반환
+            existing_quote = session.query(MinoQuote).filter_by(q=data['q'], a=data['a']).first()
+            return existing_quote
 
 async def scrape_quote():
     '''

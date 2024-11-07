@@ -157,8 +157,8 @@ function createMessageElement(message, quoteId) {
         }, 3000);  // 3초 후
     }
 
-    // buttonContainer.appendChild(deleteButton);
-    // buttonContainer.appendChild(copyButton);
+    buttonContainer.appendChild(deleteButton);
+    buttonContainer.appendChild(copyButton);
     buttonContainer.appendChild(shareButton);
     buttonContainer.appendChild(likeButton);
 

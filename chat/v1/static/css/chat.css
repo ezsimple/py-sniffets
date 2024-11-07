@@ -71,6 +71,7 @@ li {
     border: none;
     cursor: pointer;
     margin-top: 0; /* 버튼의 최상단 정렬을 위해 마진 제거 */
+    padding: 3px 5px;
     transition: background-color 0.3s; /* 배경색 변화에 대한 트랜지션 추가 */
 }
 

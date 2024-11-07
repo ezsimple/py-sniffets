@@ -88,8 +88,33 @@ function createMessageElement(message) {
         });
     });
 
-    buttonContainer.appendChild(deleteButton);
-    buttonContainer.appendChild(copyButton);
+    // 좋아요 버튼
+    const likeButton = createButton('like-btn', '<i class="fas fa-thumbs-up"></i>', () => {
+        alert('좋아요! 이 명언을 좋아합니다.');
+        // 추가적인 로직을 여기에 구현할 수 있습니다.
+    });
+
+    // 공유 버튼
+    const shareButton = createButton('share-btn', '<i class="fas fa-share-alt"></i>', () => {
+        if (navigator.share) {
+            navigator.share({
+                title: '명언 공유',
+                text: message,
+                url: window.location.href
+            }).then(() => {
+                alert('명언이 공유되었습니다.');
+            }).catch((error) => {
+                console.error('공유 실패:', error);
+            });
+        } else {
+            alert('공유 기능을 지원하지 않는 브라우저입니다.');
+        }
+    });
+
+    // buttonContainer.appendChild(deleteButton);
+    // buttonContainer.appendChild(copyButton);
+    buttonContainer.appendChild(likeButton);
+    buttonContainer.appendChild(shareButton);
 
     li.appendChild(messageContainer);
     li.appendChild(buttonContainer);

@@ -21,9 +21,15 @@ import time
 주의: crontab에서 크롤링중인 메소드를 사용중
 테이블변경시 참고 필요
 '''
-from crawling import add_quote
-from deep_translator import GoogleTranslator
 import pdb
+from deep_translator import GoogleTranslator
+from fastapi import APIRouter, HTTPException, Cookie, Depends
+from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
+from models.models import MinoLike, MinoQuote  # 모델 가져오기
+from database import SessionLocal  # 데이터베이스 세션을 가져오는 방법
+from logger import LoggerSetup
+from crawling import add_quote
 
 load_dotenv()
 PREFIX = os.getenv("PREFIX","/chat")
@@ -35,25 +41,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "aEmolOFPK86VSPXrIkDHEQZRgjAjRXZuqt_N7Hi9wQ
 cipher = Fernet(SECRET_KEY)
 
 # 로깅 설정
-current_dir = os.path.dirname(os.path.abspath(__file__))
-log_dir = os.path.join(current_dir, "log")
-os.makedirs(log_dir, exist_ok=True)  # log 디렉토리가 없으면 생성
-
-current_date = datetime.now().strftime("%Y-%m-%d")
-log_file_name = f"{os.path.basename(__file__)}-{current_date}.log"
-log_file_path = os.path.join(log_dir, log_file_name)
-handler = TimedRotatingFileHandler(log_file_path, when="midnight", interval=1, backupCount=7)
-handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(filename)s - line:%(lineno)d - %(message)s'))
-
-logging.basicConfig(
-    level=logging.WARNING, # 기본 로킹레벨을 WARNING로
-    handlers=[
-        handler,
-        logging.StreamHandler()  # 콘솔에도 로그 출력
-    ]
-)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG) # 현재 파일만 디버그 레벨로 설정
+logger_setup = LoggerSetup()
+logger = logger_setup.get_logger()
 
 app = FastAPI()
 app.mount("/chat/static", StaticFiles(directory="static"), name="static")

@@ -1,50 +1,20 @@
-from sqlalchemy import create_engine, Column, Text, Integer, DateTime, func, Index, Sequence, UniqueConstraint, text
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import text
 from sqlalchemy import exc
 import httpx
-from dotenv import load_dotenv
-import os
 import asyncio
-import logging
-from logging.handlers import TimedRotatingFileHandler
-from datetime import datetime
-from models.models import MinoQuote, Base
+from models.models import MinoQuote
+from logger import LoggerSetup
+from database import engine, Session, Base
 
 '''
 명언 카드는 포트폴리오 개념의 서비스이므로,
 일단 연동 서버측 명언 데이터를 보관하도록 한다.
 '''
-
-load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL")
-if DATABASE_URL is None:
-    raise ValueError("DATABASE_URL is not set in the environment variables.")
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-log_dir = os.path.join(current_dir, "log")
-os.makedirs(log_dir, exist_ok=True)  # log 디렉토리가 없으면 생성
-
-current_date = datetime.now().strftime("%Y-%m-%d")
-log_file_name = f"{os.path.basename(__file__)}-{current_date}.log"
-log_file_path = os.path.join(log_dir, log_file_name)
-handler = TimedRotatingFileHandler(log_file_path, when="midnight", interval=1, backupCount=7)
-handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(filename)s - line:%(lineno)d - %(message)s'))
-
-logging.basicConfig(
-    level=logging.WARNING, # 기본 로킹레벨을 WARNING로
-    handlers=[
-        handler,
-        logging.StreamHandler()  # 콘솔에도 로그 출력
-    ]
-)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG) # 현재 파일만 디버그 레벨로 설정
-
-# 데이터베이스 연결
-engine = create_engine(DATABASE_URL)
 Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
+
+# 로깅 설정
+logger_setup = LoggerSetup()
+logger = logger_setup.get_logger()
 
 def add_quote(data):
     session = Session()

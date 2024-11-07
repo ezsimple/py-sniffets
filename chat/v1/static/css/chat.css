@@ -66,7 +66,7 @@ li {
     padding-top: 0; /* 상단 패딩 0으로 설정 */
 }
 
-.copy-btn, .delete-btn {
+.copy-btn, .delete-btn, .like-btn, .share-btn {
     background: none;
     border: none;
     cursor: pointer;
@@ -74,7 +74,7 @@ li {
     transition: background-color 0.3s; /* 배경색 변화에 대한 트랜지션 추가 */
 }
 
-.copy-btn:hover, .delete-btn:hover {
+.copy-btn:hover, .delete-btn:hover, .like-btn:hover, .share-btn:hover {
     background-color: transparent; /* 호버 시 배경을 투명으로 설정 */
     color: #000; /* 호버 시 글자색 변경 */
 }

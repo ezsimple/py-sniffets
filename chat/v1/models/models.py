@@ -58,5 +58,6 @@ class MinoLike(Base):
 
     __table_args__ = (
         UniqueConstraint('user_id', 'quote_id', name='uq_mino_like_user_quote'),  # 동일한 user_id와 quote_id 조합에 대해 유일 제약 조건 추가
-        Index('idx_mino_like_hash', func.md5(user_id + cast(quote_id, String)))  # user_id와 quote_id의 해시를 사용한 인덱스
+        Index('idx_mino_like_hash', func.md5(user_id + cast(quote_id, String))),  # user_id와 quote_id의 해시를 사용한 인덱스
+        Index('idx_mino_like_created_at', 'created_at')  # created_at 인덱스 추가
     )

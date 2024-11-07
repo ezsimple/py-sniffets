@@ -30,6 +30,7 @@ from models.models import MinoLike, MinoQuote  # 모델 가져오기
 from database import SessionLocal  # 데이터베이스 세션을 가져오는 방법
 from logger import LoggerSetup
 from crawling import add_quote
+from pydantic import BaseModel
 
 load_dotenv()
 PREFIX = os.getenv("PREFIX","/chat")
@@ -59,6 +60,17 @@ clients = {}
 # 마지막 요청 시간을 저장할 딕셔너리
 last_request_time = {}
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# 데이터베이스 세션을 생성하는 종속성
+def get_db():
+    db = SessionLocal()  # 새로운 데이터베이스 세션 생성
+    try:
+        yield db  # 요청에 대한 세션을 반환
+    finally:
+        db.close()  # 요청이 끝났을 때 세션을 닫음
+
+
 # MQTT 메시지 수신 콜백
 def on_message(client, userdata, message):
     message_data = json.loads(message.payload.decode())
@@ -83,11 +95,16 @@ async def get_random_quote():
         response = await client.get(API_SERVER)
         if response.status_code == 200:
             data = response.json()
+            data[0]['quote_id'] = 0
+            data[0]['like_count'] = 0
             if "zenquotes" in API_SERVER:
                 if 'zenquotes.io' in data[0]['a']:
                     logger.warning(f'Warning: {data[0]}')
-                    return data
-                add_quote(data[0])
+                    return data[0]
+                quote = add_quote(data[0])
+                if quote:
+                    data[0]['quote_id'] = quote.id
+                    data[0]['like_count'] = quote.like_count
             return data
         return {"content": "격언을 가져오는 데 실패했습니다.", "author": "알 수 없음"}
 
@@ -138,14 +155,10 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None)):
         raise HTTPException(status_code=403, detail="User ID not provided")
 
     try:
-        user_id = cipher.decrypt(user_id.encode()).decode()  # 복호화
+        user_id = await decode_user_id(user_id)
     except Exception as e:
-        logger.error(f"Decryption error: {e}")
-        # 쿠키 제거
-        response = HTMLResponse()
-        response.set_cookie(key="user_id", value="", expires=0)  # 쿠키 제거
-        await websocket.close(code=4000)  # 원하는 종료 코드로 웹소켓 종료
-        raise HTTPException(status_code=400, detail="Invalid user ID")
+        await websocket.close(code=4000)
+        raise e
 
     mqtt_topic = f"chat/messages/{user_id}"  # 사용자별 MQTT 토픽 생성
     mqtt_client.subscribe(mqtt_topic)  # 사용자별 MQTT 토픽 구독
@@ -192,13 +205,18 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None)):
 
             # 랜덤한 격언 선택
             quote_data = await get_random_quote()
+            # 격언 데이터 가져오기
+            quote_id = quote_data[0]['quote_id'] # 격언 ID
             quote_content = quote_data[0]['q']  # 격언 내용
             quote_author = quote_data[0]['a']    # 격언 저자
+            quote_like_count = quote_data[0]['like_count'] # 좋아요 수
             translated_quote = await translate_quote(quote_data[0])  # 격언 번역
             quote_message_data = {
                 'id': 'server', # from
                 'user_id': f'{user_id}', # to
+                'quote_id': f'{quote_id}',
                 'msg': f"명언: {quote_content}\n번역: {translated_quote}\n\n- {quote_author} -",
+                'like_count': f'{quote_like_count}',
                 'read': True
             }
             # 서버에서 격언 메시지 전송
@@ -209,7 +227,54 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None)):
         del clients[user_id]  # 사용자 ID로 연결 제거
     except Exception as e:
         logger.error(f"Error in websocket handling for user {user_id}: {e}")
-        del clients[user_id]  # 오류 발생 시 연결 제거
+        del clients[user_id] 
+
+async def decode_user_id(user_id):
+    try:
+        user_id = cipher.decrypt(user_id.encode()).decode()  # 복호화
+        return user_id
+    except Exception as e:
+        logger.error(f"Decryption error: {e}")
+        # 쿠키 제거
+        response = HTMLResponse()
+        response.set_cookie(key="user_id", value="", expires=0)  # 쿠키 제거
+        raise HTTPException(status_code=400, detail="Invalid user ID")
+
+class LikeQuoteRequest(BaseModel):
+    quote_id: int
+
+from pydantic import BaseModel
+
+class LikeQuoteRequest(BaseModel):
+    quote_id: int
+
+@router.post("/like")
+async def like_quote(request: LikeQuoteRequest, user_id: str = Cookie(None), db: Session = Depends(get_db)):
+    if user_id is None:
+        raise HTTPException(status_code=403, detail="User ID not provided")
+
+    user_id = await decode_user_id(user_id)
+    quote_id = request.quote_id  # Pydantic 모델에서 quote_id 가져오기
+    like_record = db.query(MinoLike).filter(MinoLike.user_id == user_id, MinoLike.quote_id == quote_id).first()
+
+    if like_record:
+        # 이미 좋아요를 눌렀다면 현재 좋아요 수를 반환
+        quote = db.query(MinoQuote).filter(MinoQuote.id == quote_id).first()
+        return {"message": "Quote already liked", "like_count": quote.like_count}
+
+    # 좋아요 기록 추가
+    new_like = MinoLike(user_id=user_id, quote_id=quote_id)
+    db.add(new_like)  # 세션에 새로운 좋아요 추가
+    db.commit()  # 변경 사항 커밋
+
+    # 좋아요 수 증가
+    quote = db.query(MinoQuote).filter(MinoQuote.id == quote_id).first()
+    if quote:
+        quote.like_count += 1  # 좋아요 수 증가
+        db.commit()  # 변경 사항 커밋
+
+    return {"message": "Quote liked successfully", "like_count": quote.like_count}
+
 
 app.include_router(router)  # 라우터 등록
 

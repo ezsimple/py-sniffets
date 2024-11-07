@@ -4,7 +4,7 @@ import httpx
 import asyncio
 from models.models import MinoQuote
 from logger import LoggerSetup
-from database import engine, Session, Base
+from database import engine, SessionLocal, Base
 
 '''
 명언 카드는 포트폴리오 개념의 서비스이므로,
@@ -17,7 +17,7 @@ logger_setup = LoggerSetup()
 logger = logger_setup.get_logger()
 
 def add_quote(data):
-    session = Session()
+    session = SessionLocal()
     new_quote = MinoQuote(q=data['q'], a=data['a'], t=data['h'])
     
     try:
@@ -30,13 +30,19 @@ def add_quote(data):
         max_id = session.execute(max_id_query).scalar() or 0
         reset_sequence_query = text(f"SELECT setval('minoquote_id_seq', {max_id})")
         session.execute(reset_sequence_query)
+
+        # 새로 추가된 quote의 ID 반환
+        return new_quote
     except exc.IntegrityError:
         session.rollback()
+        # 이미 존재한다면 존재하는 데이터의 ID 반환
         logger.warning(f"Quote already exists, skipping... {data['q']}")
+        existing_quote = session.query(MinoQuote).filter_by(q=data['q'], a=data['a']).first()
+        return existing_quote  # 기존 명언 반환
     finally:
         session.close()
 
-async def ask_quote():
+async def scrape_quote():
     '''
     예시 포맷:
     quote_data = {
@@ -58,7 +64,7 @@ async def ask_quote():
         return {"content": "격언을 가져오는 데 실패했습니다.", "author": "알 수 없음"}
 
 if __name__ == "__main__":
-    asyncio.run(ask_quote())
+    asyncio.run(scrape_quote())
 
 '''
 일일 명언  수집 통계

@@ -59,11 +59,12 @@ function handleIncomingMessage(event) {
 
     // 메시지가 비어있지 않은 경우에만 li 요소 생성
     if (data.msg && data.msg.trim()) {
-        createMessageElement(data.msg);
+        const { msg, quote_id } = data;
+        createMessageElement(msg, quote_id);
     }
 }
 
-function createMessageElement(message) {
+function createMessageElement(message, quoteId) {
     const li = document.createElement('li');
     const pastelColor = generatePastelColor();
     li.style.backgroundColor = pastelColor;
@@ -89,13 +90,29 @@ function createMessageElement(message) {
     });
 
     // 좋아요 버튼
-    const likeButton = createButton('like-btn', '<i class="fas fa-thumbs-up"></i>', () => {
-        alert('좋아요! 이 명언을 좋아합니다.');
+    const likeButton = createButton('like-btn', '<i class="fas fa-thumbs-up"></i>', async () => {
+        // alert('좋아요! 이 명언을 좋아합니다.');
         // 추가적인 로직을 여기에 구현할 수 있습니다.
+        const response = await fetch('/chat/like', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ quote_id: quoteId })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert(`좋아요 클릭 완료! 현재 좋아요 수: ${data.like_count}`);
+        } else {
+            const errorData = await response.json();
+            console.error(errorData.detail)
+            // alert(`좋아요 클릭 실패: ${errorData.detail}`);
+        }
     });
 
     // 공유 버튼
-    const shareButton = createButton('share-btn', '<i class="fas fa-share-alt"></i>', () => {
+    const shareButton = createButton('share-btn', '<i class="fas fa-share-square"></i>', () => {
         if (navigator.share) {
             navigator.share({
                 title: '명언 공유',

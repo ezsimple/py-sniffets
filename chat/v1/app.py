@@ -25,7 +25,6 @@ from datetime import datetime
 from models.models import MinoLike, MinoQuote  # 모델 가져오기
 from database import engine, SessionLocal, Base  # 데이터베이스 세션을 가져오는 방법
 from logger import LoggerSetup
-from crawling import add_quote
 from pydantic import BaseModel
 
 load_dotenv()
@@ -92,17 +91,13 @@ async def send_message_to_clients(message_data, user_id):
     except Exception as e:
         logger.error(f"Error sending message to client: {e}")
 
-async def get_random_quote(session):
+async def get_random_quote():
     async with httpx.AsyncClient() as client:
         response = await client.get(API_SERVER)
         if response.status_code == 200:
             data = response.json()
-            quote = add_quote(session, data[0])
-            if quote:
-                data[0]['quote_id'] = quote.id
-                data[0]['like_count'] = quote.like_count
             return data
-        return {"content": "격언을 가져오는 데 실패했습니다.", "author": "알 수 없음"}
+        return {"q": "격언을 가져오는 데 실패했습니다.", "a": "알 수 없음"}
 
 # async def translate_quote(quote):
 #     translator = Translator()
@@ -200,7 +195,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None), s
                 continue
 
             # 랜덤한 격언 선택
-            quote_data = await get_random_quote(session)
+            quote_data = await get_random_quote()
             # 격언 데이터 가져오기
             quote_id = quote_data[0]['quote_id'] # 격언 ID
             quote_content = quote_data[0]['q']  # 격언 내용

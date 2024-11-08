@@ -85,7 +85,7 @@ function createMessageElement(message, quoteId) {
     // 클립보드 복사 버튼
     const copyButton = createButton('copy-btn', '<i class="fas fa-copy"></i>', () => {
         navigator.clipboard.writeText(message).then(() => {
-            alert('명언이 클립보드에 복사되었습니다.');
+            alert('클립보드에 복사되었습니다.');
         });
     });
 
@@ -93,11 +93,11 @@ function createMessageElement(message, quoteId) {
     const shareButton = createButton('share-btn', '<i class="fas fa-share-square"></i>', () => {
         if (navigator.share) {
             navigator.share({
-                title: '명언 공유',
+                title: '명언 카드',
                 text: message,
                 url: window.location.href
             }).then(() => {
-                alert('명언이 공유되었습니다.');
+                // alert('명언이 공유되었습니다.');
             }).catch((error) => {
                 console.error('공유 실패:', error);
             });

@@ -31,7 +31,7 @@ from pydantic import BaseModel
 load_dotenv()
 PREFIX = os.getenv("PREFIX","/chat")
 WS_SERVER = os.getenv("WS_SERVER", f'ws://localhost:4444{PREFIX}/ws')
-API_SERVER = os.getenv("API_SERVER1", 'https://zenquotes.io/api/random')
+API_SERVER = os.getenv("API_SERVER", 'https://zenquotes.io/api/random')
 # Fernet key must be 32 url-safe base64-encoded bytes.
 # SECRET_KEY = Fernet.generate_key().decode()  # 바이트를 문자열로 변환
 SECRET_KEY = os.getenv("SECRET_KEY", "aEmolOFPK86VSPXrIkDHEQZRgjAjRXZuqt_N7Hi9wQ8=")

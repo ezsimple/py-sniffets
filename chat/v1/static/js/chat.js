@@ -90,12 +90,14 @@ function createMessageElement(message, quoteId) {
     });
 
     // 공유 버튼
+    const isKakaoBrowser = /KAKAOTALK/i.test(navigator.userAgent);
+    const shareUrl = isKakaoBrowser ? `kakaolink://sendurl?url=${encodeURIComponent(window.location.href + '/chat')}` : window.location.href + '/chat';
     const shareButton = createButton('share-btn', '<i class="fas fa-share-square"></i>', () => {
         if (navigator.share) {
             navigator.share({
                 title: '명언 카드',
                 text: message,
-                url: window.location.href
+                url: shareUrl
             }).then(() => {
                 // alert('명언이 공유되었습니다.');
             }).catch((error) => {

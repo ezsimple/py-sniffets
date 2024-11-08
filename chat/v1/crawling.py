@@ -55,7 +55,7 @@ async def scrape_quote():
                 logger.warning(f'Warning: {data[0]}')
                 return data
 
-            session = next(get_session())
+            session = next(get_session()) # yield를 사용한 제너레이트이므로 next를 사용해야지만 session을 가져올 수 있음.
             add_quote(session, data[0])
             return data
         return {"content": "격언을 가져오는 데 실패했습니다.", "author": "알 수 없음"}

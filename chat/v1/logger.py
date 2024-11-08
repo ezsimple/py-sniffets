@@ -5,9 +5,9 @@ from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime
 
 class LoggerSetup:
-    def __init__(self, log_dir="log", file_name=__name__):
+    def __init__(self, log_dir="log"):
         self.log_dir = log_dir
-        self.logger = logging.getLogger(file_name)
+        self.logger = logging.getLogger(__name__)
         self.setup_logging()
 
     def setup_logging(self):
@@ -16,7 +16,7 @@ class LoggerSetup:
         os.makedirs(log_path, exist_ok=True)  # log 디렉토리가 없으면 생성
 
         current_date = datetime.now().strftime("%Y-%m-%d")
-        log_file_name = os.path.join(self.log_dir, f"{self.logger.name}.log")
+        log_file_name = f"{os.path.basename(__file__)}-{current_date}.log"
         log_file_path = os.path.join(log_path, log_file_name)
 
         handler = TimedRotatingFileHandler(log_file_path, when="midnight", interval=1, backupCount=7)

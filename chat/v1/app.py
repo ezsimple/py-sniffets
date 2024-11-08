@@ -38,7 +38,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "aEmolOFPK86VSPXrIkDHEQZRgjAjRXZuqt_N7Hi9wQ
 cipher = Fernet(SECRET_KEY)
 
 # 로깅 설정
-logger_setup = LoggerSetup()
+logger_setup = LoggerSetup(__name__)
 logger = logger_setup.get_logger()
 
 app = FastAPI()

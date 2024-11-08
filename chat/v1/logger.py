@@ -5,9 +5,9 @@ from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime
 
 class LoggerSetup:
-    def __init__(self, log_dir="log"):
+    def __init__(self, log_dir="log", file_name=__name__):
         self.log_dir = log_dir
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(file_name)
         self.setup_logging()
 
     def setup_logging(self):

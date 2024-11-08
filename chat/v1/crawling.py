@@ -16,21 +16,27 @@ Base.metadata.create_all(engine)
 logger_setup = LoggerSetup()
 logger = logger_setup.get_logger()
 
-def add_quote(data):
+def get_session():
+    session = SessionLocal()  # 새로운 데이터베이스 세션 생성
+    try:
+        yield session  # 요청에 대한 세션을 반환
+    finally:
+        session.close()  # 요청이 끝났을 때 세션을 닫음
+
+def add_quote(session, data):
     # with 문을 사용하여 세션 관리
-    with SessionLocal() as session:
-        new_quote = MinoQuote(q=data['q'], a=data['a'], t=data['h'])
-        try:
-            session.add(new_quote)
-            session.commit()
-            logger.debug("Quote added successfully.")
-            return new_quote
-        except exc.IntegrityError:
-            session.rollback()  # 오류 발생 시 롤백
-            logger.warning(f"Quote already exists, skipping... {data['q']}")
-            # 이미 존재하는 경우 None 반환
-            existing_quote = session.query(MinoQuote).filter_by(q=data['q'], a=data['a']).first()
-            return existing_quote
+    new_quote = MinoQuote(q=data['q'], a=data['a'], t=data['h'])
+    try:
+        session.add(new_quote)
+        session.commit()
+        logger.debug("Quote added successfully.")
+        return new_quote
+    except exc.IntegrityError:
+        session.rollback()  # 오류 발생 시 롤백
+        logger.warning(f"Quote already exists, skipping... {data['q']}")
+        # 이미 존재하는 경우 None 반환
+        existing_quote = session.query(MinoQuote).filter_by(q=data['q'], a=data['a']).first()
+        return existing_quote
 
 async def scrape_quote():
     '''
@@ -49,7 +55,8 @@ async def scrape_quote():
                 logger.warning(f'Warning: {data[0]}')
                 return data
 
-            add_quote(data[0])
+            session = next(get_session())
+            add_quote(session, data[0])
             return data
         return {"content": "격언을 가져오는 데 실패했습니다.", "author": "알 수 없음"}
 

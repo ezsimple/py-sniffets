@@ -59,12 +59,12 @@ last_request_time = {}
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 # 데이터베이스 세션을 생성하는 종속성
-def get_db():
-    db = SessionLocal()  # 새로운 데이터베이스 세션 생성
+def get_session():
+    session = SessionLocal()  # 새로운 데이터베이스 세션 생성
     try:
-        yield db  # 요청에 대한 세션을 반환
+        yield session  # 요청에 대한 세션을 반환
     finally:
-        db.close()  # 요청이 끝났을 때 세션을 닫음
+        session.close()  # 요청이 끝났을 때 세션을 닫음
 
 
 # MQTT 메시지 수신 콜백
@@ -97,7 +97,8 @@ async def get_random_quote():
                 if 'zenquotes.io' in data[0]['a']:
                     logger.warning(f'Warning: {data[0]}')
                     return data[0]
-                quote = add_quote(data[0])
+                session = next(get_session())
+                quote = add_quote(session, data[0])
                 if quote:
                     data[0]['quote_id'] = quote.id
                     data[0]['like_count'] = quote.like_count
@@ -245,29 +246,29 @@ class LikeQuoteRequest(BaseModel):
     quote_id: int
 
 @router.post("/like")
-async def like_quote(request: LikeQuoteRequest, user_id: str = Cookie(None), db: Session = Depends(get_db)):
+async def like_quote(request: LikeQuoteRequest, user_id: str = Cookie(None), session: Session = Depends(get_session)):
     if user_id is None:
         raise HTTPException(status_code=403, detail="User ID not provided")
 
     user_id = await decode_user_id(user_id)
     quote_id = request.quote_id  # Pydantic 모델에서 quote_id 가져오기
-    like_record = db.query(MinoLike).filter(MinoLike.user_id == user_id, MinoLike.quote_id == quote_id).first()
+    like_record = session.query(MinoLike).filter(MinoLike.user_id == user_id, MinoLike.quote_id == quote_id).first()
 
     if like_record:
         # 이미 좋아요를 눌렀다면 현재 좋아요 수를 반환
-        quote = db.query(MinoQuote).filter(MinoQuote.id == quote_id).first()
+        quote = session.query(MinoQuote).filter(MinoQuote.id == quote_id).first()
         return {"message": "Quote already liked", "like_count": quote.like_count}
 
     # 좋아요 기록 추가
     new_like = MinoLike(user_id=user_id, quote_id=quote_id)
-    db.add(new_like)  # 세션에 새로운 좋아요 추가
-    db.commit()  # 변경 사항 커밋
+    session.add(new_like)  # 세션에 새로운 좋아요 추가
+    session.commit()  # 변경 사항 커밋
 
     # 좋아요 수 증가
-    quote = db.query(MinoQuote).filter(MinoQuote.id == quote_id).first()
+    quote = session.query(MinoQuote).filter(MinoQuote.id == quote_id).first()
     if quote:
         quote.like_count += 1  # 좋아요 수 증가
-        db.commit()  # 변경 사항 커밋
+        session.commit()  # 변경 사항 커밋
 
     return {"message": "Quote liked successfully", "like_count": quote.like_count}
 

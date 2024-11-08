@@ -86,7 +86,7 @@ async def send_message_to_clients(message_data, user_id):
     except Exception as e:
         logger.error(f"Error sending message to client: {e}")
 
-async def get_random_quote():
+async def get_random_quote(session):
     async with httpx.AsyncClient() as client:
         response = await client.get(API_SERVER)
         if response.status_code == 200:
@@ -97,7 +97,6 @@ async def get_random_quote():
                 if 'zenquotes.io' in data[0]['a']:
                     logger.warning(f'Warning: {data[0]}')
                     return data[0]
-                session = next(get_session())
                 quote = add_quote(session, data[0])
                 if quote:
                     data[0]['quote_id'] = quote.id
@@ -142,7 +141,7 @@ async def get(request: Request, user_id: str = Cookie(None)):
     return response
 
 @router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None)):
+async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None), session: Session = Depends(get_session)):
     '''
     WebSocket에서는 Cookie를 읽지 못하는 경우가 있음.
     그러므로 먼저 /에서 쿠키를 생성하고, 클라이언트에서 쿠키를 읽어서, 쿼리 파라미터로 전달하는 방식을 사용.
@@ -201,7 +200,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None)):
                 continue
 
             # 랜덤한 격언 선택
-            quote_data = await get_random_quote()
+            quote_data = await get_random_quote(session)
             # 격언 데이터 가져오기
             quote_id = quote_data[0]['quote_id'] # 격언 ID
             quote_content = quote_data[0]['q']  # 격언 내용

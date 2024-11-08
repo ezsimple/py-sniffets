@@ -23,12 +23,14 @@ from fastapi import APIRouter, HTTPException, Cookie, Depends
 from sqlalchemy.orm import Session
 from datetime import datetime
 from models.models import MinoLike, MinoQuote  # 모델 가져오기
-from database import SessionLocal  # 데이터베이스 세션을 가져오는 방법
+from database import engine, SessionLocal, Base  # 데이터베이스 세션을 가져오는 방법
 from logger import LoggerSetup
 from crawling import add_quote
 from pydantic import BaseModel
 
 load_dotenv()
+
+
 PREFIX = os.getenv("PREFIX","/chat")
 WS_SERVER = os.getenv("WS_SERVER", f'ws://localhost:4444{PREFIX}/ws')
 API_SERVER = os.getenv("API_SERVER", 'https://zenquotes.io/api/random')
@@ -45,6 +47,10 @@ app = FastAPI()
 app.mount("/chat/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 router = APIRouter(prefix=PREFIX)
+
+# 데이터베이스 테이블 생성
+Base.metadata.create_all(engine)  # 모든 테이블을 생성
+
 logger.info(f"WS_SERVER : {WS_SERVER}")
 
 mqtt_broker = "127.0.0.1"
@@ -91,16 +97,10 @@ async def get_random_quote(session):
         response = await client.get(API_SERVER)
         if response.status_code == 200:
             data = response.json()
-            data[0]['quote_id'] = 0
-            data[0]['like_count'] = 0
-            if "zenquotes" in API_SERVER:
-                if 'zenquotes.io' in data[0]['a']:
-                    logger.warning(f'Warning: {data[0]}')
-                    return data[0]
-                quote = add_quote(session, data[0])
-                if quote:
-                    data[0]['quote_id'] = quote.id
-                    data[0]['like_count'] = quote.like_count
+            quote = add_quote(session, data[0])
+            if quote:
+                data[0]['quote_id'] = quote.id
+                data[0]['like_count'] = quote.like_count
             return data
         return {"content": "격언을 가져오는 데 실패했습니다.", "author": "알 수 없음"}
 

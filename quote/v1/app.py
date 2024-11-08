@@ -90,7 +90,7 @@ async def get_random_quote():
             raise HTTPException(status_code=404, detail="Quote not found.")
 
         # 응답 포맷팅
-        res = [{"q": quote.q, "a": quote.a, "t": quote.t}]
+        res = [{"q": quote.q, "a": quote.a, "t": quote.t, "quote_id": quote.id, "like_count": quote.like_count }]
         return res
 
 app.include_router(router)

@@ -53,7 +53,7 @@ class MinoLike(Base):
     
     id = Column(Integer, primary_key=True, nullable=False)  # 자동 번호 생성
     user_id = Column(String(length=256), nullable=False)  # 사용자 ID
-    quote_id = Column(Integer, ForeignKey('MinoQuotes2.id'), nullable=False)  # MinoQuote2의 외래 키
+    quote_id = Column(Integer, ForeignKey('MinoQuotes.id'), nullable=False)  # MinoQuote2의 외래 키
     created_at = Column(DateTime, server_default=func.now())  # 생성일시
 
     __table_args__ = (

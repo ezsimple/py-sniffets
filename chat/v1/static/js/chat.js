@@ -60,6 +60,7 @@ function handleIncomingMessage(event) {
     // 메시지가 비어있지 않은 경우에만 li 요소 생성
     if (data.msg && data.msg.trim()) {
         const { msg, quote_id } = data;
+        console.log(quote_id, msg);
         createMessageElement(msg, quote_id);
     }
 }

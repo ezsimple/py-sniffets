@@ -230,25 +230,32 @@ const sendMessage = function() {
     }, 1000);
 };
 
+function handleKeyDown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault(); // 기본 동작 방지
+        sendMessage(); // 메시지 전송 함수 호출
+    }
+}
+
+function handleSelectStart(event) {
+    event.preventDefault(); // 텍스트 선택 방지
+}
+
+function handleDoubleClick(event) {
+    event.preventDefault(); // 기본 동작 방지 (텍스트 선택 방지)
+    sendMessage(); // 메시지 전송 함수 호출
+}
+
 // UI 관련 설정
 function setupUIHandlers() {
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault(); // 기본 동작 방지
-            sendMessage(); // 메시지 전송 함수 호출
-        }
-    });
-
-    document.addEventListener('selectstart', function(event) {
-        event.preventDefault(); // 텍스트 선택 방지
-    });
-
-    document.addEventListener('dblclick', function(event) {
-        event.preventDefault(); // 기본 동작 방지 (텍스트 선택 방지)
-        sendMessage(); // 메시지 전송 함수 호출
-    });
-
-    document.getElementById('quoteButton').addEventListener('click', sendMessage);
+    document.removeEventListener('keydown', handleKeyDown);
+    document.removeEventListener('selectstart', handleSelectStart);
+    document.removeEventListener('dblclick', handleDoubleClick);
+     
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('selectstart', handleSelectStart);
+    document.addEventListener('dblclick', handleDoubleClick);
+    document.getElementById('quoteButton').addEventListener('click', sendMessage); 
 }
 
 // 오늘의 명언 버튼 비활성화

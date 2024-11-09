@@ -1,0 +1,28 @@
+class MinoLocations
+  '''
+  지역정보
+  '''
+  id pk autogenerate,
+  full_name 지역명
+  name 지역명
+  latitude,
+  longitude,
+  tz (timezone),
+  create_at datetime auto,
+
+class MinoWeather
+  '''
+  날씨정보
+  '''
+  id pk autogenerate,
+  loc_id (FK MinoLocations.id),
+  year (yyyy),
+  month (mm),
+  day (dd),
+  hour (HH),
+  min (MM),
+  sec (ss = default '00'),
+  강수,
+  강수유형,
+  온도,
+  습도,

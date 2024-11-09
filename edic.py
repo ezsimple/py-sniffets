@@ -139,6 +139,10 @@ def daum_translate(target_str):
 	return (translator.translate(target_str))
 
 def google_translate(target_str):
+    if is_korean(target_str):
+        translator = GoogleTranslator(source='ko', target='en')
+        return translator.translate(target_str)
+
     translator = GoogleTranslator(source='en', target='ko')
     return translator.translate(target_str)
 

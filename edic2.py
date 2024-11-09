@@ -37,7 +37,10 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 2 or is_korean(search_word):
         meanings = google_translate(search_word)
-        result['의미'] = meanings
+        if is_korean(search_word):
+            result['단어'] = meanings
+        else:
+            result['의미'] = meanings
         print_json(result)
         sys.exit(0)
 

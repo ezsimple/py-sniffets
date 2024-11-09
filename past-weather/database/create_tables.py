@@ -38,6 +38,16 @@ class MinoWeather(Base):
                 f"precip_type={self.precip_type}, temperature={self.temperature}, "
                 f"humidity={self.humidity})>")
 
+    def __hash__(self):
+        # loc_id와 measure_date를 해시값으로 사용
+        return hash((self.loc_id, self.measure_date))
+
+    def __eq__(self, other):
+        if isinstance(other, MinoWeather):
+            # loc_id와 measure_date가 같으면 동일한 객체로 간주
+            return (self.loc_id, self.measure_date) == (other.loc_id, other.measure_date)
+        return False
+
 
 # SQLAlchemy 엔진 생성
 DATABASE_URL='postgresql://ezsimple:qwer%21%4034@138.2.125.118:5432/ezsimple'

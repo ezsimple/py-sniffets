@@ -105,7 +105,9 @@ def validate_csv_files(directory):
 
 # CSV 파일을 읽어 MinoWeather 객체를 생성하는 제너레이터 함수
 def read_weather_data(directory):
+
     for year in range(2020, 2025):  # 2020년부터 2024년까지
+        weather_data = set()  # 중복을 방지하기 위한 set
         year_dir = os.path.join(directory, f'송악읍{year}')
         for filename in os.listdir(year_dir):
             if '강수' in filename or '기온' in filename or '습도' in filename or '강수형태' in filename:
@@ -114,29 +116,16 @@ def read_weather_data(directory):
                     reader = csv.reader(file)
                     next(reader)  # 첫 번째 줄(헤더) 건너뛰기
                     start_date = None
-                    weather_data = {}  # 데이터를 저장할 딕셔너리
 
                     try:
-                        for line_number, row in enumerate(reader, start=1):
-                            if row[0].__contains__('Start :'):
+                        for row in reader:
+                            if 'Start :' in row[0]:
                                 start_date = row[0].split(': ')[1]  # Start 날짜 추출
                                 start_year = int(start_date[:4])
                                 start_month = int(start_date[4:6])
-                            else:
-                                day, hour, value = int(row[0]), int(row[1]), float(row[2])
-                                # 데이터에 따라 값 저장
-                                if '강수' in filename:
-                                    weather_data.setdefault((day, hour), {})['precipitation'] = value
-                                    weather_data.setdefault((day, hour), {})['precip_type'] = None  # 초기화
-                                elif '기온' in filename:
-                                    weather_data.setdefault((day, hour), {})['temperature'] = value
-                                elif '습도' in filename:
-                                    weather_data.setdefault((day, hour), {})['humidity'] = value
-                                elif '강수형태' in filename:
-                                    weather_data.setdefault((day, hour), {})['precip_type'] = value
+                                continue
 
-                        # 모든 데이터가 준비되면 MinoWeather 객체 생성
-                        for (day, hour), data in weather_data.items():
+                            day, hour, value = int(row[0]), int(row[1]), float(row[2])
                             # measure_date 생성
                             measure_date = datetime(
                                 year=start_year,
@@ -146,17 +135,38 @@ def read_weather_data(directory):
                                 minute=hour % 100,  # 분은 HHMM의 나머지
                                 second=0  # 초는 0으로 설정
                             )
-                            print(MinoWeather(
+
+                            # MinoWeather 객체 생성
+                            weather_record = MinoWeather(
+                                id=None,
                                 loc_id=1,  # 송악읍의 loc_id를 적절히 설정해야 함
                                 measure_date=measure_date,
-                                precipitation=data.get('precipitation', 0),
-                                precip_type=data.get('precip_type'),
-                                temperature=data.get('temperature'),
-                                humidity=data.get('humidity')
-                            ))
+                                precipitation=0,
+                                precip_type=None,
+                                temperature=None,
+                                humidity=None
+                            )
+
+                            # 데이터 업데이트
+                            if '강수' in filename and '강수형태' not in filename:
+                                weather_record.precipitation = value
+                            elif '기온' in filename:
+                                weather_record.temperature = value
+                            elif '습도' in filename:
+                                weather_record.humidity = value
+                            elif '강수형태' in filename:
+                                weather_record.precip_type = value
+
+                            # set에 추가 (중복된 경우 자동으로 무시됨)
+                            weather_data.add(weather_record)
+
+                            # 모든 데이터가 준비되면 출력
                     except ValueError as e:
-                        print(f"Error processing file {file_path}: Line {line_number} - {e}")
+                        print(f"Error processing file {file_path}: {e}")
                         continue
+
+        for record in weather_data:
+            print(record)
 
 
 def insert_weather_data(session, directory):

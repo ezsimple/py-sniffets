@@ -6,7 +6,7 @@ import json
 import requests
 from bs4 import BeautifulSoup
 import sys
-from edic import daum_translate, is_korean
+from edic import google_translate, is_korean
 
 def search_daum_dictionary(word):
     url = f"https://dic.daum.net/search.do?q={word}"
@@ -18,7 +18,7 @@ def search_daum_dictionary(word):
     if pronunciation:
         pronunciation = pronunciation.text.strip()
 
-    meanings = daum_translate(word)
+    meanings = google_translate(word)
 
     return pronunciation, meanings
 
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     result = {'검색': search_word}
 
     if len(sys.argv) > 2 or is_korean(search_word):
-        meanings = daum_translate(search_word)
+        meanings = google_translate(search_word)
         result['의미'] = meanings
         print_json(result)
         sys.exit(0)

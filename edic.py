@@ -8,6 +8,7 @@ import urllib3
 import json
 import requests
 from bs4 import BeautifulSoup
+from deep_translator import GoogleTranslator
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -33,7 +34,7 @@ LANGUAGES = {
 }
 
 
-class Translator(object):
+class DaumTranslator(object):
     """
     Kakao Translate ajax API implemenation class
     You have to create an instance of Translator to use this API
@@ -134,9 +135,16 @@ def is_korean(query):
 
 
 def daum_translate(target_str):
-	translator = Translator()
+	translator = DaumTranslator()
 	return (translator.translate(target_str))
 
+def google_translate(target_str):
+    if is_korean(target_str):
+        translator = GoogleTranslator(source='ko', target='en')
+        return translator.translate(target_str)
+
+    translator = GoogleTranslator(source='en', target='ko')
+    return translator.translate(target_str)
 
 def search_daum_dictionary(word):
     url = f"https://dic.daum.net/search.do?q={word}"

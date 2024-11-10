@@ -1,0 +1,13 @@
+https://www.data.go.kr/tcs/dss/selectDataSetList.do?dType=API&keyword=동네예보+조회서비스
+기상청_단기예보 ((구)_동네예보) 조회서비스
+
+추천데이터>[파일데이터]기상청_초단기실황 : 
+https://data.kma.go.kr/data/rmt/rmtList.do?code=400&pgmNo=570
+
+파일셋>검색조건>충청남도>당진시>송악읍 [x]
+기간> 1년단위
+요소>강수형태,습도,강수,기온
+
+다운로드
+
+각csv파일들의 첫번째라인에서 Start: 부분을 다음줄로 이동 및 저장

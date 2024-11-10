@@ -164,9 +164,9 @@ def make_pandas_weather_data(directory):
             with open(file_path, 'r') as file:
                 print(file_path)
                 if '강수' in filename and '강수형태' not in filename:
-                    rainfall_df = pd.read_csv(file_path, parse_dates=['measure_date'])
-                    rainfall_df['rainfall'] = rainfall_df['value']
-                    rainfall_df.drop('value', axis=1, inplace=True)
+                    precipitation_df = pd.read_csv(file_path, parse_dates=['measure_date'])
+                    precipitation_df['precipitation'] = precipitation_df['value']
+                    precipitation_df.drop('value', axis=1, inplace=True)
                 if '기온' in filename:
                     temperature_df = pd.read_csv(file_path, parse_dates=['measure_date'])
                     temperature_df['temperature'] = temperature_df['value']
@@ -180,7 +180,7 @@ def make_pandas_weather_data(directory):
                     precipitation_type_df['precipitation_type'] = precipitation_type_df['value']
                     precipitation_type_df.drop('value', axis=1, inplace=True)
 
-        merged_df = pd.merge(rainfall_df, temperature_df, on='measure_date', how='outer')
+        merged_df = pd.merge(precipitation_df, temperature_df, on='measure_date', how='outer')
         merged_df = pd.merge(merged_df, humidity_df, on='measure_date', how='outer')
         merged_df = pd.merge(merged_df, precipitation_type_df, on='measure_date', how='outer')
         merged_df['loc_id'] = LOC_ID
@@ -202,7 +202,7 @@ def read_weather_data(directory):
                 yield MinoWeather(
                     measure_date=row['measure_date'],
                     loc_id=LOC_ID, # 송악읍
-                    rainfall=row['rainfall'],
+                    precipitation=row['precipitation'],
                     temperature=row['temperature'],
                     humidity=row['humidity'],
                     precipitation_type=row['precipitation_type']
@@ -230,7 +230,7 @@ def insert_weather_data(session, directory):
                 id serial4 NOT NULL,
                 loc_id int4 NOT NULL,
                 measure_date timestamp NOT NULL,
-                rainfall float8 NULL,
+                precipitation float8 NULL,
                 precipitation_type float8 NULL,
                 temperature float8 NULL,
                 humidity float8 NULL,
@@ -248,12 +248,12 @@ def insert_weather_data(session, directory):
     for weather_data in read_weather_data(directory):
         try:
             session.execute(text("""
-                INSERT INTO temp_table (measure_date, loc_id, rainfall, precipitation_type, temperature, humidity)
-                VALUES (:measure_date, :loc_id, :rainfall, :precipitation_type, :temperature, :humidity)
+                INSERT INTO temp_table (measure_date, loc_id, precipitation, precipitation_type, temperature, humidity)
+                VALUES (:measure_date, :loc_id, :precipitation, :precipitation_type, :temperature, :humidity)
             """), {
                 'measure_date': weather_data.measure_date,
                 'loc_id': LOC_ID,
-                'rainfall': weather_data.rainfall,
+                'precipitation': weather_data.precipitation,
                 'precipitation_type': weather_data.precipitation_type,
                 'temperature': weather_data.temperature,
                 'humidity': weather_data.humidity
@@ -274,8 +274,8 @@ def insert_weather_data(session, directory):
     # 3. temp 테이블의 데이터를 MinoWeather 테이블로 복사
     try:
         session.execute(text("""
-            INSERT INTO public."MinoWeather" (measure_date, loc_id, rainfall, precipitation_type, temperature, humidity)
-            SELECT measure_date, loc_id, rainfall, precipitation_type, temperature, humidity
+            INSERT INTO public."MinoWeather" (measure_date, loc_id, precipitation, precipitation_type, temperature, humidity)
+            SELECT measure_date, loc_id, precipitation, precipitation_type, temperature, humidity
             FROM temp_table
             ON CONFLICT (measure_date) DO NOTHING;
         """))
@@ -301,12 +301,12 @@ def save_to_mino_weather_table(directory):
                 id serial4 NOT NULL,
                 loc_id int4 NOT NULL,
                 measure_date timestamp NOT NULL,
-                rainfall float8 NULL,
+                precipitation float8 NULL,
                 precipitation_type float8 NULL,
                 temperature float8 NULL,
                 humidity float8 NULL,
-                create_at timestamp NULL,
-                update_at timestamp NULL,
+                create_at timestamp DEFAULT CURRENT_TIMESTAMP,
+                update_at timestamp DEFAULT CURRENT_TIMESTAMP,
                 CONSTRAINT "MinoWeather_measure_date_key" UNIQUE (measure_date),
                 CONSTRAINT "MinoWeather_pkey" PRIMARY KEY (id)          
             )
@@ -320,16 +320,19 @@ def save_to_mino_weather_table(directory):
         for year in range(START_YEAR, END_YEAR + 1):
             filename = f'merged_송악읍{year}.csv'
             file_path = os.path.join(directory, filename)
+            current_time = datetime.now()
             print(file_path)
             if os.path.exists(file_path):
                 df = pd.read_csv(file_path)
+                df['create_at'] = current_time
+                df['update_at'] = current_time
                 df.to_sql('temp_table', connection, if_exists='append', index=False)
 
     # 3. temp 테이블의 데이터를 MinoWeather테이블로 복사
     try:
         session.execute(text("""
-            INSERT INTO public."MinoWeather" (measure_date, loc_id, rainfall, precipitation_type, temperature, humidity)
-            SELECT measure_date, loc_id, rainfall, precipitation_type, temperature, humidity
+            INSERT INTO public."MinoWeather" (measure_date, loc_id, precipitation, precipitation_type, temperature, humidity, create_at, update_at)
+            SELECT measure_date, loc_id, precipitation, precipitation_type, temperature, humidity, create_at, update_at
             FROM temp_table
             ON CONFLICT (measure_date) DO NOTHING;
         """))

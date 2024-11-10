@@ -24,7 +24,7 @@ class MinoWeather(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     loc_id = Column(Integer, ForeignKey('MinoLocations.id'), nullable=False)
     measure_date = Column(DateTime, nullable=False, unique=True) # 날짜
-    rainfall = Column(Float) # 강수
+    precipitation = Column(Float) # 강수
     precipitation_type = Column(Float) # 강수형태
     temperature = Column(Float) # 온도
     humidity = Column(Float) # 습도
@@ -33,7 +33,7 @@ class MinoWeather(Base):
 
     def __repr__(self):
         return (f"<MinoWeather(id={self.id}, loc_id={self.loc_id}, "
-                f"measure_date={self.measure_date}, rainfall={self.rainfall}, "
+                f"measure_date={self.measure_date}, rainfall={self.precipitation}, "
                 f"precipitation_type={self.precipitation_type}, temperature={self.temperature}, "
                 f"humidity={self.humidity})>")
 

@@ -1,4 +1,4 @@
-measure_date,rainfall,temperature,humidity,precipitation_type,loc_id
+measure_date,precipitation,temperature,humidity,precipitation_type,loc_id
 2022-01-01 00:00:00,0.0,-3.7,38.0,0.0,1
 2022-01-01 01:00:00,0.0,-2.5,35.0,0.0,1
 2022-01-01 02:00:00,0.0,-0.5,33.0,0.0,1

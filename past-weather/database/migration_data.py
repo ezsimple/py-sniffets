@@ -42,13 +42,13 @@
  format: day,hour,value location:55_112 Start : 20200101
  1, 0000, 81.000000
 
- 각 폴더의 csv 파일을 읽어서, MinoWeather 테이블에 데이터를 넣고 싶어.
+ 각 폴더의 csv 파일을 읽어서, MinoWeatherHourly 테이블에 데이터를 넣고 싶어.
  데이터가 많은 만큼 yield 제너레이터를 사용했으면 해.
 '''
 # %%
 import os
 import csv
-from create_tables import MinoWeather, session, engine
+from create_tables import MinoWeatherHourly, session, engine
 from datetime import datetime, timedelta
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
@@ -149,7 +149,7 @@ def make_correct_csv_file(directory):
                 writer.writerows(corrected_data)  # 수정된 데이터 작성
                 # 변경된 내용을 csv 파일에 저장
 
-# CSV 파일을 읽어 MinoWeather 객체를 생성하는 제너레이터 함수
+# CSV 파일을 읽어 MinoWeatherHourly 객체를 생성하는 제너레이터 함수
 def make_pandas_weather_data(directory):
     output_dir = '송악읍날씨정보'
     os.makedirs(output_dir, exist_ok=True)
@@ -199,7 +199,7 @@ def read_weather_data(directory):
         if os.path.exists(file_path):
             df = pd.read_csv(file_path)
             for index, row in df.iterrows():
-                yield MinoWeather(
+                yield MinoWeatherHourly(
                     measure_date=row['measure_date'],
                     loc_id=LOC_ID, # 송악읍
                     precipitation=row['precipitation'],
@@ -220,7 +220,7 @@ def insert_weather_data(session, directory):
     └── merged_송악읍2024.csv 
 
     read_weather_data 함수를 사용해서 만들어줘. (yield 제너레이터 사용)
-    class MinoWeather 사용
+    class MinoWeatherHourly 사용
     '''
 
     # 1. 임시테이블 생성
@@ -236,8 +236,8 @@ def insert_weather_data(session, directory):
                 humidity float8 NULL,
                 create_at timestamp NULL,
                 update_at timestamp NULL,
-                CONSTRAINT "MinoWeather_measure_date_key" UNIQUE (measure_date),
-                CONSTRAINT "MinoWeather_pkey" PRIMARY KEY (id)          
+                CONSTRAINT "MinoWeatherhourly_measure_date_key" UNIQUE (measure_date),
+                CONSTRAINT "MinoWeatherhourly_pkey" PRIMARY KEY (id)          
             )
         """))
         session.commit()
@@ -274,7 +274,7 @@ def insert_weather_data(session, directory):
     # 3. temp 테이블의 데이터를 MinoWeather 테이블로 복사
     try:
         session.execute(text("""
-            INSERT INTO public."MinoWeather" (measure_date, loc_id, precipitation, precipitation_type, temperature, humidity)
+            INSERT INTO public."MinoWeatherHourly" (measure_date, loc_id, precipitation, precipitation_type, temperature, humidity)
             SELECT measure_date, loc_id, precipitation, precipitation_type, temperature, humidity
             FROM temp_table
             ON CONFLICT (measure_date) DO NOTHING;
@@ -307,8 +307,8 @@ def save_to_mino_weather_table(directory):
                 humidity float8 NULL,
                 create_at timestamp DEFAULT CURRENT_TIMESTAMP,
                 update_at timestamp DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT "MinoWeather_measure_date_key" UNIQUE (measure_date),
-                CONSTRAINT "MinoWeather_pkey" PRIMARY KEY (id)          
+                CONSTRAINT "MinoWeatherHourly_measure_date_key" UNIQUE (measure_date),
+                CONSTRAINT "MinoWeatherHourly_pkey" PRIMARY KEY (id)          
             )
         """))
         session.commit()
@@ -328,13 +328,74 @@ def save_to_mino_weather_table(directory):
                 df['update_at'] = current_time
                 df.to_sql('temp_table', connection, if_exists='append', index=False)
 
-    # 3. temp 테이블의 데이터를 MinoWeather테이블로 복사
+    # 3. temp 테이블의 데이터를 MinoWeatherHourly 테이블로 복사
     try:
         session.execute(text("""
-            INSERT INTO public."MinoWeather" (measure_date, loc_id, precipitation, precipitation_type, temperature, humidity, create_at, update_at)
+            INSERT INTO public."MinoWeatherHourly" (measure_date, loc_id, precipitation, precipitation_type, temperature, humidity, create_at, update_at)
             SELECT measure_date, loc_id, precipitation, precipitation_type, temperature, humidity, create_at, update_at
             FROM temp_table
             ON CONFLICT (measure_date) DO NOTHING;
+        """))
+
+        session.execute(text("""
+            INSERT INTO public."MinoWeatherDaily" (loc_id, measure_day, sum_precipitation, precipitation_type,
+                                max_temperature, min_temperature, avg_temperature,
+                                max_humidity, min_humidity, avg_humidity, create_at, update_at)
+            SELECT
+                loc_id,
+                measure_date::date AS measure_day,  -- measure_date를 날짜 형식으로 변환
+                SUM(precipitation) AS sum_precipitation,  -- 일일 강수량 합계
+                -- 가장 빈도가 높은 강수형태를 선택
+                (SELECT precipitation_type
+                FROM public."MinoWeatherHourly" AS sub
+                WHERE sub.loc_id = loc_id AND sub.measure_date::date = measure_date::date
+                GROUP BY precipitation_type
+                ORDER BY COUNT(*) DESC
+                LIMIT 1
+                ) AS precipitation_type,  -- 가장 빈도가 높은 강수형태
+                MAX(temperature) AS max_temperature,  -- 최대 온도
+                MIN(temperature) AS min_temperature,  -- 최소 온도
+                AVG(temperature) AS avg_temperature,  -- 평균 온도
+                MAX(humidity) AS max_humidity,  -- 최대 습도
+                MIN(humidity) AS min_humidity,  -- 최소 습도
+                AVG(humidity) AS avg_humidity,  -- 평균 습도
+                NOW() AS create_at,  -- 현재 시간
+                NOW() AS update_at   -- 현재 시간
+            FROM
+                public."MinoWeatherHourly" AS main
+            GROUP BY
+                loc_id, measure_date::date  -- loc_id와 날짜로 그룹화
+            ON CONFLICT (loc_id, measure_day) DO NOTHING;
+        """))
+
+        session.execute(text("""
+            INSERT INTO public."MinoWeatherWeekly" (loc_id, measure_week, sum_precipitation, precipitation_type, 
+                                max_temperature, min_temperature, avg_temperature, 
+                                max_humidity, min_humidity, avg_humidity, create_at, update_at)
+            SELECT 
+                loc_id,
+                TO_CHAR(DATE_TRUNC('week', measure_date), 'YYYY-MM-WW') AS measure_week,  -- yyyy-mm-week 형식으로 주 단위 집계
+                SUM(precipitation) AS sum_precipitation,  -- 주간 강수량 합계
+                -- 가장 빈도가 높은 강수형태를 선택
+                (SELECT precipitation_type
+                FROM public."MinoWeatherHourly" AS sub
+                WHERE sub.loc_id = loc_id AND sub.measure_date::date = measure_date::date
+                GROUP BY precipitation_type
+                ORDER BY COUNT(*) DESC
+                LIMIT 1) AS precipitation_type,  -- 가장 빈도가 높은 강수형태
+                MAX(temperature) AS max_temperature,  -- 주간 최대 온도
+                MIN(temperature) AS min_temperature,  -- 주간 최소 온도
+                AVG(temperature) AS avg_temperature,  -- 주간 평균 온도
+                MAX(humidity) AS max_humidity,  -- 주간 최대 습도
+                MIN(humidity) AS min_humidity,  -- 주간 최소 습도
+                AVG(humidity) AS avg_humidity,  -- 주간 평균 습도
+                NOW() AS create_at,  -- 현재 시간
+                NOW() AS update_at   -- 현재 시간
+            FROM 
+                public."MinoWeatherHourly" AS main
+            GROUP BY 
+                loc_id, TO_CHAR(DATE_TRUNC('week', measure_date), 'YYYY-MM-WW')
+            ON CONFLICT (loc_id, measure_week) DO NOTHING;
         """))
     except SQLAlchemyError as e:
         session.rollback()  # 트랜잭션 롤백

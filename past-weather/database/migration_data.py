@@ -374,7 +374,14 @@ def save_to_mino_weather_table(directory):
                                 max_humidity, min_humidity, avg_humidity, create_at, update_at)
             SELECT 
                 loc_id,
-                TO_CHAR(DATE_TRUNC('week', measure_date), 'YYYY-MM-WW') AS measure_week,  -- yyyy-mm-week 형식으로 주 단위 집계
+                TO_CHAR(DATE_TRUNC('month', measure_date), 'YYYY-MM') || '-' || 
+                LPAD(CASE 
+                    WHEN EXTRACT(WEEK FROM measure_date) - EXTRACT(WEEK FROM DATE_TRUNC('month', measure_date)) + 1 = 1 THEN '01'
+                    WHEN EXTRACT(WEEK FROM measure_date) - EXTRACT(WEEK FROM DATE_TRUNC('month', measure_date)) + 1 = 2 THEN '02'
+                    WHEN EXTRACT(WEEK FROM measure_date) - EXTRACT(WEEK FROM DATE_TRUNC('month', measure_date)) + 1 = 3 THEN '03'
+                    WHEN EXTRACT(WEEK FROM measure_date) - EXTRACT(WEEK FROM DATE_TRUNC('month', measure_date)) + 1 = 4 THEN '04'
+                    ELSE '05'  -- 다섯째주 이상인 경우
+                END, 2, '0') AS measure_week,  -- 주를 "yyyy-mm-01" 형식으로 표현
                 SUM(precipitation) AS sum_precipitation,  -- 주간 강수량 합계
                 -- 가장 빈도가 높은 강수형태를 선택
                 (SELECT precipitation_type
@@ -394,7 +401,8 @@ def save_to_mino_weather_table(directory):
             FROM 
                 public."MinoWeatherHourly" AS main
             GROUP BY 
-                loc_id, TO_CHAR(DATE_TRUNC('week', measure_date), 'YYYY-MM-WW')
+                loc_id, DATE_TRUNC('month', measure_date), 
+                EXTRACT(WEEK FROM measure_date) - EXTRACT(WEEK FROM DATE_TRUNC('month', measure_date)) + 1  -- 주 번호를 그룹화
             ON CONFLICT (loc_id, measure_week) DO NOTHING;
         """))
     except SQLAlchemyError as e:

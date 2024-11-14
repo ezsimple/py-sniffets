@@ -48,7 +48,7 @@
 # %%
 import os
 import csv
-from create_tables import MinoWeatherHourly, session, engine
+from create_tables import MinoWeatherHourly, MinoPrecipitationCode, session, engine
 from datetime import datetime, timedelta
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
@@ -183,6 +183,8 @@ def make_pandas_weather_data(directory):
         merged_df = pd.merge(precipitation_df, temperature_df, on='measure_date', how='outer')
         merged_df = pd.merge(merged_df, humidity_df, on='measure_date', how='outer')
         merged_df = pd.merge(merged_df, precipitation_type_df, on='measure_date', how='outer')
+        # precipitation_type이 음수인 경우 0으로 변경
+        merged_df['precipitation_type'] = merged_df['precipitation_type'].apply(lambda x: max(x, 0))
         merged_df['loc_id'] = LOC_ID
         merged_df.fillna(0, inplace=True)
         
@@ -222,6 +224,18 @@ def insert_weather_data(session, directory):
     read_weather_data 함수를 사용해서 만들어줘. (yield 제너레이터 사용)
     class MinoWeatherHourly 사용
     '''
+
+    try:
+        session.execute(text("""
+            INSERT INTO public."MinoPrecipitationCode" (code, description)
+            VALUES (0, '없음'), (1, '비'), (2, '비/눈'), (3, '눈'), (4, '소나기'), (5, '빗방울'), (6, '빗방울눈날림'), (7, '눈날림')
+            ON CONFLICT (code) DO NOTHING;
+        """))
+    except SQLAlchemyError as e:
+        session.rollback()  # 트랜잭션 롤백
+        print(f"Error inserting data: {e}")
+        sys.exit(-1) # 빠른 디버깅을 위해 에러 발생 시 프로그램 종료
+
 
     # 1. 임시테이블 생성
     try:

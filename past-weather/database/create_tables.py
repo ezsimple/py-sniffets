@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Date, ForeignKey, create_engine, Index, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Float, DateTime, Date, ForeignKey, create_engine, Index, UniqueConstraint, text, func,TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
@@ -16,8 +16,18 @@ class MinoLocations(Base):
     latitude = Column(Float) # 위도
     longitude = Column(Float) # 경도
     timezone = Column(String(30), default='Asia/Seoul') # 시간대
-    create_at = Column(DateTime, default=datetime.now()) # 생성 시간
-    update_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now()) # 업데이트 시간
+    create_at = Column(TIMESTAMP, server_default=func.now())
+    update_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+
+class MinoPrecipitationCode(Base):
+    '''
+    강수형태 : 없음(0), 비(1), 비/눈(2), 눈(3), 소나기(4), 빗방울(5), 빗방울눈날림(6), 눈날림(7) 
+    '''
+    __tablename__ = 'MinoPrecipitationCode'
+    code = Column(Integer, primary_key=True)
+    description = Column(String(255))
+    create_at = Column(TIMESTAMP, server_default=func.now())
+    update_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
 
 class MinoWeatherHourly(Base):
     __tablename__ = 'MinoWeatherHourly'
@@ -25,11 +35,11 @@ class MinoWeatherHourly(Base):
     loc_id = Column(Integer, ForeignKey('MinoLocations.id'), nullable=False)
     measure_date = Column(DateTime, nullable=False, unique=True) # 날짜
     precipitation = Column(Float) # 강수
-    precipitation_type = Column(Float) # 강수형태
+    precipitation_type = Column(Integer, ForeignKey('MinoPrecipitationCode.code'), nullable=False) # 강수형태
     temperature = Column(Float) # 온도
     humidity = Column(Float) # 습도
-    create_at = Column(DateTime, default=datetime.now()) # 생성 시간
-    update_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now()) # 업데이트 시간
+    create_at = Column(TIMESTAMP, server_default=func.now())
+    update_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
 
     __table_args__ = (
         Index('ix_loc_id_measure_date', 'loc_id', 'measure_date'),  # loc_id와 measure_date에 대한 인덱스 추가
@@ -60,15 +70,15 @@ class MinoWeatherDaily(Base):
     loc_id = Column(Integer, ForeignKey('MinoLocations.id'), nullable=False)
     measure_day = Column(Date, nullable=False)  # 날짜 (년-월-일)
     sum_precipitation = Column(Float)  # 일일 강수량
-    precipitation_type = Column(Float)  # 강수형태
+    precipitation_type = Column(Integer, ForeignKey('MinoPrecipitationCode.code'), nullable=False) # 강수형태
     max_temperature = Column(Float)  # 최대 온도
     min_temperature = Column(Float)  # 최소 온도
     avg_temperature = Column(Float)  # 평균 온도
     max_humidity = Column(Float)  # 최대 습도
     min_humidity = Column(Float)  # 최소 습도
     avg_humidity = Column(Float)  # 평균 습도
-    create_at = Column(DateTime, default=datetime.now())  # 생성 시간
-    update_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())  # 업데이트 시간
+    create_at = Column(TIMESTAMP, server_default=func.now())
+    update_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
 
     __table_args__ = (
         Index('ix_loc_id_measure_day', 'loc_id', 'measure_day'),  # loc_id와 measure_day에 대한 인덱스 추가
@@ -93,15 +103,15 @@ class MinoWeatherWeekly(Base):
     loc_id = Column(Integer, ForeignKey('MinoLocations.id'), nullable=False)
     measure_week = Column(String, nullable=False)  # 년-월-주 (예: '2024-11-2')
     sum_precipitation = Column(Float)  # 한주 강수량
-    precipitation_type = Column(Float)  # 강수형태
+    precipitation_type = Column(Integer, ForeignKey('MinoPrecipitationCode.code'), nullable=False) # 강수형태
     max_temperature = Column(Float)  # 최대 온도
     min_temperature = Column(Float)  # 최소 온도
     avg_temperature = Column(Float)  # 평균 온도
     max_humidity = Column(Float)  # 최대 습도
     min_humidity = Column(Float)  # 최소 습도
     avg_humidity = Column(Float)  # 평균 습도
-    create_at = Column(DateTime, default=datetime.now())  # 생성 시간
-    update_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())  # 업데이트 시간
+    create_at = Column(TIMESTAMP, server_default=func.now())
+    update_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
 
     __table_args__ = (
         Index('ix_loc_id_measure_week', 'loc_id', 'measure_week'),  # loc_id와 measure_week에 대한 인덱스 추가

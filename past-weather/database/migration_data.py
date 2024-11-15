@@ -368,12 +368,7 @@ def save_to_mino_weather_table(directory):
                 loc_id,
                 TO_CHAR(measure_date, 'YYYY-MM') AS measure_month,
                 SUM(precipitation) AS sum_precipitation,
-                (SELECT precipitation_type
-                FROM public."MinoWeatherHourly" AS sub
-                WHERE sub.loc_id = loc_id AND TO_CHAR(sub.measure_date, 'YYYY-MM') = TO_CHAR(measure_date, 'YYYY-MM')
-                GROUP BY precipitation_type
-                ORDER BY COUNT(*) desc
-                LIMIT 1) AS precipitation_type,  -- 가장 빈도가 높은 강수형태
+                MAX(precipitation_type) AS precipitation_type, -- 눈, 비를 구분하기 위해.
                 MAX(temperature) AS max_temperature,
                 MIN(temperature) AS min_temperature,
                 AVG(temperature) AS avg_temperature,

@@ -55,7 +55,7 @@ async def year_chart(request: Request, city: str, yyyy: str):
         data['temperature'].append(int(entry.avg_temperature))
     
     df = pd.DataFrame(data)
-    df['month'] = pd.to_datetime(df['month'], format='%Y-%m')
+    # df['month'] = pd.to_datetime(df['month'], format='%Y-%m')
 
      # Altair 차트 생성
     daily_precipitation_chart = alt.Chart(df).mark_bar(color='green').encode(

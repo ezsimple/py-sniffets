@@ -50,7 +50,7 @@ import os
 import csv
 from create_tables import MinoWeatherHourly, MinoPrecipitationCode, session, engine
 from datetime import datetime, timedelta
-from sqlalchemy import text
+from sqlalchemy import text, MetaData, Table
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
 import sys
@@ -183,9 +183,31 @@ def make_pandas_weather_data(directory):
         merged_df = pd.merge(precipitation_df, temperature_df, on='measure_date', how='outer')
         merged_df = pd.merge(merged_df, humidity_df, on='measure_date', how='outer')
         merged_df = pd.merge(merged_df, precipitation_type_df, on='measure_date', how='outer')
-        # precipitation_type이 음수인 경우 0으로 변경
+
+        # 이상치 처리 - 강수량 precipitation이 음수인 경우 0으로 변경
+        # 이상치 처리 - 강수형태 precipitation_type이 음수인 경우 0으로 변경
+        merged_df['precipitation'] = merged_df['precipitation'].apply(lambda x: max(x, 0))
         merged_df['precipitation_type'] = merged_df['precipitation_type'].apply(lambda x: max(x, 0))
+
+        # 이상치 처리 - 습도
+        merged_df['humidity'] = merged_df['humidity'].apply(lambda x: max(x, 0))
+        # 평균과 표준편차 계산
+        mean_humidity = merged_df['humidity'].mean()
+        std_dev_humidity = merged_df['humidity'].std()
+
+        # 하한과 상한 설정
+        lower_bound = mean_humidity - 2 * std_dev_humidity
+        upper_bound = mean_humidity + 2 * std_dev_humidity
+
+        # 이상치 보정
+        merged_df['humidity'] = merged_df['humidity'].apply(lambda x: max(min(x, upper_bound), lower_bound))
+
+        # 이상치 처리 - 온도: 영하 -20는 0으로 처리
+        # 영하 -20도 이하의 온도 값을 0으로 처리하여 이상치를 제거합니다.
+        # 나머지 온도 값은 그대로 유지됩니다.
+        merged_df['temperature'] = merged_df['temperature'].add(20).apply(lambda x: max(x, 0)).sub(20)
         merged_df['loc_id'] = LOC_ID
+        # 결측치 처리
         merged_df.fillna(0, inplace=True)
         
         merged_filename = f'merged_송악읍{year}.csv'
@@ -210,103 +232,17 @@ def read_weather_data(directory):
                     precipitation_type=row['precipitation_type']
                 )
 
-def insert_weather_data(session, directory):
-    '''
-    # 한줄 한줄 입력하는 방식
-    $ tree  송악읍날씨정보
-    송악읍날씨정보
-    ├── merged_송악읍2020.csv
-    ├── merged_송악읍2021.csv
-    ├── merged_송악읍2022.csv
-    ├── merged_송악읍2023.csv
-    └── merged_송악읍2024.csv 
-
-    read_weather_data 함수를 사용해서 만들어줘. (yield 제너레이터 사용)
-    class MinoWeatherHourly 사용
-    '''
-
-    try:
-        session.execute(text("""
-            INSERT INTO public."MinoPrecipitationCode" (code, description)
-            VALUES (0, '없음'), (1, '비'), (2, '비/눈'), (3, '눈'), (4, '소나기'), (5, '빗방울'), (6, '빗방울눈날림'), (7, '눈날림')
-            ON CONFLICT (code) DO NOTHING;
-        """))
-    except SQLAlchemyError as e:
-        session.rollback()  # 트랜잭션 롤백
-        print(f"Error inserting data: {e}")
-        sys.exit(-1) # 빠른 디버깅을 위해 에러 발생 시 프로그램 종료
-
-    # 1. 임시테이블 생성
-    try:
-        session.execute(text("""
-            CREATE TEMPORARY TABLE temp_table (
-                id serial4 NOT NULL,
-                loc_id int4 NOT NULL,
-                measure_date timestamp NOT NULL,
-                precipitation float8 NULL,
-                precipitation_type float8 NULL,
-                temperature float8 NULL,
-                humidity float8 NULL,
-                create_at timestamp NULL,
-                update_at timestamp NULL,
-                CONSTRAINT "MinoWeatherhourly_measure_date_key" UNIQUE (measure_date),
-                CONSTRAINT "MinoWeatherhourly_pkey" PRIMARY KEY (id)          
-            )
-        """))
-        session.commit()
-    except Exception as e:
-        print(f"Error occurred: {e}")
-
-    # 2. 임시테이블에 모든 데이터 삽입
-    for weather_data in read_weather_data(directory):
-        try:
-            session.execute(text("""
-                INSERT INTO temp_table (measure_date, loc_id, precipitation, precipitation_type, temperature, humidity)
-                VALUES (:measure_date, :loc_id, :precipitation, :precipitation_type, :temperature, :humidity)
-            """), {
-                'measure_date': weather_data.measure_date,
-                'loc_id': LOC_ID,
-                'precipitation': weather_data.precipitation,
-                'precipitation_type': weather_data.precipitation_type,
-                'temperature': weather_data.temperature,
-                'humidity': weather_data.humidity
-            })
-        except SQLAlchemyError as e:
-            session.rollback()  # 트랜잭션 롤백
-            print(f"Error inserting data: {e}")
-            sys.exit(-1) # 빠른 디버깅을 위해 에러 발생 시 프로그램 종료
-        except Exception as e:
-            print(f"Error inserting data: {e}")
-
-        if len(session.new) >= 1000:  # 1000개마다 커밋
-            session.commit()
-
-    session.commit()  # 남은 데이터 커밋
-
-
-    # 3. temp 테이블의 데이터를 MinoWeather 테이블로 복사
-    try:
-        session.execute(text("""
-            INSERT INTO public."MinoWeatherHourly" (measure_date, loc_id, precipitation, precipitation_type, temperature, humidity)
-            SELECT measure_date, loc_id, precipitation, precipitation_type, temperature, humidity
-            FROM temp_table
-            ON CONFLICT (measure_date) DO NOTHING;
-        """))
-    except SQLAlchemyError as e:
-        session.rollback()  # 트랜잭션 롤백
-        print(f"Error inserting data: {e}")
-        sys.exit(-1) # 빠른 디버깅을 위해 에러 발생 시 프로그램 종료
-
-    # 4. temp 테이블 삭제
-    session.execute(text(""" DROP TABLE IF EXISTS temp_table; """))
-
-    # 5. 변경사항 커밋
-    session.commit()
 
 def save_to_mino_weather_table(directory):
-    '''
-    pandas.to_sql을 이용해서, 고속 저장
-    '''
+    # 메타데이터 객체 생성
+    metadata = MetaData(schema='public')
+
+    # 테이블 정의
+    MinoWeatherHourly = Table('MinoWeatherHourly', metadata, autoload_with=engine)
+    MinoWeatherDaily = Table('MinoWeatherDaily', metadata, autoload_with=engine)
+    MinoWeatherWeekly = Table('MinoWeatherWeekly', metadata, autoload_with=engine)
+    MinoWeatherMonthly = Table('MinoWeatherMonthly', metadata, autoload_with=engine)
+
     # 1. 임시테이블 생성
     try:
         session.execute(text("""
@@ -329,6 +265,7 @@ def save_to_mino_weather_table(directory):
         print(f"Error occurred: {e}")
     
     # 2. pandas로 temp_table 에 넣기
+    # pandas.to_sql을 이용해서, 고속 저장
     with engine.connect() as connection:
         for year in range(START_YEAR, END_YEAR + 1):
             filename = f'merged_송악읍{year}.csv'
@@ -343,6 +280,11 @@ def save_to_mino_weather_table(directory):
 
     # 3. temp 테이블의 데이터를 MinoWeatherHourly 테이블로 복사
     try:
+        session.execute(text(f'TRUNCATE TABLE public."MinoWeatherHourly";'))
+        session.execute(text(f'TRUNCATE TABLE public."MinoWeatherDaily";'))
+        session.execute(text(f'TRUNCATE TABLE public."MinoWeatherWeekly";'))
+        session.execute(text(f'TRUNCATE TABLE public."MinoWeatherMonthly";'))
+
         session.execute(text("""
             INSERT INTO public."MinoWeatherHourly" (measure_date, loc_id, precipitation, precipitation_type, temperature, humidity, create_at, update_at)
             SELECT measure_date, loc_id, precipitation, precipitation_type, temperature, humidity, create_at, update_at
@@ -460,7 +402,4 @@ if __name__ == "__main__":
     remove_all_blank_lines(directory)
     make_correct_csv_file(directory)
     make_pandas_weather_data(directory)
-    # insert_weather_data(session, directory='./송악읍날씨정보')
     save_to_mino_weather_table(directory='./송악읍날씨정보')
-
-# %%

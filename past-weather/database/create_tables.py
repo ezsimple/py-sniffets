@@ -126,6 +126,35 @@ class MinoWeatherWeekly(Base):
                 f"max_humidity={self.max_humidity}, min_humidity={self.min_humidity}, "
                 f"avg_humidity={self.avg_humidity})>")
 
+class MinoWeatherMonthly(Base):
+    __tablename__ = 'MinoWeatherMonthly'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    loc_id = Column(Integer, ForeignKey('MinoLocations.id'), nullable=False)
+    measure_month = Column(String, nullable=False)  # 년-월 (예: '2024-11')
+    sum_precipitation = Column(Float)  # 월간 강수량
+    precipitation_type = Column(Integer, ForeignKey('MinoPrecipitationCode.code'), nullable=False) # 강수형태
+    max_temperature = Column(Float)  # 최대 온도
+    min_temperature = Column(Float)  # 최소 온도
+    avg_temperature = Column(Float)  # 평균 온도
+    max_humidity = Column(Float)  # 최대 습도
+    min_humidity = Column(Float)  # 최소 습도
+    avg_humidity = Column(Float)  # 평균 습도
+    create_at = Column(TIMESTAMP, server_default=func.now())
+    update_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+
+    __table_args__ = (
+        Index('ix_loc_id_measure_month', 'loc_id', 'measure_month'),  # loc_id와 measure_month에 대한 인덱스 추가
+        UniqueConstraint('loc_id', 'measure_month', name='uq_loc_id_measure_month')  # 고유 제약 조건 추가
+    )
+
+    def __repr__(self):
+        return (f"<MinoWeatherMonthly(id={self.id}, loc_id={self.loc_id}, "
+                f"measure_month={self.measure_month}, monthly_precipitation={self.sum_precipitation}, "
+                f"precipitation_type={self.precipitation_type}, max_temperature={self.max_temperature}, "
+                f"min_temperature={self.min_temperature}, avg_temperature={self.avg_temperature}, "
+                f"max_humidity={self.max_humidity}, min_humidity={self.min_humidity}, "
+                f"avg_humidity={self.avg_humidity})>")
+
 
 
 # SQLAlchemy 엔진 생성

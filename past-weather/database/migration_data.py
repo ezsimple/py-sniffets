@@ -236,7 +236,6 @@ def insert_weather_data(session, directory):
         print(f"Error inserting data: {e}")
         sys.exit(-1) # 빠른 디버깅을 위해 에러 발생 시 프로그램 종료
 
-
     # 1. 임시테이블 생성
     try:
         session.execute(text("""
@@ -419,6 +418,31 @@ def save_to_mino_weather_table(directory):
                 EXTRACT(WEEK FROM measure_date) - EXTRACT(WEEK FROM DATE_TRUNC('month', measure_date)) + 1  -- 주 번호를 그룹화
             ON CONFLICT (loc_id, measure_week) DO NOTHING;
         """))
+
+        session.execute(text("""
+            INSERT INTO public."MinoWeatherMonthly"
+            (loc_id, measure_month, sum_precipitation, precipitation_type, max_temperature, min_temperature, avg_temperature, max_humidity, min_humidity, avg_humidity)
+            SELECT 
+                loc_id,
+                TO_CHAR(measure_date, 'YYYY-MM') AS measure_month,
+                SUM(precipitation) AS sum_precipitation,
+                (SELECT precipitation_type
+                FROM public."MinoWeatherHourly" AS sub
+                WHERE sub.loc_id = loc_id AND TO_CHAR(sub.measure_date, 'YYYY-MM') = TO_CHAR(measure_date, 'YYYY-MM')
+                GROUP BY precipitation_type
+                ORDER BY COUNT(*) desc
+                LIMIT 1) AS precipitation_type,  -- 가장 빈도가 높은 강수형태
+                MAX(temperature) AS max_temperature,
+                MIN(temperature) AS min_temperature,
+                AVG(temperature) AS avg_temperature,
+                MAX(humidity) AS max_humidity,
+                MIN(humidity) AS min_humidity,
+                AVG(humidity) AS avg_humidity
+            FROM public."MinoWeatherHourly" AS main
+            GROUP BY loc_id, TO_CHAR(measure_date, 'YYYY-MM')
+            ON CONFLICT (loc_id, measure_date) DO NOTHING;
+        """))
+
     except SQLAlchemyError as e:
         session.rollback()  # 트랜잭션 롤백
         print(f"Error inserting data: {e}")

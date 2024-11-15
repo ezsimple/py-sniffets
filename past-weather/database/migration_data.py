@@ -440,7 +440,7 @@ def save_to_mino_weather_table(directory):
                 AVG(humidity) AS avg_humidity
             FROM public."MinoWeatherHourly" AS main
             GROUP BY loc_id, TO_CHAR(measure_date, 'YYYY-MM')
-            ON CONFLICT (loc_id, measure_date) DO NOTHING;
+            ON CONFLICT (loc_id, measure_month) DO NOTHING;
         """))
 
     except SQLAlchemyError as e:

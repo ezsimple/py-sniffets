@@ -1,0 +1,7 @@
+[디렉토리 설명]
+chat/ # 명언카드
+chat/v1/crawling.py # 명언크롤링
+quote/ # 명언클론API
+http_auth/ # 개인용파일다운로드서버
+past-weather/ # 송악읍과거날씨
+yoon3134/ # 큰딸파이썬관련예제

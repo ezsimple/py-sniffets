@@ -77,7 +77,8 @@ async def monthly_chart(request: Request, city: str, yyyy: str):
     finally:
         session.close()
 
-    return CustomTemplateResponse("chart.html", {"request": request, "chart": combined_chart})
+    title = f'송악읍 {yyyy}년 기상 정보'
+    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart})
 
 @router.get("/{city:str}/{yyyy:str}/{mm:str}", response_class=HTMLResponse)
 async def daily_chart(request: Request, city: str, yyyy: str, mm: str):
@@ -95,7 +96,7 @@ async def daily_chart(request: Request, city: str, yyyy: str, mm: str):
         return get_redirect_url(city, yyyy, mm)
 
     # mm 검증 및 최대 월 가져오기
-    if not str(mm).isdigit() or (1 > int(mm) or int(mm) > 12):
+    if not str(mm).isdigit() or (1 > int(mm) or int(mm) > 12) or len(mm) > 2:
         mm = get_max_month_for_year(session, yyyy)  # 최대 월 가져오기
         return get_redirect_url(city, yyyy, mm)
 
@@ -141,7 +142,8 @@ async def daily_chart(request: Request, city: str, yyyy: str, mm: str):
     finally:
         session.close()
 
-    return CustomTemplateResponse("chart.html", {"request": request, "chart": combined_chart})
+    title = f'송악읍 {yyyy}년 {mm}월 기상 정보'
+    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart})
 
 def get_max_month_for_year(session, year):
     """주어진 년도의 최대 월을 반환하는 함수"""

@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI, APIRouter
 from fastapi.staticfiles import StaticFiles
-from starlette.responses import RedirectResponse, HTMLResponse
+from starlette.responses import RedirectResponse, HTMLResponse, JSONResponse
 from starlette.requests import Request
 from core.config import PREFIX, logging
 from core.model import CustomTemplateResponse, RedirectGetResponse
@@ -11,6 +11,7 @@ from database.create_tables import engine, MinoWeatherMonthly, MinoWeatherDaily
 from database.weather_visualization import WeatherVisualization
 from datetime import datetime
 import calendar
+import json
 
 app = FastAPI(title="Past Weather(송악읍)", version="0.0.1")
 app.mount(f"{PREFIX}/static", StaticFiles(directory="static"), name="static")
@@ -26,20 +27,12 @@ async def to_firstpage(request: Request):
     # group by year, order by desc
     return CustomTemplateResponse("index.html", {"request": request})
 
-@router.get("/{city:str}/{yyyy:str}", response_class=HTMLResponse)
-async def monthly_chart(request: Request, city: str, yyyy: str):
+
+@router.get("/api/{city:str}/{yyyy:str}", response_class=JSONResponse)
+async def monthly_api(request: Request, city: str, yyyy: str):
     '''
     년-월별 차트 생성
     '''
-    if not yyyy.isdigit():
-        yyyy = datetime.now().year  
-        return RedirectGetResponse(url=f"{PREFIX}/{city}/{yyyy}")
-
-    current_year = datetime.now().year
-    if MIN_YEAR > int(yyyy) or int(yyyy) > current_year:
-        yyyy = current_year
-        return RedirectGetResponse(url=f"{PREFIX}/{city}/{yyyy}")
-
     logger.info(f"city: {city}, yyyy: {yyyy}")
 
     session = SessionLocal()
@@ -65,43 +58,23 @@ async def monthly_chart(request: Request, city: str, yyyy: str):
             data['습도(%)'].append(int(entry.avg_humidity))
             data['온도(°C)'].append(int(entry.avg_temperature))
 
-        # 클래스 인스턴스 생성
-        weather_viz = WeatherVisualization(data)
-        # 차트 생성
-        combined_chart = weather_viz.combined_chart().to_html()
-
     except Exception as e:
         logger.error(f"Error occurred: {e}")
-        return HTMLResponse(content="데이터를 가져오는 중 오류가 발생했습니다.", status_code=500)
+        return JSONResponse(content={"error": f"Internal server error: {str(e)}"}, status_code=500)
 
     finally:
         session.close()
+    
+    return JSONResponse(content=data)
 
-    title = f'송악읍 {yyyy}년 기상 정보'
-    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart})
-
-@router.get("/{city:str}/{yyyy:str}/{mm:str}", response_class=HTMLResponse)
-async def daily_chart(request: Request, city: str, yyyy: str, mm: str):
+@router.get("/api/{city:str}/{yyyy:str}/{mm:str}", response_class=JSONResponse)
+async def daily_api(request: Request, city: str, yyyy: str, mm: str):
     '''
     일별 강수량, 일별 평균 온도 그래프
     '''
-    session = SessionLocal()
-    # 현재 년도 가져오기
-    current_year = datetime.now().year
-
-    # yyyy 검증 및 최대 월 가져오기
-    if not str(yyyy).isdigit() or (MIN_YEAR > int(yyyy) or int(yyyy) > current_year):
-        yyyy = current_year  # 유효하지 않으면 현재년도로 대체
-        mm = get_max_month_for_year(session, yyyy)  # 최대 월 가져오기
-        return get_redirect_url(city, yyyy, mm)
-
-    # mm 검증 및 최대 월 가져오기
-    if not str(mm).isdigit() or (1 > int(mm) or int(mm) > 12) or len(mm) > 2:
-        mm = get_max_month_for_year(session, yyyy)  # 최대 월 가져오기
-        return get_redirect_url(city, yyyy, mm)
-
     logger.info(f"city: {city}, yyyy: {yyyy}, mm: {mm}")
 
+    session = SessionLocal()
     data = {
         '일자': [],
         '온도(°C)': [],
@@ -130,32 +103,72 @@ async def daily_chart(request: Request, city: str, yyyy: str, mm: str):
             data['습도(%)'].append(int(entry.avg_humidity))
             data['온도(°C)'].append(int(entry.avg_temperature))
 
-        # 클래스 인스턴스 생성
-        weather_viz = WeatherVisualization(data, 'daily')
-        # 차트 생성
-        combined_chart = weather_viz.combined_chart().to_html()
-
     except Exception as e:
         logger.error(f"Error occurred: {e}")
-        return HTMLResponse(content="데이터를 가져오는 중 오류가 발생했습니다.", status_code=500)
+        return JSONResponse(content={"error": f"Internal server error: {str(e)}"}, status_code=500)
 
     finally:
         session.close()
+    
+    return JSONResponse(content=data)
 
+@router.get("/{city:str}/{yyyy:str}", response_class=HTMLResponse)
+async def monthly_chart(request: Request, city: str, yyyy: str):
+    current_year = datetime.now().year
+    if not str(yyyy).isdigit() or (MIN_YEAR > int(yyyy) or int(yyyy) > current_year):
+        yyyy = current_year  # 유효하지 않으면 현재년도로 대체
+        return get_redirect_url(city, yyyy, None)
+
+    json_data = await monthly_api(request, city, yyyy)
+    data = json_data.body.decode('utf-8')
+    data = json.loads(data)
+    weather_viz = WeatherVisualization(data)
+    combined_chart = weather_viz.combined_chart().to_json()
+    title = f'송악읍 {yyyy}년 기상 정보'
+    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart})
+
+@router.get("/{city:str}/{yyyy:str}/{mm:str}", response_class=HTMLResponse)
+async def daily_chart(request: Request, city: str, yyyy: str, mm: str):
+    # 현재 년도 가져오기
+    current_year = datetime.now().year
+
+    # yyyy 검증 및 최대 월 가져오기
+    if not str(yyyy).isdigit() or (MIN_YEAR > int(yyyy) or int(yyyy) > current_year):
+        yyyy = current_year  # 유효하지 않으면 현재년도로 대체
+        mm = get_max_month_for_year(yyyy)  # 최대 월 가져오기
+        return get_redirect_url(city, yyyy, mm)
+
+    # mm 검증 및 최대 월 가져오기
+    if not str(mm).isdigit() or (1 > int(mm) or int(mm) > 12) or len(mm) > 2:
+        mm = get_max_month_for_year(yyyy)  # 최대 월 가져오기
+        return get_redirect_url(city, yyyy, mm)
+
+    json_data = await daily_api(request, city, yyyy, mm)
+    data = json_data.body.decode('utf-8')
+    data = json.loads(data)
+    weather_viz = WeatherVisualization(data, 'daily')
+    combined_chart = weather_viz.combined_chart().to_json()
     title = f'송악읍 {yyyy}년 {mm}월 기상 정보'
     return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart})
 
-def get_max_month_for_year(session, year):
+def get_max_month_for_year(year):
     """주어진 년도의 최대 월을 반환하는 함수"""
-    return session.query(
-        func.max(extract('month', MinoWeatherDaily.measure_day)).label('max_month')
-    ).filter(
-        extract('year', MinoWeatherDaily.measure_day) == year
-    ).scalar()
+    session = SessionLocal()
+    try:
+        return session.query(
+            func.max(extract('month', MinoWeatherDaily.measure_day)).label('max_month')
+        ).filter(
+            extract('year', MinoWeatherDaily.measure_day) == year
+        ).scalar()
+    finally:
+        session.close()
 
 def get_redirect_url(city, yyyy, mm):
     """리다이렉트 URL 생성 함수"""
-    return RedirectGetResponse(url=f"{PREFIX}/{city}/{yyyy}/{mm}")
+    url = f'{PREFIX}/{city}/{yyyy}'
+    if mm:
+        url = f'{PREFIX}/{city}/{yyyy}/{mm:02}'
+    return RedirectGetResponse(url=url)
 
 app.include_router(router)  # 라우터 등록
 

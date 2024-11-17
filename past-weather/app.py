@@ -23,10 +23,10 @@ MIN_YEAR = 2014
 
 @router.get("/", response_class=RedirectResponse)
 async def to_firstpage(request: Request):
-    # use MinoWeatherMonthly, using SQLAlchemy
-    # group by year, order by desc
-    return CustomTemplateResponse("index.html", {"request": request})
-
+    city = CITY
+    yyyy = datetime.now().year
+    mm = get_max_month_for_year(yyyy)
+    return get_redirect_url(city, yyyy, mm)
 
 @router.get("/api/{city:str}/{yyyy:str}", response_class=JSONResponse)
 async def monthly_api(request: Request, city: str, yyyy: str):

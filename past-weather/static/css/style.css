@@ -30,11 +30,6 @@ h1 {
     font-family: 'Arial', sans-serif; /* 글꼴 패밀리 */
     background-color: #f9f9f9; /* 배경 색상 */
 }
-.chart-container {
-    width: 100%; /* 너비 100%로 설정 */
-    max-width: 800px; /* 최대 너비 설정 */
-    margin: auto; /* 중앙 정렬 */
-}
 .month-picker {
     display: flex;
     flex-direction: column;
@@ -67,4 +62,8 @@ h1 {
 .vega-embed {
     width: 100% !important; /* Vega 차트의 너비를 100%로 설정 */
     height: auto !important; /* 높이를 자동으로 설정 */
+}
+.chart-container {
+    max-width: 100%; /* 최대 너비 설정 */
+    margin: auto; /* 중앙 정렬 */
 }

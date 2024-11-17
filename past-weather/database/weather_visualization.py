@@ -21,7 +21,7 @@ class WeatherVisualization(alt.Chart):
             x=alt.X('일자:T', axis=alt.Axis(title='날짜', format='%d')),  # 날짜 형식
             y=alt.Y('온도(°C):Q', axis=alt.Axis(title='온도(°C)')),
             tooltip=['일자:T', '온도(°C):Q']
-        ).properties(height=200, width=800,title='온도 변화')
+        ).properties(height=200, title='온도 변화')
         return temperature_chart
 
     def humidity_chart(self):
@@ -29,7 +29,7 @@ class WeatherVisualization(alt.Chart):
             x=alt.X('일자:T', axis=alt.Axis(title='날짜', format='%d')),  # 날짜 형식
             y=alt.Y('습도(%):Q', axis=alt.Axis(title='습도(%)')),
             tooltip=['일자:T', '습도(%):Q']
-        ).properties(height=200, width=800,title='습도 변화')
+        ).properties(height=200, title='습도 변화')
         return humidity_chart
 
     def precipitation_chart(self):
@@ -37,7 +37,7 @@ class WeatherVisualization(alt.Chart):
             x=alt.X('일자:T', axis=alt.Axis(title='날짜', format='%d')),  # 날짜 형식
             y=alt.Y('강수량(mm):Q', axis=alt.Axis(title='강수량(mm)', orient='right')),
             tooltip=['일자:T', '강수량(mm):Q']
-        ).properties(height=200, width=800,title='강수량 변화')
+        ).properties(height=200, title='강수량 변화')
         return precipitation_chart
     
     def combined_chart(self):

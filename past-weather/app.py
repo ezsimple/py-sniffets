@@ -124,8 +124,12 @@ async def monthly_chart(request: Request, city: str, yyyy: str):
     data = json.loads(data)
     weather_viz = WeatherVisualization(data)
     combined_chart = weather_viz.combined_chart().to_json()
+
+    min_month, max_month = get_min_max_month()
+    months = get_months_for_year(yyyy)
+    selectedMonth = yyyy + '-' + months[-1]
     title = f'송악읍 {yyyy}년 기상 정보'
-    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart})
+    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart, "selecedMonth": selectedMonth, "min_month": min_month, "max_month": max_month })
 
 @router.get("/{city:str}/{yyyy:str}/{mm:str}", response_class=HTMLResponse)
 async def daily_chart(request: Request, city: str, yyyy: str, mm: str):
@@ -148,8 +152,50 @@ async def daily_chart(request: Request, city: str, yyyy: str, mm: str):
     data = json.loads(data)
     weather_viz = WeatherVisualization(data, 'daily')
     combined_chart = weather_viz.combined_chart().to_json()
+
+    min_month, max_month = get_min_max_month()
+    selectedMonth = yyyy + '-' + mm
     title = f'송악읍 {yyyy}년 {mm}월 기상 정보'
-    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart})
+    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart, "selectedMonth": selectedMonth, "min_month": min_month, "max_month": max_month})
+
+
+def get_years():
+    """데이터베이스에 존재하는 모든 연도를 반환하는 함수"""
+    session = SessionLocal()
+    try:
+        result = session.query(MinoWeatherMonthly.measure_month).distinct().all()
+        years = sorted(set(month[0].split('-')[0] for month in result))  # 중복 제거 후 정렬
+        return years
+    finally:
+        session.close()
+
+
+def get_min_max_month():
+    """month picker min max range """
+    session = SessionLocal()
+    try:
+        result = session.query(
+            func.min(MinoWeatherMonthly.measure_month).label('min_month'),
+            func.max(MinoWeatherMonthly.measure_month).label('max_month')
+        ).one()
+        return result.min_month, result.max_month  # max_month와 min_month 반환
+    finally:
+        session.close()
+
+
+def get_months_for_year(year):
+    """주어진 년도의 최대 월을 반환하는 함수"""
+    session = SessionLocal()
+    try:
+        # 주어진 연도에 해당하는 월을 선택하는 쿼리
+        result = session.query(MinoWeatherMonthly.measure_month).filter(
+            MinoWeatherMonthly.measure_month.like(f'{year}-%')
+        ).distinct().order_by(MinoWeatherMonthly.measure_month.asc()).all()
+
+        months = [month[0].split('-')[1] for month in result]
+        return months
+    finally:
+        session.close()
 
 def get_max_month_for_year(year):
     """주어진 년도의 최대 월을 반환하는 함수"""

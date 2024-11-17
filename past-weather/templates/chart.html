@@ -51,6 +51,12 @@
       const el = document.getElementById('vis');
       vegaEmbed("#vis", spec, embedOpt)
         .catch(error => showError(el, error));
+      
+      // 창 크기 조정 시 차트 크기 조정
+      window.addEventListener('resize', function() {
+        vegaEmbed("#vis", spec, embedOpt)
+            .catch(error => showError(el, error));
+      });
 
       document.getElementById('monthSelect').addEventListener('change', function() {
         const selectedMonth = document.getElementById('monthSelect').value;

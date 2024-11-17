@@ -78,3 +78,8 @@ summary {
     margin: 20px 0;
     text-align: center; /* 중앙 정렬 */
 }
+
+.vega-embed {
+    width: 100% !important; /* Vega 차트의 너비를 100%로 설정 */
+    height: auto !important; /* 높이를 자동으로 설정 */
+}

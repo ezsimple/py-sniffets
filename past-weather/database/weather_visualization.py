@@ -42,7 +42,6 @@ class WeatherVisualization(alt.Chart):
     
     def temperature_layer(self, width='container', height=200):
         temperature_layer = self.temperature_chart().properties(
-            width=width,
             height=height
         ).encode(
             x=alt.X(
@@ -70,7 +69,6 @@ class WeatherVisualization(alt.Chart):
         ).resolve_scale(
             y='independent'  # y축을 독립적으로 설정
         ).properties(
-            width=width,
             height=height
         )
         return humidity_precipitation_layer

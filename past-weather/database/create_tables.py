@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, Float, DateTime, Date, ForeignKe
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+from dotenv import load_dotenv
+import os
 
 # SQLAlchemy Base 클래스 정의
 Base = declarative_base()
@@ -156,9 +158,13 @@ class MinoWeatherMonthly(Base):
                 f"avg_humidity={self.avg_humidity})>")
 
 
+# .env 가 링크로 연결되어 있어야 함.
+load_dotenv()
+DATABASE_URL = os.getenv("DATABASE_URL", None)
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL is not set in the environment variables.")
 
 # SQLAlchemy 엔진 생성
-DATABASE_URL='postgresql://ezsimple:qwer%21%4034@138.2.125.118:5432/ezsimple'
 engine = create_engine(DATABASE_URL, echo=True)
 
 # 세션 메이커 초기화

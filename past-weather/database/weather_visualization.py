@@ -24,33 +24,33 @@ class WeatherVisualization(alt.Chart):
         ).properties(height=200, title='온도 변화')
         return temperature_chart
 
-    def humidity_chart(self):
-        humidity_chart = alt.Chart(self.df).mark_line(color='gray').encode(
-            x=alt.X('일자:T', axis=alt.Axis(title='날짜', format='%d')),  # 날짜 형식
-            y=alt.Y('습도(%):Q', axis=alt.Axis(title='습도(%)')),
-            tooltip=['일자:T', '습도(%):Q']
-        ).properties(height=200, title='습도 변화')
-        return humidity_chart
-
     def precipitation_chart(self):
         precipitation_chart = alt.Chart(self.df).mark_bar(color='blue', opacity=0.5).encode(
             x=alt.X('일자:T', axis=alt.Axis(title='날짜', format='%d')),  # 날짜 형식
-            y=alt.Y('강수량(mm):Q', axis=alt.Axis(title='강수량(mm)', orient='right')),
+            y=alt.Y('강수량(mm):Q', axis=alt.Axis(title='강수량(mm)')),
             tooltip=['일자:T', '강수량(mm):Q']
         ).properties(height=200, title='강수량 변화')
         return precipitation_chart
+
+    def humidity_chart(self):
+        humidity_chart = alt.Chart(self.df).mark_line(color='gray').encode(
+            x=alt.X('일자:T', axis=alt.Axis(title='날짜', format='%d')),  # 날짜 형식
+            y=alt.Y('습도(%):Q', axis=alt.Axis(title='습도(%)', orient='right')),
+            tooltip=['일자:T', '습도(%):Q']
+        ).properties(height=200, title='습도 변화')
+        return humidity_chart
     
     def combined_chart(self):
         ''' 온도, 습도, 강수량 차트를 수직으로 결합 '''
         temperature_layer = self.temperature_chart()
-        humidity_layer = self.humidity_chart()
         precipitation_layer = self.precipitation_chart()
+        humidity_layer = self.humidity_chart()
 
         combined_layer = alt.vconcat(
             temperature_layer,
             alt.layer(
-                humidity_layer,
-                precipitation_layer
+                precipitation_layer,
+                humidity_layer
             ).resolve_scale(
                 y='independent'
             ).properties(

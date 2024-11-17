@@ -40,7 +40,7 @@ class WeatherVisualization(alt.Chart):
         )
         return precipitation_chart
     
-    def temperature_layer(self, width=600, height=200):
+    def temperature_layer(self, width='container', height=200):
         temperature_layer = self.temperature_chart().properties(
             width=width,
             height=height
@@ -52,7 +52,7 @@ class WeatherVisualization(alt.Chart):
         )
         return temperature_layer
 
-    def humidity_precipitation_layer(self, width=600, height=200):
+    def humidity_precipitation_layer(self, width='container', height=200):
         # 습도와 강수량 차트를 수직으로 결합
         humidity_precipitation_layer = alt.layer(
             self.humidity_chart().encode(
@@ -75,7 +75,7 @@ class WeatherVisualization(alt.Chart):
         )
         return humidity_precipitation_layer
 
-    def combined_chart(self, width=600, height=200):
+    def combined_chart(self, width='container', height=200):
         '''
         온도, 습도, 강수량 차트를 수직으로 결합
         '''

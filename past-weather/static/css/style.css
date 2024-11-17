@@ -3,13 +3,26 @@
     margin: 0;
     padding: 0;
 }
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* 최소 높이를 100%로 설정 */
+}
+footer {
+    background-color: #f1f1f1; /* 배경색 */
+    padding: 20px 20px 20px 50px; /* 안쪽 여백 */
+    text-align: left; /* 텍스트 중앙 정렬 */
+    margin-top: auto; /* 상단 요소가 늘어날 때 푸터가 아래로 밀려나도록 설정 */
+}
 h1 {
     font-size: 1.6em;           /* 큰 글꼴 크기 */
     font-weight: bold;          /* 글꼴 두께를 굵게 */
     color: #333;                /* 텍스트 색상 */
     text-align: left;         /* 좌측 정렬 */
     margin: 0px 0px 40px 0px;            /* 위아래 여백 */
-    padding: 10px;              /* 안쪽 여백 */
+    padding: 20px 20px 20px 50px; /* 안쪽 여백 */
     border-bottom: 2px solid #ccc; /* 아래 경계선 추가 */
     text-transform: uppercase;  /* 대문자로 변환 */
     letter-spacing: 1px;       /* 글자 간격 조정 */

@@ -129,7 +129,7 @@ async def monthly_chart(request: Request, city: str, yyyy: str):
     years = calculate_year_difference(min_month, max_month)
     months = get_months_for_year(yyyy)
     selectedMonth = yyyy + '-' + months[-1]
-    title = f'송악읍 {yyyy}년 과거 날씨 정보 - ({years}년치)'
+    title = f'송악읍 {yyyy}년 과거 날씨 정보'
     return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart, "selectedMonth": selectedMonth, "min_month": min_month, "max_month": max_month, "years":years })
 
 @router.get("/{city:str}/{yyyy:str}/{mm:str}", response_class=HTMLResponse)
@@ -163,7 +163,7 @@ async def daily_chart(request: Request, city: str, yyyy: str, mm: str):
     weather_viz = WeatherVisualization(data, 'daily')
     combined_chart = weather_viz.combined_chart().to_json()
 
-    title = f'송악읍 {yyyy}년 {mm}월 과거 날씨 정보 - ({years}년치)'
+    title = f'송악읍 {yyyy}년 {mm}월 과거 날씨 정보'
     return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart, "selectedMonth": selectedMonth, "min_month": min_month, "max_month": max_month, "years": years})
 
 

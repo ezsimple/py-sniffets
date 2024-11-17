@@ -126,16 +126,18 @@ async def monthly_chart(request: Request, city: str, yyyy: str):
     combined_chart = weather_viz.combined_chart().to_json()
 
     min_month, max_month = get_min_max_month()
+    years = calculate_year_difference(min_month, max_month)
     months = get_months_for_year(yyyy)
     selectedMonth = yyyy + '-' + months[-1]
-    title = f'송악읍 {yyyy}년 기상 정보'
-    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart, "selecedMonth": selectedMonth, "min_month": min_month, "max_month": max_month })
+    title = f'송악읍 {yyyy}년 과거 날씨 정보 - ({years}년치)'
+    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart, "selectedMonth": selectedMonth, "min_month": min_month, "max_month": max_month, "years":years })
 
 @router.get("/{city:str}/{yyyy:str}/{mm:str}", response_class=HTMLResponse)
 async def daily_chart(request: Request, city: str, yyyy: str, mm: str):
     # 현재 년도 가져오기
     selectedMonth = yyyy + '-' + mm
     min_month, max_month = get_min_max_month()
+    years = calculate_year_difference(min_month, max_month)
     current_year = datetime.now().year
 
     # 제공가능한 날짜 범위를 벗어나는 경우
@@ -161,8 +163,8 @@ async def daily_chart(request: Request, city: str, yyyy: str, mm: str):
     weather_viz = WeatherVisualization(data, 'daily')
     combined_chart = weather_viz.combined_chart().to_json()
 
-    title = f'송악읍 {yyyy}년 {mm}월 기상 정보'
-    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart, "selectedMonth": selectedMonth, "min_month": min_month, "max_month": max_month})
+    title = f'송악읍 {yyyy}년 {mm}월 과거 날씨 정보 - ({years}년치)'
+    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart, "selectedMonth": selectedMonth, "min_month": min_month, "max_month": max_month, "years": years})
 
 
 def get_years():
@@ -188,6 +190,13 @@ def get_min_max_month():
     finally:
         session.close()
 
+def calculate_year_difference(min_month, max_month):
+    min_date = datetime.strptime(min_month, '%Y-%m')
+    max_date = datetime.strptime(max_month, '%Y-%m')
+    year_difference = max_date.year - min_date.year
+    if max_date.month < min_date.month:
+        year_difference -= 1
+    return year_difference
 
 def get_months_for_year(year):
     """주어진 년도의 최대 월을 반환하는 함수"""

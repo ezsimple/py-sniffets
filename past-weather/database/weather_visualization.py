@@ -54,7 +54,7 @@ class WeatherVisualization(alt.Chart):
             ).resolve_scale(
                 y='independent'
             ).properties(
-                title='습도 & 강수량 변화'
+                title='강수량 & 습도 변화'
             )
         ).properties(
         ).configure_mark(

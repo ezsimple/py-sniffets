@@ -22,7 +22,8 @@
   </footer>
   <script>
     (function(vegaEmbed) {
-      const width = window.innerWidth;
+      const max_width = 1280;
+      const width = window.innerWidth > max_width ? max_width : window.innerWidth;
       const spec = {{ chart | safe }}
       spec.config.view = {
         continuousHeight: 200,

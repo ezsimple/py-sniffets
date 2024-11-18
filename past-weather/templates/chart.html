@@ -5,29 +5,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}?_={{ timestamp }}">
-  <style>
-  .vega-embed {
-      width: 100% !important; /* 강제로 너비를 100%로 설정 */
-      height: auto !important; /* 높이를 자동으로 조정 */
-  }
-
-  .vega-embed .chart-wrapper {
-      width: 100% !important; /* 차트 래퍼의 너비를 100%로 설정 */
-      text-align: left;
-  }
-
-  .vega-embed-wrapper {
-      max-width: 100% !important; /* 최대 너비를 100%로 설정 */
-      height: auto;
-      overflow: hidden; /* 오버플로우 숨기기 */
-  }
-
-  .chart-container {
-      max-width: 100%; /* 최대 너비를 100%로 설정 */
-      margin: auto; /* 중앙 정렬 */
-      padding: 10px; /* 여백 추가 */
-  }
-  </style>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5.20.1"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>

@@ -22,7 +22,12 @@
   </footer>
   <script>
     (function(vegaEmbed) {
+      const width = window.innerWidth;
       const spec = {{ chart | safe }}
+      spec.config.view = {
+        continuousHeight: 200,
+        continuousWidth: width - 100 // 현재 페이지의 넓이를 사용
+      };
       const embedOpt = {"mode": "vega-lite"};
 
       function showError(el, error){

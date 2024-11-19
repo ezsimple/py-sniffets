@@ -47,7 +47,6 @@ class WeatherVisualization(alt.Chart):
         humidity_layer = self.humidity_chart()
 
         combined_layer = alt.vconcat(
-            temperature_layer,
             alt.layer(
                 precipitation_layer,
                 humidity_layer
@@ -55,7 +54,8 @@ class WeatherVisualization(alt.Chart):
                 y='independent'
             ).properties(
                 title='강수량 & 습도 변화'
-            )
+            ),
+            temperature_layer
         ).properties(
         ).configure_mark(
             # strokeWidth=2,

@@ -205,8 +205,8 @@ def make_pandas_weather_data(directory):
         # 이상치 처리 - 온도: 영하 -20는 0으로 처리
         # 영하 -20도 이하의 온도 값을 0으로 처리하여 이상치를 제거합니다.
         # 나머지 온도 값은 그대로 유지됩니다.
+        # merged_df['temperature'] = merged_df['temperature'].add(20).apply(lambda x: max(x, 0)).sub(20)
 
-        # 평균과 표준편차 계산
         mean_temperature = merged_df['temperature'].mean()
         std_dev_temperature = merged_df['temperature'].std()
 
@@ -216,6 +216,7 @@ def make_pandas_weather_data(directory):
 
         # 이상치 보정
         merged_df['temperature'] = merged_df['temperature'].apply(lambda x: max(min(x, upper_temp_bound), lower_temp_bound))
+
         merged_df['loc_id'] = LOC_ID
         # 결측치 처리
         merged_df.fillna(0, inplace=True)

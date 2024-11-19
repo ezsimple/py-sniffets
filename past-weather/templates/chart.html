@@ -16,6 +16,37 @@
     <input type="month" id="monthSelect" name="month" min='{{min_month}}' max='{{max_month}}' value='{{selectedMonth}}' required>
   </div>
 
+  <div id=""summary">
+    <h2>기상 데이터 요약</h2>
+    <ul>
+        <li><strong>최고 온도:</strong> {{ summary.max_temperature }} °C</li>
+        <li><strong>최고 온도 기록 날짜:</strong>
+            <ul>
+                {% for date in summary.max_temperature_dates %}
+                    <li>{{ date }}</li>
+                {% endfor %}
+            </ul>
+        </li>
+        <li><strong>최저 온도:</strong> {{ summary.min_temperature }} °C</li>
+        <li><strong>최저 온도 기록 날짜:</strong>
+            <ul>
+                {% for date in summary.min_temperature_dates %}
+                    <li>{{ date }}</li>
+                {% endfor %}
+            </ul>
+        </li>
+        <li><strong>총 강수량:</strong> {{ summary.total_precipitation }} mm</li>
+        <li><strong>최대 강수량:</strong> {{ summary.max_precipitation }} mm</li>
+        <li><strong>최대 강수량 기록 날짜:</strong>
+            <ul>
+                {% for date in summary.max_precipitation_dates %}
+                    <li>{{ date }}</li>
+                {% endfor %}
+            </ul>
+        </li>
+    </ul>
+  </div>
+
   <div id="vis"></div>
   <footer>
     <p>기상청 동네예보 ({{min_month}} ~ {{max_month}})</p>

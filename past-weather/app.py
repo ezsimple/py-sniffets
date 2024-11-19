@@ -5,13 +5,15 @@ from starlette.responses import RedirectResponse, HTMLResponse, JSONResponse
 from starlette.requests import Request
 from core.config import PREFIX, logging
 from core.model import CustomTemplateResponse, RedirectGetResponse
-from sqlalchemy import extract, func
+from sqlalchemy import extract, func, select
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import and_
 from database.create_tables import engine, MinoWeatherMonthly, MinoWeatherDaily
 from database.weather_visualization import WeatherVisualization
 from datetime import datetime
 import calendar
 import json
+import pandas as pd
 
 app = FastAPI(title="Past Weather(송악읍)", version="0.0.1")
 app.mount(f"{PREFIX}/static", StaticFiles(directory="static"), name="static")
@@ -112,6 +114,11 @@ async def daily_api(request: Request, city: str, yyyy: str, mm: str):
     
     return JSONResponse(content=data)
 
+@router.get("/api/summary/{city:str}/{yyyy:str}/{mm:str}", response_class=JSONResponse)
+async def summary_api(request: Request, city: str, yyyy: str, mm: str):
+    summary = get_summary_by_month(city, yyyy, mm)
+    return summary
+
 @router.get("/{city:str}/{yyyy:str}", response_class=HTMLResponse)
 async def monthly_chart(request: Request, city: str, yyyy: str):
     current_year = datetime.now().year
@@ -162,10 +169,66 @@ async def daily_chart(request: Request, city: str, yyyy: str, mm: str):
     data = json.loads(data)
     weather_viz = WeatherVisualization(data, 'daily')
     combined_chart = weather_viz.combined_chart().to_json()
+    summary = get_summary_by_month(city, yyyy, mm)
 
     title = f'송악읍 과거 날씨 정보'
-    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart, "selectedMonth": selectedMonth, "min_month": min_month, "max_month": max_month, "years": years})
+    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart, "selectedMonth": selectedMonth, "min_month": min_month, "max_month": max_month, "years": years, "summary": summary})
 
+def get_summary_by_month(city: str, year: str, month: str):
+
+    # 시작과 끝 날짜 계산
+    start_date = f"{year}-{month}-01"
+    last_day = calendar.monthrange(int(year), int(month))[1]  # 해당 월의 마지막 날짜
+    end_date = f"{year}-{month}-{last_day}"
+
+    query = (
+        select(
+            MinoWeatherDaily.measure_day,
+            MinoWeatherDaily.max_temperature,
+            MinoWeatherDaily.min_temperature,
+            MinoWeatherDaily.max_humidity,
+            MinoWeatherDaily.min_humidity,
+            MinoWeatherDaily.sum_precipitation
+        )
+        .filter(
+            and_(
+                MinoWeatherDaily.loc_id == 1, # songak is loc_id==1
+                MinoWeatherDaily.measure_day >= start_date,
+                MinoWeatherDaily.measure_day <= end_date
+            )
+        )
+    )
+
+    session = SessionLocal()
+    results = session.execute(query).fetchall()
+
+    # 결과를 DataFrame으로 변환
+    df = pd.DataFrame(results, columns=['measure_day', 'max_temperature', 'min_temperature', 'max_humidity', 'min_humidity', 'sum_precipitation'])
+
+    # 강수량이 0인 경우 처리
+    if df['sum_precipitation'].sum() == 0:
+        summary = {
+            'max_temperature': df['max_temperature'].max() if not df['max_temperature'].empty else None,
+            'max_temperature_dates': df.loc[df['max_temperature'] == df['max_temperature'].max(), 'measure_day'].tolist(),
+            'min_temperature': df['min_temperature'].min() if not df['min_temperature'].empty else None,
+            'min_temperature_dates': df.loc[df['min_temperature'] == df['min_temperature'].min(), 'measure_day'].tolist(),
+            'total_precipitation': 0,
+            'max_precipitation': 0,
+            'max_precipitation_dates': [],
+        }
+        return summary
+
+    # 비가 한번이라도 온 경우
+    summary = {
+        'max_temperature': df['max_temperature'].max(),
+        'max_temperature_dates': df.loc[df['max_temperature'] == df['max_temperature'].max(), 'measure_day'].tolist(),
+        'min_temperature': df['min_temperature'].min(),
+        'min_temperature_dates': df.loc[df['min_temperature'] == df['min_temperature'].min(), 'measure_day'].tolist(),
+        'total_precipitation': df['sum_precipitation'].sum(),
+        'max_precipitation': df['sum_precipitation'].max(),
+        'max_precipitation_dates': df.loc[df['sum_precipitation'] == df['sum_precipitation'].max(), 'measure_day'].tolist(),
+    }
+    return summary
 
 def get_years():
     """데이터베이스에 존재하는 모든 연도를 반환하는 함수"""

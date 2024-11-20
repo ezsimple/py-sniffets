@@ -38,7 +38,7 @@ header h1 {
 header .description {
     margin: 5px 0 0 0; /* 위쪽 마진 추가, 아래쪽 마진 제거 */
     color: white; /* 글자 색상 설정 (배경에 맞게 조정) */
-    font-size: 0.6em; /* 글자 크기 설정 */
+    font-size: 0.5em; /* 글자 크기 설정 */
     font-weight: 100;
     font-family: gothic;
     font-style: italic;
@@ -52,7 +52,7 @@ header .profile-image {
     border-radius: 50%; /* 동그란 모양으로 만들기 */
     position: absolute; /* 절대 위치로 변경 */
     bottom: -20px; /* 헤더 아래로 이동 */
-    right: 40px; /* 오른쪽 여백 */
+    right: 20px; /* 오른쪽 여백 */
 }
 
 /* 카드 컨테이너 스타일 */

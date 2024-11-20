@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <link rel="stylesheet" href="{{ url_for('static', path='css/login.css') }}?_={{ timestamp }}">
+    <link rel="stylesheet" href="{{ url_for('v1/static', path='css/login.css') }}?_={{ timestamp }}">
     <div class="login-container">
         <h1>로그인</h1>
         <div class="form-box">
@@ -16,5 +16,5 @@
             </form>
         </div>
     </div>
-    <script src="{{ url_for('static', path='js/login.js') }}?_={{ timestamp }}"></script>
+    <script src="{{ url_for('v1/static', path='js/login.js') }}?_={{ timestamp }}"></script>
 {% endblock %}

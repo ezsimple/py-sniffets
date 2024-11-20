@@ -53,6 +53,7 @@ header .profile-image {
     position: absolute; /* 절대 위치로 변경 */
     bottom: -20px; /* 헤더 아래로 이동 */
     right: 20px; /* 오른쪽 여백 */
+    filter: grayscale(100%); /* 그레이스케일로 마스킹 */
 }
 
 /* 카드 컨테이너 스타일 */

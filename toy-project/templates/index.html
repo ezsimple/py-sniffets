@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>토이 프로젝트</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='image/developer-profile-thumbnail.jpg') }}" alt="프로필 이미지" class="profile-image">
+        <h1>Toy Projects
+            <p class="description">Spring Boot 및 Python 기반 웹개발자</p>
+        </h1>
+    </header>
+    <div class="card-container">
+        <div class="card">
+            <div class="card-header">
+                <img src="{{ url_for('static', filename='image/recrute-thumbnail.jpg') }}" alt="프로젝트 이미지">
+                <h3>리쿠르팅 통계</h3>
+            </div>
+            <div class="card-body">
+                <p class="description">
+                    월간 직원연락망.xls 분석으로 만든 통계용 챠트
+                    <div class="tech">Flask, pandas, matplotlib, seaborn 사용</div>
+                </p>
+                <a href="https://a1.mkeasy.kro.kr/hr_list" target="_new">바로가기</a>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <img src="{{ url_for('static', filename='image/file-server-thumbnail.jpg') }}" alt="프로젝트 이미지">
+                <h3>파일 다운로드</h3>
+            </div>
+            <div class="card-body">
+                <p class="description">
+                    개인용 파일 다운로드(타입별 인라인 보기) 지원
+                    <div class="tech">FastAPI, pydantic, oAuth2, cookie, redis, middleware 사용</div>
+                </p>
+                <a href="https://a1.mkeasy.kro.kr/v1" target="_new">바로가기</a>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <img src="{{ url_for('static', filename='image/famous-quotes-thumbnail.jpg') }}" alt="프로젝트 이미지">
+                <h3>명언 카드</h3>
+            </div>
+            <div class="card-body">
+                <p class="description">
+                    명언 API 서버 제작 및 한글 해석, 공유기능 제공
+                    <div class="tech">FastAPI, SQLAlchemy, PostgreSQL, websocket, mqtt, deep-L translator 사용</div>
+                </p>
+                <a href="https://a1.mkeasy.kro.kr/chat/" target="_new">바로가기</a>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <img src="{{ url_for('static', filename='image/past-weather-thumbnail.jpg') }}" alt="프로젝트 이미지">
+                <h3>송악읍 과거 날씨</h3>
+            </div>
+            <div class="card-body">
+                <p class="description">
+                    송악읍 공공데이터 자료 이용, 총10년치(380,436건)자료 처리
+                    <div class="tech">고속 데이터 전처리(결측치,이상치), FastAPI, pandas, SQLAlchemy, PostgreSQL 사용</div>
+                </p>
+                <a href="https://a1.mkeasy.kro.kr/past-weather" target="_new">바로가기</a>
+            </div>
+        </div>
+        <!-- 추가 카드 -->
+    </div>
+    <footer>
+        <a href="mailto:minho0883.lee@gmail.com">@minho0883.lee</a>
+    </footer>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

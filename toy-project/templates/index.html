@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>토이 프로젝트</title>
-    <link rel="stylesheet" href="{{ url_for('toy-project/static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <header>
-        <img src="{{ url_for('toy-project/static', filename='image/developer-profile-thumbnail.jpg') }}" alt="프로필 이미지" class="profile-image">
+        <img src="{{ url_for('static', filename='image/developer-profile-thumbnail.jpg') }}" alt="프로필 이미지" class="profile-image">
         <h1>Toy Projects
             <p class="description">Spring Boot 및 Python 기반 웹개발자</p>
         </h1>
@@ -16,7 +16,7 @@
     <div class="card-container">
         <div class="card">
             <div class="card-header">
-                <img src="{{ url_for('toy-project/static', filename='image/recrute-thumbnail.jpg') }}" alt="프로젝트 이미지">
+                <img src="{{ url_for('static', filename='image/recrute-thumbnail.jpg') }}" alt="프로젝트 이미지">
                 <h3>리쿠르팅 통계</h3>
             </div>
             <div class="card-body">
@@ -29,7 +29,7 @@
         </div>
         <div class="card">
             <div class="card-header">
-                <img src="{{ url_for('toy-project/static', filename='image/file-server-thumbnail.jpg') }}" alt="프로젝트 이미지">
+                <img src="{{ url_for('static', filename='image/file-server-thumbnail.jpg') }}" alt="프로젝트 이미지">
                 <h3>파일 다운로드</h3>
             </div>
             <div class="card-body">
@@ -42,7 +42,7 @@
         </div>
         <div class="card">
             <div class="card-header">
-                <img src="{{ url_for('toy-project/static', filename='image/famous-quotes-thumbnail.jpg') }}" alt="프로젝트 이미지">
+                <img src="{{ url_for('static', filename='image/famous-quotes-thumbnail.jpg') }}" alt="프로젝트 이미지">
                 <h3>명언 카드</h3>
             </div>
             <div class="card-body">
@@ -55,7 +55,7 @@
         </div>
         <div class="card">
             <div class="card-header">
-                <img src="{{ url_for('toy-project/static', filename='image/past-weather-thumbnail.jpg') }}" alt="프로젝트 이미지">
+                <img src="{{ url_for('static', filename='image/past-weather-thumbnail.jpg') }}" alt="프로젝트 이미지">
                 <h3>송악읍 과거 날씨</h3>
             </div>
             <div class="card-body">
@@ -71,6 +71,6 @@
     <footer>
         <a href="mailto:minho0883.lee@gmail.com">@minho0883.lee</a>
     </footer>
-    <script src="{{ url_for('toy-project/static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

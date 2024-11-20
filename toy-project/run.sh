@@ -6,4 +6,4 @@ export APPLICATION_MODE=PRODUCTION
 
 PATH=.:$PATH:/home/ubuntu/.pyenv/shims
 
-uwsgi --ini uwsgi-toy-project.ini
+nohup uwsgi --ini uwsgi-toy-project.ini &

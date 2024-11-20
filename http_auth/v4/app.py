@@ -80,7 +80,7 @@ middleware = [
 ]
 
 app = FastAPI(middleware=middleware)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/v1/static", StaticFiles(directory="static"), name="static")
 router = APIRouter(prefix=PREFIX)  
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{PREFIX}/token")

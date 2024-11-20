@@ -1,4 +1,5 @@
 [디렉토리 설명]
+toy-project/ # a1.mkeasy.kro.kr의 대문 페이지 & 카카오브라우저 탈출기능
 chat/ # 명언카드
 chat/v1/crawling.py # 명언크롤링
 quote/ # 명언클론API

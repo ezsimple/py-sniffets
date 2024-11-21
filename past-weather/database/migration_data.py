@@ -385,22 +385,9 @@ def save_to_mino_weather_table(directory):
     # 5. 변경사항 커밋
     session.commit()
 
-def vacuum():
-    # VACUUM을 독립적으로 실행 (트랜잭션에서 분리해야만 함)
-    connection = engine.raw_connection()  # raw_connection() 사용
-    try:
-        # autocommit 모드 활성화
-        connection.autocommit = True
-        cursor = connection.cursor()  # 커서 생성
-        cursor.execute('VACUUM FULL;')  # VACUUM 명령어 실행
-        cursor.close()  # 커서 닫기
-    finally:
-        connection.close()  # 연결 닫기
-
 if __name__ == "__main__":
     directory = './송악읍'
     remove_all_blank_lines(directory)
     make_correct_csv_file(directory)
     make_pandas_weather_data(directory)
     save_to_mino_weather_table(directory='./송악읍날씨정보')
-    vacuum()

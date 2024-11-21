@@ -311,14 +311,7 @@ def save_to_mino_weather_table(directory):
                 loc_id,
                 measure_date::date AS measure_day,  -- measure_date를 날짜 형식으로 변환
                 SUM(precipitation) AS sum_precipitation,  -- 일일 강수량 합계
-                -- 가장 빈도가 높은 강수형태를 선택
-                (SELECT precipitation_type
-                FROM public."MinoWeatherHourly" AS sub
-                WHERE sub.loc_id = loc_id AND sub.measure_date::date = measure_date::date
-                GROUP BY precipitation_type
-                ORDER BY COUNT(*) DESC
-                LIMIT 1
-                ) AS precipitation_type,  -- 가장 빈도가 높은 강수형태
+                MAX(precipitation_type) AS precipitation_type,  -- 눈, 비 구분을 위해
                 MAX(temperature) AS max_temperature,  -- 최대 온도
                 MIN(temperature) AS min_temperature,  -- 최소 온도
                 AVG(temperature) AS avg_temperature,  -- 평균 온도
@@ -349,13 +342,7 @@ def save_to_mino_weather_table(directory):
                     ELSE '05'  -- 다섯째주 이상인 경우
                 END, 2, '0') AS measure_week,  -- 주를 "yyyy-mm-01" 형식으로 표현
                 SUM(precipitation) AS sum_precipitation,  -- 주간 강수량 합계
-                -- 가장 빈도가 높은 강수형태를 선택
-                (SELECT precipitation_type
-                FROM public."MinoWeatherHourly" AS sub
-                WHERE sub.loc_id = loc_id AND sub.measure_date::date = measure_date::date
-                GROUP BY precipitation_type
-                ORDER BY COUNT(*) DESC
-                LIMIT 1) AS precipitation_type,  -- 가장 빈도가 높은 강수형태
+                MAX(precipitation_type) AS precipitation_type,  -- 눈,비 구분을 위해
                 MAX(temperature) AS max_temperature,  -- 주간 최대 온도
                 MIN(temperature) AS min_temperature,  -- 주간 최소 온도
                 AVG(temperature) AS avg_temperature,  -- 주간 평균 온도

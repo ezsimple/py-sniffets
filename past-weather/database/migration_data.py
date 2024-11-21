@@ -288,7 +288,7 @@ def save_to_mino_weather_table(directory):
                 df['create_at'] = current_time
                 df['update_at'] = current_time
                 df.to_sql('temp_table', connection, if_exists='append', index=False)
-        connection.execute('VACCUM;')
+        connection.execute(text('VACCUM;'))
 
     # 3. temp 테이블의 데이터를 MinoWeatherHourly 테이블로 복사
     try:

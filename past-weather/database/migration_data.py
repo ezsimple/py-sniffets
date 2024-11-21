@@ -288,14 +288,10 @@ def save_to_mino_weather_table(directory):
                 df['create_at'] = current_time
                 df['update_at'] = current_time
                 df.to_sql('temp_table', connection, if_exists='append', index=False)
+        connection.execute('VACCUM;')
 
     # 3. temp 테이블의 데이터를 MinoWeatherHourly 테이블로 복사
     try:
-        session.execute(text(f'TRUNCATE TABLE public."MinoWeatherHourly";'))
-        session.execute(text(f'TRUNCATE TABLE public."MinoWeatherDaily";'))
-        session.execute(text(f'TRUNCATE TABLE public."MinoWeatherWeekly";'))
-        session.execute(text(f'TRUNCATE TABLE public."MinoWeatherMonthly";'))
-
         session.execute(text("""
             INSERT INTO public."MinoWeatherHourly" (measure_date, loc_id, precipitation, precipitation_type, temperature, humidity, create_at, update_at)
             SELECT measure_date, loc_id, precipitation, precipitation_type, temperature, humidity, create_at, update_at

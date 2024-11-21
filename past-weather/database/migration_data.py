@@ -288,7 +288,7 @@ def save_to_mino_weather_table(directory):
                 df['create_at'] = current_time
                 df['update_at'] = current_time
                 df.to_sql('temp_table', connection, if_exists='append', index=False)
-        connection.execute(text('VACUUM;'))
+
 
     # 3. temp 테이블의 데이터를 MinoWeatherHourly 테이블로 복사
     try:
@@ -385,6 +385,17 @@ def save_to_mino_weather_table(directory):
     # 5. 변경사항 커밋
     session.commit()
 
+def vacuum():
+    # VACUUM을 독립적으로 실행 (트랜잭션에서 분리해야만 함)
+    connection = engine.raw_connection()  # raw_connection() 사용
+    try:
+        # autocommit 모드 활성화
+        connection.autocommit = True
+        cursor = connection.cursor()  # 커서 생성
+        cursor.execute('VACUUM FULL;')  # VACUUM 명령어 실행
+        cursor.close()  # 커서 닫기
+    finally:
+        connection.close()  # 연결 닫기
 
 if __name__ == "__main__":
     directory = './송악읍'
@@ -392,3 +403,4 @@ if __name__ == "__main__":
     make_correct_csv_file(directory)
     make_pandas_weather_data(directory)
     save_to_mino_weather_table(directory='./송악읍날씨정보')
+    vacuum()

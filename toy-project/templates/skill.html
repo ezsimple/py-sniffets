@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스킬트리</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <a href="/">
+            <img src="{{ url_for('static', filename='image/profile-thumbnail.png') }}" alt="프로필 이미지" class="profile-image">
+        </a>
+        <h1>
+            Skill Tree
+            <p class="description">Spring Boot 및 Python 기반 웹개발자</p>
+        </h1>
+    </header>
+    <div class="skill-tree">
+        <img src="{{ url_for('static', filename='image/skill_tree.png') }}" alt="스킬트리" class="skill-tree">
+    </div>
+    <footer>
+        <a href="mailto:minho0883.lee@gmail.com">@minho0883.lee</a>
+    </footer>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

@@ -7,6 +7,10 @@ def create_app():
     def home():
         return render_template('index.html')
 
+    @app.route('/skill')
+    def skill_tree():
+        return render_template('skill.html')
+
     return app
 
 if __name__ == '__main__':

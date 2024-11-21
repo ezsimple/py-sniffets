@@ -19,6 +19,26 @@ body {
     height: 100vh; /* 전체 화면 높이 */
 }
 
+a {
+    color: #007BFF; /* 기본 링크 색상 */
+    text-decoration: none; /* 기본 밑줄 제거 */
+    font-weight: bold; /* 글씨 두껍게 */
+    transition: color 0.3s ease; /* 색상 변경 시 부드러운 전환 효과 */
+}
+
+a:hover {
+    color: #0056b3; /* 호버 시 색상 변경 */
+    text-decoration: none; /* 호버 시 밑줄 추가 */
+}
+
+a:visited {
+    color: #6c757d; /* 방문한 링크의 색상 */
+}
+
+a:active {
+    color: #004085; /* 클릭한 링크의 색상 */
+}
+
 /* 헤더 스타일 */
 header {
     display: flex; /* Flexbox를 사용하여 아이템 정렬 */

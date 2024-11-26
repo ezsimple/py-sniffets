@@ -188,3 +188,5 @@ pyrightconfig.json
 
 # 운영중 생기는 파일들
 nohup.out
+cookies.json
+master.pid

@@ -1,0 +1,97 @@
+.env
+--
+KEYCLOAK_SERVER_URL=https://a1.mkeasy.kro.kr/auth/
+KEYCLOAK_REALM=MinoRealm
+KEYCLOAK_CLIENT_ID=file-download-app
+KEYCLOAK_CLIENT_SECRET=leiXXLa6GawOYzAH2aPRVwc4GM6J2Ncx
+
+core.config.py
+--
+KEYCLOAK_SERVER_URL = os.getenv("KEYCLOAK_SERVER_URL")
+KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM")
+KEYCLOAK_CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID")
+KEYCLOAK_CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
+
+app.py
+--
+from core.config import KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET
+from keycloak import KeycloakOpenID
+from fastapi.security import OAuth2PasswordBearer
+
+keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
+                                  client_id=KEYCLOAK_CLIENT_ID,
+                                  realm_name=KEYCLOAK_REALM)
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{PREFIX}/token")
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    # 예외 로그 기록
+    logger.error(f"HTTPException occurred: {exc.detail}, Status code: {exc.status_code}, Path: {request.url.path}")
+    return RedirectGetResponse(url=f"{PREFIX}/login")
+
+
+@app.get(f"{PREFIX}/protected")
+async def protected_route(token: str = Depends(oauth2_scheme)):
+    try:
+        userinfo = keycloak_openid.userinfo(token)
+        return {"message": "Protected route", "user": userinfo}
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+
+@app.post(f"{PREFIX}/token")
+async def login(request: Request, response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
+    form = LoginForm(username=form_data.username, password=form_data.password)
+    try:
+        access_token = keycloak_openid.token(form.username, form.password, client_secret_key=KEYCLOAK_CLIENT_SECRET) # <== 여기서 Exception 발생.
+        # access_token = await build_access_token(form.username)
+        # await redis_client.set(token, form.username, ex=SESSION_TIMEOUT)
+        '''
+        JWT를 쿠키에 저장
+        HTTPOnly 속성: 쿠키에 httponly 속성을 설정하면
+        JavaScript에서 접근할 수 없기 때문에 XSS(교차 사이트 스크립팅) 공격으로부터
+        보호할 수 있습니다.
+
+        모바일 브라우저에서 쿠키를 설정할 때,
+        SameSite=None 및 Secure 속성을 설정하여 모바일 앱에서 쿠키를 수용할 수 있도록 합니다.
+        '''
+        response.set_cookie("access_token", access_token, httponly=True, max_age=SESSION_TIMEOUT, samesite='None', secure=True)
+        # access_token = Token(token, 'bearer')
+        return access_token
+
+    except Exception as e:
+        logger.error(f"Error during token retrieval: {e}")  # 로그 기록
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+
+test.sh
+--
+# .env 파일에서 환경 변수 로드
+set -a # 모든 변수를 자동으로 export
+source .env
+set +a  # 자동 export 해제
+
+# 인증 요청
+curl -X POST "$KEYCLOAK_SERVER_URL/realms/$KEYCLOAK_REALM/protocol/openid-connect/token" \
+-H "Content-Type: application/x-www-form-urlencoded" \
+-d "client_id=$KEYCLOAK_CLIENT_ID" \
+-d "client_secret=$KEYCLOAK_CLIENT_SECRET" \
+-d "username=$USERNAME" \
+-d "password=$PASSWORD" \
+-d "grant_type=password"
+
+
+실행결과(성공):
+--
+{"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1YUVsWFMtcnN1aWx2ckY5MW9zM2gxRVBkQnJGVlBlaUsxWkVwZFlCTkNnIn0.eyJleHAiOjE3MzI3OTMxNjQsImlhdCI6MTczMjc4OTU2NCwianRpIjoiZmVjOWEyZjYtZmZmOC00OWQ2LWFjMDUtN2M0NmZjNmU2ZjU0IiwiaXNzIjoiaHR0cHM6Ly9hMS5ta2Vhc3kua3JvLmtyL2F1dGgvcmVhbG1zL01pbm9SZWFsbSIsInN1YiI6Ijc5NTVmYWJjLTAzZGQtNGNlMS1hNjcwLTc0NDNlNTc5Y2M4ZCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImZpbGUtZG93bmxvYWQtYXBwIiwic2Vzc2lvbl9zdGF0ZSI6Ijk1NWE4ZDgyLWRjOWEtNDRiNC1iNmJmLTJmOTViMDQ5YTU1ZCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cHM6Ly9hMS5ta2Vhc3kua3JvLmtyL3YxLyoiXSwicmVzb3VyY2VfYWNjZXNzIjp7ImZpbGUtZG93bmxvYWQtYXBwIjp7InJvbGVzIjpbIlJPTEVfVVNFUiIsIlJPTEVfQURNSU4iXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJzaWQiOiI5NTVhOGQ4Mi1kYzlhLTQ0YjQtYjZiZi0yZjk1YjA0OWE1NWQiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIm5hbWUiOiLsnbQg7KeA7JykIiwicHJlZmVycmVkX3VzZXJuYW1lIjoieW9vbiIsImdpdmVuX25hbWUiOiLsnbQiLCJmYW1pbHlfbmFtZSI6IuyngOycpCIsImVtYWlsIjoibWtlYXN5QGdtYWlsLmNvbSJ9.KC2AOJw9WV8DTV9demM8QCZ7GfDO1rtMqop3YQYtZ7X3AkCryyBrrgHqJWJBWyHrdMbxtQR8T_nIVl42OtYTQkNCR1scnMdcuAVRNFZVTW1n8oYwktQXcYxwy_DWc1rwswyDWLdTQrAxavnfrf677EaXHmeKhIUnq1C-JmVvnDWkrf1HAJ6N9kL_TthgjKuaK7xEd5vpPwxN3poJTmY8l3S9y8stDDmUv51exQHqSXcDOPtbGj_mmP6TNaSARqGD6gIVqeHnX3ytkEnOjvYwYCb1YpPJuxFV1uIfClIdC-2tkuFyNZWCXI65ZcRu1AwkVuZ8l8Fpr7dolSeGKqPevw","expires_in":3600,"refresh_expires_in":1800,"refresh_token":"eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJkMmVmZjcxZi1hMDBkLTQ2OGItOThkNi0zZjFhZmMwNjBlZGIifQ.eyJleHAiOjE3MzI3OTEzNjQsImlhdCI6MTczMjc4OTU2NCwianRpIjoiMDYwMTE4MzgtOThmOC00MDNkLTg4OGUtYzZkYjEzY2VkNzkzIiwiaXNzIjoiaHR0cHM6Ly9hMS5ta2Vhc3kua3JvLmtyL2F1dGgvcmVhbG1zL01pbm9SZWFsbSIsImF1ZCI6Imh0dHBzOi8vYTEubWtlYXN5Lmtyby5rci9hdXRoL3JlYWxtcy9NaW5vUmVhbG0iLCJzdWIiOiI3OTU1ZmFiYy0wM2RkLTRjZTEtYTY3MC03NDQzZTU3OWNjOGQiLCJ0eXAiOiJSZWZyZXNoIiwiYXpwIjoiZmlsZS1kb3dubG9hZC1hcHAiLCJzZXNzaW9uX3N0YXRlIjoiOTU1YThkODItZGM5YS00NGI0LWI2YmYtMmY5NWIwNDlhNTVkIiwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwic2lkIjoiOTU1YThkODItZGM5YS00NGI0LWI2YmYtMmY5NWIwNDlhNTVkIn0.PIh6gLpFo13OtpytMBjsbFq4xGbkgQ0LQBfk0CwuZfSa4GmJu7jKq0xBMMISnC-iM3tR9dVQiBZp6uiDQ8qvZQ","token_type":"Bearer","not-before-policy":0,"session_state":"955a8d82-dc9a-44b4-b6bf-2f95b049a55d","scope":"email profile"}
+
+
+질문 : 
+curl 테스트는 성공했어. 
+그런데 FastAPI에서 오류가 나고 있어.
+form = LoginForm(username=form_data.username, password=form_data.password)
+의 값은 username : yoon, password : 3134 임을 확인했어.
+그런데 KeyCloak 로그를 확인하면 
+2024-11-28 18:40:01,150 WARN  [org.keycloak.events] (executor-thread-151) type="LOGIN_ERROR", realmId="173de081-4d52-4866-b44e-0f21043ee263", clientId="file-download-app", userId="null", ipAddress="116.34.248.173", error="invalid_client_credentials", grant_type="password"
+이렇게 나와? 원인이 뭘까?

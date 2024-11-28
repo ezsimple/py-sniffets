@@ -1,0 +1,1 @@
+pip install fastapi uvicorn redis python-multipart python-jose[cryptography] aioredis

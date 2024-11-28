@@ -89,18 +89,17 @@ middleware = [
 
 app = FastAPI(middleware=middleware)
 app.mount("/v1/static", StaticFiles(directory="static"), name="static")
-router = APIRouter(prefix=PREFIX)  
+router = APIRouter(prefix=PREFIX)
 
 # Keycloak OpenID 객체 생성
-print("Keycloak Server URL:", os.getenv("KEYCLOAK_SERVER_URL"))
-print("Keycloak Realm:", os.getenv("KEYCLOAK_REALM"))
-print("Client ID:", os.getenv("KEYCLOAK_CLIENT_ID"))
-print("Client Secret:", os.getenv("KEYCLOAK_CLIENT_SECRET"))
+# print("Keycloak Server URL:", os.getenv("KEYCLOAK_SERVER_URL"))
+# print("Keycloak Realm:", os.getenv("KEYCLOAK_REALM"))
+# print("Client ID:", os.getenv("KEYCLOAK_CLIENT_ID"))
+# print("Client Secret:", os.getenv("KEYCLOAK_CLIENT_SECRET"))
 
 keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
                                  client_id=KEYCLOAK_CLIENT_ID,
                                  realm_name=KEYCLOAK_REALM)
-
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{PREFIX}/token")
 
@@ -134,6 +133,7 @@ async def protected_route(token: str = Depends(oauth2_scheme)):
 
 async def build_access_token(username: str):
     '''
+    LoginMiddleWare에서 인증여부 확인을 위해 사용
     Build Access Token Data
     '''
     token_data = {

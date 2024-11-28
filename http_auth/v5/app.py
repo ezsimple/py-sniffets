@@ -1,6 +1,7 @@
 import os
 import re
 import magic
+import time
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Depends, HTTPException, APIRouter, Form, status, Request
 from fastapi.responses import JSONResponse
@@ -61,7 +62,7 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
 
         # 로그인 페이지가 아닌 다른 경로 접근시
         if not access_token:
-            return RedirectGetResponse(url=f"{settings.PREFIX}/login")
+            return RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}")
 
         try:
             payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
@@ -69,7 +70,7 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
             # 세션 연장
             await redis_client.expire(access_token, settings.SESSION_TIMEOUT)
         except jwt.PyJWTError:
-            return RedirectGetResponse(url=f"{settings.PREFIX}/login")
+            return RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}")
 
         response = await call_next(request)
         return response
@@ -109,14 +110,14 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.PREFIX}/token")
 async def http_exception_handler(request: Request, exc: HTTPException):
     # 예외 로그 기록
     logger.error(f"HTTPException occurred: {exc.detail}, Status code: {exc.status_code}, Path: {request.url.path}")
-    return RedirectGetResponse(url=f"{settings.PREFIX}/login")
+    return RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}")
 
 # ValueError 처리기
 @app.exception_handler(ValueError)
 async def value_error_handler(request: Request, exc: ValueError):
     # 예외 로그 기록
     logger.error(f"ValueError occurred: {exc}, Path: {request.url.path}")
-    return RedirectGetResponse(url=f"{settings.PREFIX}/login") # 추후 에러페이지로
+    return RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}") # 추후 에러페이지로
 
 @router.get("/login")
 async def login_view(request: Request, response: Response):
@@ -194,7 +195,7 @@ async def login(request: Request, response: Response, form_data: OAuth2PasswordR
 
 @router.api_route("/logout", methods=["GET", "POST"], response_class=RedirectResponse)
 async def logout(request: Request):
-    response = RedirectGetResponse(url=f"{settings.PREFIX}/login")
+    response = RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}")
     response.delete_cookie("access_token")  # 쿠키 삭제
 
     # 캐시 방지 헤더 추가 (뒤로가기 방지)
@@ -208,7 +209,7 @@ async def logout(request: Request):
 async def redirect_to_dl(request: Request):
     if request.state.user:
         return RedirectGetResponse(url=f"{settings.PREFIX}/dl/")
-    return RedirectGetResponse(url=f"{settings.PREFIX}/login") 
+    return RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}") 
 
 @router.get("/dl/{path:path}", response_class=HTMLResponse)
 async def list_files(request: Request, path: str = ''):

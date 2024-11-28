@@ -13,9 +13,10 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware import Middleware
 from starlette.responses import Response, RedirectResponse, FileResponse, HTMLResponse
-from core.config import PREFIX, SESSION_SERVER, SESSION_TIMEOUT, SECRET_KEY, logger
-from core.config import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI, GOOGLE_TOKEN_URI, GOOGLE_AUTH_URI
-from core.config import KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET
+# from core.config import PREFIX, SESSION_SERVER, SESSION_TIMEOUT, SECRET_KEY, logger
+# from core.config import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI, GOOGLE_TOKEN_URI, GOOGLE_AUTH_URI
+# from core.config import KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET
+from core.config import settings
 from core.model import User, Token, LoginForm, LoginRequiredMiddleware, CustomTemplateResponse, RedirectGetResponse
 from passlib.context import CryptContext
 import aioredis
@@ -32,7 +33,7 @@ logging.basicConfig(level=logging.DEBUG)  # DEBUG 레벨로 로그 출력 설정
 logger = logging.getLogger("keycloak")  # Keycloak 관련 로그를 위한 로거 생성
 
 # Redis 클라이언트 초기화
-redis_client = aioredis.from_url(SESSION_SERVER)
+redis_client = aioredis.from_url(settings.SESSION_SERVER)
 
 class LoginRequiredMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -40,17 +41,17 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
         access_token = request.cookies.get("access_token")
 
         # 특정경로 인증 생략
-        if request.url.path.startswith(f"{PREFIX}/token") \
-                or request.url.path.startswith(f"{PREFIX}/auth/callback") \
+        if request.url.path.startswith(f"{settings.PREFIX}/token") \
+                or request.url.path.startswith(f"{settings.PREFIX}/auth/callback") \
                 or request.url.path.startswith("/static/"):
             response = await call_next(request)
             return response
 
         # 로그인 페이지 접근시
-        if request.url.path.startswith(f"{PREFIX}/login"):
+        if request.url.path.startswith(f"{settings.PREFIX}/login"):
             if access_token:
                 try:
-                    payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
+                    payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
                     request.state.user = User(username=payload["sub"])  # 사용자 정보 설정
                 except jwt.PyJWTError:
                     pass
@@ -60,15 +61,15 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
 
         # 로그인 페이지가 아닌 다른 경로 접근시
         if not access_token:
-            return RedirectGetResponse(url=f"{PREFIX}/login")
+            return RedirectGetResponse(url=f"{settings.PREFIX}/login")
 
         try:
-            payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
+            payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
             request.state.user = User(username=payload["sub"])  # 사용자 정보 설정
             # 세션 연장
-            await redis_client.expire(access_token, SESSION_TIMEOUT)
+            await redis_client.expire(access_token, settings.SESSION_TIMEOUT)
         except jwt.PyJWTError:
-            return RedirectGetResponse(url=f"{PREFIX}/login")
+            return RedirectGetResponse(url=f"{settings.PREFIX}/login")
 
         response = await call_next(request)
         return response
@@ -76,7 +77,7 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
 
 # 순서중요합니다. SessionMiddleWare가 항상 먼저 와야함.
 middleware = [
-    Middleware(SessionMiddleware, secret_key=SECRET_KEY),
+    Middleware(SessionMiddleware, secret_key=settings.SECRET_KEY),
     Middleware(LoginRequiredMiddleware),
     Middleware(
       CORSMiddleware,
@@ -88,8 +89,8 @@ middleware = [
 ]
 
 app = FastAPI(middleware=middleware)
-app.mount("/v1/static", StaticFiles(directory="static"), name="static")
-router = APIRouter(prefix=PREFIX)
+app.mount(settings.STATIC_URL, StaticFiles(directory="static"), name="static")
+router = APIRouter(prefix=settings.PREFIX)
 
 # Keycloak OpenID 객체 생성
 # print("Keycloak Server URL:", os.getenv("KEYCLOAK_SERVER_URL"))
@@ -97,33 +98,33 @@ router = APIRouter(prefix=PREFIX)
 # print("Client ID:", os.getenv("KEYCLOAK_CLIENT_ID"))
 # print("Client Secret:", os.getenv("KEYCLOAK_CLIENT_SECRET"))
 
-keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
-                                 client_id=KEYCLOAK_CLIENT_ID,
-                                 realm_name=KEYCLOAK_REALM)
+keycloak_openid = KeycloakOpenID(server_url=settings.KEYCLOAK_SERVER_URL,
+                                 client_id=settings.KEYCLOAK_CLIENT_ID,
+                                 realm_name=settings.KEYCLOAK_REALM)
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{PREFIX}/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.PREFIX}/token")
 
 # HTTPException 처리기
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     # 예외 로그 기록
     logger.error(f"HTTPException occurred: {exc.detail}, Status code: {exc.status_code}, Path: {request.url.path}")
-    return RedirectGetResponse(url=f"{PREFIX}/login")
+    return RedirectGetResponse(url=f"{settings.PREFIX}/login")
 
 # ValueError 처리기
 @app.exception_handler(ValueError)
 async def value_error_handler(request: Request, exc: ValueError):
     # 예외 로그 기록
     logger.error(f"ValueError occurred: {exc}, Path: {request.url.path}")
-    return RedirectGetResponse(url=f"{PREFIX}/login") # 추후 에러페이지로
+    return RedirectGetResponse(url=f"{settings.PREFIX}/login") # 추후 에러페이지로
 
 @router.get("/login")
 async def login_view(request: Request, response: Response):
     if not hasattr(request.state, 'user') or request.state.user is None:
         return CustomTemplateResponse("login.html", {"request": request})
-    return RedirectGetResponse(url=f"{PREFIX}/dl")
+    return RedirectGetResponse(url=f"{settings.PREFIX}/dl")
 
-@app.get(f"{PREFIX}/protected")
+@app.get(f"{settings.PREFIX}/protected")
 async def protected_route(token: str = Depends(oauth2_scheme)):
     try:
         userinfo = keycloak_openid.userinfo(token)
@@ -138,23 +139,23 @@ async def build_access_token(username: str):
     '''
     token_data = {
         "sub": username,
-        "exp": datetime.utcnow() + timedelta(seconds=SESSION_TIMEOUT)
+        "exp": datetime.utcnow() + timedelta(seconds=settings.SESSION_TIMEOUT)
     }
-    access_token = jwt.encode(token_data, SECRET_KEY, algorithm="HS256")
+    access_token = jwt.encode(token_data, settings.SECRET_KEY, algorithm="HS256")
     return access_token
 
-@app.post(f"{PREFIX}/token", response_class=JSONResponse)
+@app.post(f"{settings.PREFIX}/token", response_class=JSONResponse)
 async def login(request: Request, response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
     # logger.debug(f"Username: {form_data.username}, Password: {form_data.password}")
     # Keycloak에 인증 요청
     # 로그인 성공
     async with httpx.AsyncClient() as client:
         keycloak_response = await client.post(
-            f"{KEYCLOAK_SERVER_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/token",
+            f"{settings.KEYCLOAK_SERVER_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/token",
             headers={"Content-Type": "application/x-www-form-urlencoded"},
             data={
-                "client_id": KEYCLOAK_CLIENT_ID,
-                "client_secret": KEYCLOAK_CLIENT_SECRET,
+                "client_id": settings.KEYCLOAK_CLIENT_ID,
+                "client_secret": settings.KEYCLOAK_CLIENT_SECRET,
                 "username": form_data.username,
                 "password": form_data.password,
                 "grant_type": "password"
@@ -174,7 +175,7 @@ async def login(request: Request, response: Response, form_data: OAuth2PasswordR
         return JSONResponse(content={"message": "Incorrect username or password"}, status_code=status.HTTP_401_UNAUTHORIZED)
 
     access_token = await build_access_token(form_data.username)
-    await redis_client.set(access_token, form_data.username, ex=SESSION_TIMEOUT)
+    await redis_client.set(access_token, form_data.username, ex=settings.SESSION_TIMEOUT)
 
     keycloak_token = keycloak_response.json()
     # access_token = token.get('access_token')
@@ -187,21 +188,27 @@ async def login(request: Request, response: Response, form_data: OAuth2PasswordR
     모바일 브라우저에서 쿠키를 설정할 때,
     SameSite=None 및 Secure 속성을 설정하여 모바일 앱에서 쿠키를 수용할 수 있도록 합니다.
     '''
-    response.set_cookie("access_token", access_token, httponly=True, max_age=SESSION_TIMEOUT, samesite='None', secure=True)
+    response.set_cookie("access_token", access_token, httponly=True, max_age=settings.SESSION_TIMEOUT, samesite='None', secure=True)
 
     return keycloak_token
 
 @router.api_route("/logout", methods=["GET", "POST"], response_class=RedirectResponse)
 async def logout(request: Request):
-    response = RedirectGetResponse(url=f"{PREFIX}/login")
+    response = RedirectGetResponse(url=f"{settings.PREFIX}/login")
     response.delete_cookie("access_token")  # 쿠키 삭제
+
+    # 캐시 방지 헤더 추가 (뒤로가기 방지)
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+
     return response
 
 @router.get("/", response_class=RedirectResponse)
 async def redirect_to_dl(request: Request):
     if request.state.user:
-        return RedirectGetResponse(url=f"{PREFIX}/dl/")
-    return RedirectGetResponse(url=f"{PREFIX}/login") 
+        return RedirectGetResponse(url=f"{settings.PREFIX}/dl/")
+    return RedirectGetResponse(url=f"{settings.PREFIX}/login") 
 
 @router.get("/dl/{path:path}", response_class=HTMLResponse)
 async def list_files(request: Request, path: str = ''):

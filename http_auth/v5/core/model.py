@@ -4,19 +4,19 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import RedirectResponse, HTMLResponse
 from starlette.requests import Request
 from datetime import datetime
-from core.config import PREFIX, SESSION_SERVER, SESSION_TIMEOUT, SECRET_KEY, templates
+from core.config import settings, templates
 import aioredis
 import jwt
 
 # Redis 클라이언트 초기화
-redis_client = aioredis.from_url(SESSION_SERVER)
+redis_client = aioredis.from_url(settings.SESSION_SERVER)
 
 # (중요) SessionMiddleWare가 가장 먼저 호출되어야 함.
 class LoginRequiredMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
 
-        if request.url.path.startswith(f"{PREFIX}/login") \
-                or request.url.path.startswith(f"{PREFIX}/token") \
+        if request.url.path.startswith(f"{settings.PREFIX}/login") \
+                or request.url.path.startswith(f"{settings.PREFIX}/token") \
                 or request.url.path.startswith("/static/"):
             response = await call_next(request)
             return response
@@ -27,17 +27,17 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
         if session_id and await redis_client.exists(f"session:{session_id}"):
             try:
                 access_token = request.session["access_token"]
-                await redis_client.expire(f"session:{session_id}", SESSION_TIMEOUT)
-                await redis_client.expire(access_token, SESSION_TIMEOUT)  # 세션 연장
-                payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
+                await redis_client.expire(f"session:{session_id}", settings.SESSION_TIMEOUT)
+                await redis_client.expire(access_token, settings.SESSION_TIMEOUT)  # 세션 연장
+                payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
                 # username = payload.get("sub")
                 # request.state.user = User(username=username)    
                 is_logined = True
             except jwt.PyJWTError:
-                return RedirectGetResponse(url=f"{PREFIX}/login")
+                return RedirectGetResponse(url=f"{settings.PREFIX}/login")
 
         if not is_logined:
-            return RedirectGetResponse(url=f"{PREFIX}/login")
+            return RedirectGetResponse(url=f"{settings.PREFIX}/login")
 
         response = await call_next(request)
         return response

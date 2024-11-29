@@ -1,6 +1,5 @@
 # %%
 from keycloak import KeycloakOpenID
-import logging
 import os
 from dotenv import load_dotenv
 
@@ -9,9 +8,6 @@ KEYCLOAK_SERVER_URL = os.getenv("KEYCLOAK_SERVER_URL")
 KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM")
 KEYCLOAK_CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID")
 KEYCLOAK_CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
-
-logging.basicConfig(level=logging.DEBUG)  # DEBUG 레벨로 로그 출력 설정
-logger = logging.getLogger("keycloak")  # Keycloak 관련 로그를 위한 로거 생성
 
 keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
                                  client_id=KEYCLOAK_CLIENT_ID,
@@ -30,4 +26,3 @@ def login():
 if __name__ == "__main__":
     login()
 
-# %%

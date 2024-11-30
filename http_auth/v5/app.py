@@ -3,7 +3,7 @@ import re
 import magic
 import time
 from datetime import datetime, timedelta
-from fastapi import FastAPI, Depends, HTTPException, APIRouter, Form, status, Request
+from fastapi import FastAPI, Depends, HTTPException, APIRouter, status, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -14,21 +14,14 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware import Middleware
 from starlette.responses import Response, RedirectResponse, FileResponse, HTMLResponse
-# from core.config import PREFIX, SESSION_SERVER, SESSION_TIMEOUT, SECRET_KEY, logger
-# from core.config import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI, GOOGLE_TOKEN_URI, GOOGLE_AUTH_URI
-# from core.config import KEYCLOAK_SERVER_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET
 from core.config import settings
-from core.model import User, Token, LoginForm, LoginRequiredMiddleware, CustomTemplateResponse, RedirectGetResponse
-from passlib.context import CryptContext
+from core.model import User, LoginRequiredMiddleware, CustomTemplateResponse, RedirectGetResponse
 import aioredis
-import uuid
 import jwt
-import requests
-from user_agents import parse
 from keycloak import KeycloakOpenID
 from fastapi.security import OAuth2PasswordBearer
-import httpx
 import logging
+import json
 
 logging.basicConfig(level=logging.DEBUG)  # DEBUG 레벨로 로그 출력 설정
 logger = logging.getLogger("keycloak")  # Keycloak 관련 로그를 위한 로거 생성
@@ -66,11 +59,26 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
 
         try:
             payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
-            request.state.user = User(username=payload["sub"])  # 사용자 정보 설정
+            username=payload["sub"]
+            request.state.user = User(username=username)  # 사용자 정보 설정
             # 세션 연장
-            await redis_client.expire(access_token, settings.SESSION_TIMEOUT)
+            # refresh_token으로 변경되어야 해서, 아래 주석처리
+            # await redis_client.expire(username, settings.SESSION_TIMEOUT)
         except jwt.PyJWTError:
             return RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}")
+
+        keycloak_response = await redis_client.get(username)
+        if keycloak_response:
+            # 바이트 문자열을 UTF-8 문자열로 디코딩
+            keycloak_response = keycloak_response.decode('utf-8')
+            # json 은  쌍따옴표(")를 사용해야 json.loads를 사용할 수 있음.
+            keycloak_response = keycloak_response.replace("'", '"')
+            keycloak_response = json.loads(keycloak_response)
+            refresh_token = keycloak_response.get('refresh_token')
+            new_token = keycloak_openid.refresh_token(refresh_token)
+            new_token = str(new_token).replace("'", '"')
+            # 세션 연장
+            await redis_client.set(username, str(new_token), ex=settings.SESSION_TIMEOUT)
 
         response = await call_next(request)
         return response
@@ -93,14 +101,9 @@ app = FastAPI(middleware=middleware)
 app.mount(settings.STATIC_URL, StaticFiles(directory="static"), name="static")
 router = APIRouter(prefix=settings.PREFIX)
 
-# Keycloak OpenID 객체 생성
-# print("Keycloak Server URL:", os.getenv("KEYCLOAK_SERVER_URL"))
-# print("Keycloak Realm:", os.getenv("KEYCLOAK_REALM"))
-# print("Client ID:", os.getenv("KEYCLOAK_CLIENT_ID"))
-# print("Client Secret:", os.getenv("KEYCLOAK_CLIENT_SECRET"))
-
 keycloak_openid = KeycloakOpenID(server_url=settings.KEYCLOAK_SERVER_URL,
                                  client_id=settings.KEYCLOAK_CLIENT_ID,
+                                 client_secret_key=settings.KEYCLOAK_CLIENT_SECRET,
                                  realm_name=settings.KEYCLOAK_REALM)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.PREFIX}/token")
@@ -148,38 +151,17 @@ async def build_access_token(username: str):
 @app.post(f"{settings.PREFIX}/token", response_class=JSONResponse)
 async def login(request: Request, response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
     # logger.debug(f"Username: {form_data.username}, Password: {form_data.password}")
-    # Keycloak에 인증 요청
-    # 로그인 성공
-    async with httpx.AsyncClient() as client:
-        keycloak_response = await client.post(
-            f"{settings.KEYCLOAK_SERVER_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/token",
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
-            data={
-                "client_id": settings.KEYCLOAK_CLIENT_ID,
-                "client_secret": settings.KEYCLOAK_CLIENT_SECRET,
-                "username": form_data.username,
-                "password": form_data.password,
-                "grant_type": "password"
-            }
-        )
-
-    # try:
-    #     #  로그인 실패
-    #     token1 = keycloak_openid.token(form_data.username, form_data.password, client_secret_key=KEYCLOAK_CLIENT_SECRET)
-    # except Exception as e:
-    #     logging.debug(f"client_id: {KEYCLOAK_CLIENT_ID}, client_secret: {KEYCLOAK_CLIENT_SECRET}")
-    #     logging.debug(str(e))
-    #     raise HTTPException(status_code=401, detail=str(e))
-
-    # 응답 처리
-    if keycloak_response.status_code != 200:
+    try:
+        keycloak_response = keycloak_openid.token(form_data.username, form_data.password)
+    except Exception as e:
+        logging.debug(str(e))
         return JSONResponse(content={"message": "Incorrect username or password"}, status_code=status.HTTP_401_UNAUTHORIZED)
 
+    keycloak_response = str(keycloak_response).replace("'", '"')
+    keycloak_response = json.loads(keycloak_response)
+    await redis_client.set(form_data.username, str(keycloak_response), ex=settings.SESSION_TIMEOUT)
     access_token = await build_access_token(form_data.username)
-    await redis_client.set(access_token, form_data.username, ex=settings.SESSION_TIMEOUT)
 
-    keycloak_token = keycloak_response.json()
-    # access_token = token.get('access_token')
     '''
     JWT를 쿠키에 저장
     HTTPOnly 속성: 쿠키에 httponly 속성을 설정하면
@@ -191,11 +173,30 @@ async def login(request: Request, response: Response, form_data: OAuth2PasswordR
     '''
     response.set_cookie("access_token", access_token, httponly=True, max_age=settings.SESSION_TIMEOUT, samesite='None', secure=True)
 
-    return keycloak_token
+    return keycloak_response
 
 @router.api_route("/logout", methods=["GET", "POST"], response_class=RedirectResponse)
 async def logout(request: Request):
     response = RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}")
+    access_token = request.cookies.get("access_token")
+    try:
+        payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
+        username = payload["sub"]
+    except jwt.PyJWTError:
+        return RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}")
+
+    if username:
+        keycloak_response = await redis_client.get(username)
+        if keycloak_response:
+            # 바이트 문자열을 UTF-8 문자열로 디코딩
+            keycloak_response = keycloak_response.decode('utf-8')
+            # json 은  쌍따옴표(")를 사용해야 json.loads를 사용할 수 있음.
+            keycloak_response = keycloak_response.replace("'", '"')
+            keycloak_response = json.loads(keycloak_response)
+            refresh_token = keycloak_response.get('refresh_token')
+            keycloak_openid.logout(refresh_token)
+            await redis_client.delete(username)
+
     response.delete_cookie("access_token")  # 쿠키 삭제
 
     # 캐시 방지 헤더 추가 (뒤로가기 방지)

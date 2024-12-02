@@ -83,8 +83,7 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
                 await redis_client.set(username, str(new_token), ex=settings.SESSION_TIMEOUT)
             except KeycloakPostError as e:
                 logger.error(f"Keycloak refresh_token error: {e}")
-                # Redis에서 해당 사용자 세션 삭제
-                await redis_client.delete(username)
+                return RedirectGetResponse(url=f"{settings.PREFIX}/logout")
 
         response = await call_next(request)
         return response

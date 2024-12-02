@@ -1,8 +1,10 @@
 #!/bin/bash
 # Hot Reload
 
-PID=$(lsof -ti :3333)
+HOST=127.0.0.1
+PORT=3333
+PID=$(lsof -ti :${PORT})
 if [ -n "$PID" ]; then
 	kill -9 "$PID"
 fi
-python -m uvicorn app:app --host 127.0.0.1 --port 3333 --reload
+python -m uvicorn app:app --host $HOST --port $PORT --reload

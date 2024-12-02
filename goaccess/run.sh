@@ -1,6 +1,6 @@
 #!/bin/bash
 export LANG=ko_KR.UTF-8
-REPORT_DIR=/home/ubuntu/dl/goaccess
+REPORT_DIR=/home/ubuntu/dl/접속통계
 mkdir -p $REPORT_DIR
 
 PID=$(pidof goaccess)

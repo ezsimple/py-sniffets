@@ -22,6 +22,7 @@ from keycloak import KeycloakOpenID
 from fastapi.security import OAuth2PasswordBearer
 import logging
 import json
+from keycloak.exceptions import KeycloakPostError
 
 logging.basicConfig(level=logging.DEBUG)  # DEBUG 레벨로 로그 출력 설정
 logger = logging.getLogger("keycloak")  # Keycloak 관련 로그를 위한 로거 생성
@@ -75,10 +76,15 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
             keycloak_response = keycloak_response.replace("'", '"')
             keycloak_response = json.loads(keycloak_response)
             refresh_token = keycloak_response.get('refresh_token')
-            new_token = keycloak_openid.refresh_token(refresh_token)
-            new_token = str(new_token).replace("'", '"')
-            # 세션 연장
-            await redis_client.set(username, str(new_token), ex=settings.SESSION_TIMEOUT)
+            try:
+                new_token = keycloak_openid.refresh_token(refresh_token)
+                new_token = str(new_token).replace("'", '"')
+                # 세션 연장
+                await redis_client.set(username, str(new_token), ex=settings.SESSION_TIMEOUT)
+            except KeycloakPostError as e:
+                logger.error(f"Keycloak refresh_token error: {e}")
+                # Redis에서 해당 사용자 세션 삭제
+                await redis_client.delete(username)
 
         response = await call_next(request)
         return response

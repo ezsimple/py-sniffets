@@ -30,6 +30,9 @@ logger = logging.getLogger("keycloak")  # Keycloak 관련 로그를 위한 로�
 # Redis 클라이언트 초기화
 redis_client = aioredis.from_url(settings.SESSION_SERVER)
 
+def _():
+    return int(time.time())
+
 class LoginRequiredMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # 쿠키에서 access_token 가져오기
@@ -56,7 +59,7 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
 
         # 로그인 페이지가 아닌 다른 경로 접근시
         if not access_token:
-            return RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}")
+            return RedirectGetResponse(url=f"{settings.PREFIX}/login")
 
         try:
             payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
@@ -66,7 +69,7 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
             # refresh_token으로 변경되어야 해서, 아래 주석처리
             # await redis_client.expire(username, settings.SESSION_TIMEOUT)
         except jwt.PyJWTError:
-            return RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}")
+            return RedirectGetResponse(url=f"{settings.PREFIX}/login")
 
         keycloak_response = await redis_client.get(username)
         if keycloak_response:
@@ -118,14 +121,14 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.PREFIX}/token")
 async def http_exception_handler(request: Request, exc: HTTPException):
     # 예외 로그 기록
     logger.error(f"HTTPException occurred: {exc.detail}, Status code: {exc.status_code}, Path: {request.url.path}")
-    return RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}")
+    return RedirectGetResponse(url=f"{settings.PREFIX}/login")
 
 # ValueError 처리기
 @app.exception_handler(ValueError)
 async def value_error_handler(request: Request, exc: ValueError):
     # 예외 로그 기록
     logger.error(f"ValueError occurred: {exc}, Path: {request.url.path}")
-    return RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}") # 추후 에러페이지로
+    return RedirectGetResponse(url=f"{settings.PREFIX}/login") # 추후 에러페이지로
 
 @router.get("/login")
 async def login_view(request: Request, response: Response):
@@ -182,13 +185,13 @@ async def login(request: Request, response: Response, form_data: OAuth2PasswordR
 
 @router.api_route("/logout", methods=["GET", "POST"], response_class=RedirectResponse)
 async def logout(request: Request):
-    response = RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}")
+    response = RedirectGetResponse(url=f"{settings.PREFIX}/login")
     access_token = request.cookies.get("access_token")
     try:
         payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
         username = payload["sub"]
     except jwt.PyJWTError:
-        return RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}")
+        return RedirectGetResponse(url=f"{settings.PREFIX}/login")
 
     if username:
         keycloak_response = await redis_client.get(username)
@@ -215,7 +218,7 @@ async def logout(request: Request):
 async def redirect_to_dl(request: Request):
     if request.state.user:
         return RedirectGetResponse(url=f"{settings.PREFIX}/dl/")
-    return RedirectGetResponse(url=f"{settings.PREFIX}/login?_={int(time.time())}") 
+    return RedirectGetResponse(url=f"{settings.PREFIX}/login") 
 
 @router.get("/dl/{path:path}", response_class=HTMLResponse)
 async def list_files(request: Request, path: str = ''):

@@ -74,6 +74,7 @@ async def get_random_quote():
         quote_ids = result.scalars().all()  # 모든 ID를 리스트로 가져옴
 
         if not quote_ids:
+            logger.error("#ERROR# No quotes available.")
             raise HTTPException(status_code=404, detail="No quotes available.")
 
         # 랜덤 인덱스 생성
@@ -87,6 +88,7 @@ async def get_random_quote():
         quote = result.scalar_one_or_none()
 
         if quote is None:
+            logger.error(f"#ERROR# Quote not found. random_quote_id: {random_quote_id}")
             raise HTTPException(status_code=404, detail="Quote not found.")
 
         # 응답 포맷팅

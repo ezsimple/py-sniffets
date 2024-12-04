@@ -1,8 +1,3 @@
-'''
-24.09.12 파이썬 강의 소스
-거북이 그리기 - 별 그리기
-'''
-# %%
 import turtle
 
 turtle.shape("turtle")

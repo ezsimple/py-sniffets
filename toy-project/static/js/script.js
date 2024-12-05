@@ -18,13 +18,15 @@ document.querySelectorAll('.card').forEach(card => {
 
     // 마우스 오버 시 active 클래스 추가
     card.addEventListener('mouseover', function() {
-        const body = this.querySelector('.card-body');
-        body.classList.add('active'); // active 클래스 추가
+        toggleCard(this);
     });
 
     // 마우스 아웃 시 active 클래스 제거
     card.addEventListener('mouseout', function() {
-        const body = this.querySelector('.card-body');
-        body.classList.remove('active'); // active 클래스 제거
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            const body = card.querySelector('.card-body');
+            body.classList.remove('active');
+        });
     });
 });

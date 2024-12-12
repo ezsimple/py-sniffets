@@ -18,41 +18,40 @@ function isMobile() {
     return isMobileDevice || hasTouchScreen;
 }
 
-function toggleCard(clickedCard) {
+function toggleCard(clickedCard, event) {
+    if (event && (event.target.tagName === 'A' || event.target.tagName === 'BUTTON')) {
+        return;
+    }
+
     const clickedBody = clickedCard.querySelector('.card-body');
     
     if (isMobile()) {
-        // 모바일에서는 현재 카드의 상태를 반전
         if (clickedBody.classList.contains('active')) {
             clickedBody.classList.remove('active');
-        } 
-        else {
-            // 다른 모든 카드는 닫고 현재 카드만 열기
+        } else {
             document.querySelectorAll('.card-body').forEach(body => {
                 body.classList.remove('active');
             });
             clickedBody.classList.add('active');
         }
-        return;
-    } 
-    
-    // PC에서는 마우스오버 동작 유지
-    document.querySelectorAll('.card-body').forEach(body => {
-        body.classList.remove('active');
-    });
-    clickedBody.classList.add('active');
+    } else {
+        document.querySelectorAll('.card-body').forEach(body => {
+            body.classList.remove('active');
+        });
+        clickedBody.classList.add('active');
+    }
 }
 
 document.querySelectorAll('.card').forEach(card => {
     if (isMobile()) {
-        // 모바일에서는 터치/클릭 이벤트만 사용
         card.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleCard(this);
+            if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            toggleCard(this, e);
         });
     } else {
-        // PC에서는 마우스오버/아웃 이벤트 사용
         card.addEventListener('mouseover', function() {
             toggleCard(this);
         });

@@ -25,20 +25,22 @@ function toggleCard(clickedCard) {
         // 모바일에서는 현재 카드의 상태를 반전
         if (clickedBody.classList.contains('active')) {
             clickedBody.classList.remove('active');
-        } else {
+        } 
+        else {
             // 다른 모든 카드는 닫고 현재 카드만 열기
             document.querySelectorAll('.card-body').forEach(body => {
                 body.classList.remove('active');
             });
             clickedBody.classList.add('active');
         }
-    } else {
-        // PC에서는 마우스오버 동작 유지
-        document.querySelectorAll('.card-body').forEach(body => {
-            body.classList.remove('active');
-        });
-        clickedBody.classList.add('active');
-    }
+        return;
+    } 
+    
+    // PC에서는 마우스오버 동작 유지
+    document.querySelectorAll('.card-body').forEach(body => {
+        body.classList.remove('active');
+    });
+    clickedBody.classList.add('active');
 }
 
 document.querySelectorAll('.card').forEach(card => {

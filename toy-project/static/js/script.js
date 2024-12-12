@@ -11,44 +11,46 @@ function isMobile() {
         (navigator.msMaxTouchPoints > 0)
     );
     
-    const isPortrait = window.innerHeight > window.innerWidth;
     const isMobileDevice = mobileKeywords.some(keyword => 
         userAgent.includes(keyword)
     );
     
-    return isMobileDevice || (hasTouchScreen && isPortrait);
+    return isMobileDevice || hasTouchScreen;
 }
 
 function toggleCard(clickedCard) {
+    const clickedBody = clickedCard.querySelector('.card-body');
+    
     if (isMobile()) {
-        // 모바일에서는 클릭한 카드만 토글
-        const clickedBody = clickedCard.querySelector('.card-body');
-        clickedBody.classList.toggle('active');
-    } else {
-        // PC에서는 기존 동작 유지
-        const cards = document.querySelectorAll('.card');
-        cards.forEach(card => {
-            const body = card.querySelector('.card-body');
-            if (card === clickedCard) {
-                body.classList.add('active');
-            } else {
+        // 모바일에서는 현재 카드의 상태를 반전
+        if (clickedBody.classList.contains('active')) {
+            clickedBody.classList.remove('active');
+        } else {
+            // 다른 모든 카드는 닫고 현재 카드만 열기
+            document.querySelectorAll('.card-body').forEach(body => {
                 body.classList.remove('active');
-            }
+            });
+            clickedBody.classList.add('active');
+        }
+    } else {
+        // PC에서는 마우스오버 동작 유지
+        document.querySelectorAll('.card-body').forEach(body => {
+            body.classList.remove('active');
         });
+        clickedBody.classList.add('active');
     }
 }
 
 document.querySelectorAll('.card').forEach(card => {
-    // 클릭 이벤트
-    card.addEventListener('click', function(e) {
-        if (isMobile()) {
-            e.preventDefault(); // 기본 동작 방지
+    if (isMobile()) {
+        // 모바일에서는 터치/클릭 이벤트만 사용
+        card.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             toggleCard(this);
-        }
-    });
-
-    // PC에서만 마우스오버/아웃 이벤트 적용
-    if (!isMobile()) {
+        });
+    } else {
+        // PC에서는 마우스오버/아웃 이벤트 사용
         card.addEventListener('mouseover', function() {
             toggleCard(this);
         });
@@ -62,9 +64,7 @@ document.querySelectorAll('.card').forEach(card => {
 
 // 화면 크기 변경 시 모든 카드 닫기
 window.addEventListener('resize', function() {
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(card => {
-        const body = card.querySelector('.card-body');
+    document.querySelectorAll('.card-body').forEach(body => {
         body.classList.remove('active');
     });
 });

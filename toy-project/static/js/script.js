@@ -51,18 +51,29 @@ function toggleCard(clickedCard, event) {
             clickedBody.classList.remove('active');
             clickedCard.classList.remove('active');
             cardTimer = null;
-        }, 5000);
+        }, cardTimerDuration);
     }
 }
 
 document.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('click', function(e) {
-        if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        toggleCard(this, e);
-    });
+    if (isMobile()) {
+        card.addEventListener('click', function(e) {
+            if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            toggleCard(this, e);
+        });
+    } else {
+        card.addEventListener('mouseover', function() {
+            toggleCard(this);
+        });
+
+        card.addEventListener('mouseout', function() {
+            const body = this.querySelector('.card-body');
+            body.classList.remove('active');
+        });
+    }
 });
 
 // 화면 크기 변경 시 모든 카드 닫기와 타이머 취소

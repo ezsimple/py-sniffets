@@ -5,6 +5,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 /* 헤더 스타일 */
@@ -43,9 +44,9 @@ header .profile-image {
     bottom: -20px;
     right: 20px;
     filter: grayscale(90%);
+    z-index: 1000;
 }
 
-/* 기존 카드 스타일 유지 */
 .card {
     transition: all 0.3s ease;
     position: relative;
@@ -53,16 +54,15 @@ header .profile-image {
     border-radius: 0.35rem;
     background: white;
     overflow: visible;
-    max-width: 240px;
+    width: 240px;
+    max-width: 100%;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 2;
 }
 
 /* active 상태일 때 카드 전체에 그림자 적용 */
 .card.active {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    border-radius: 0.35rem;
+    z-index: 900;
 }
 
 .card .card-header {
@@ -70,12 +70,8 @@ header .profile-image {
     border: none;
     padding: 0.8rem;
     position: relative;
-    z-index: 2;
+    z-index: 3;
     border-radius: 0.35rem;
-}
-
-.card.active .card-header {
-    border-radius: 0.35rem 0.35rem 0 0;
 }
 
 .card-body.active + .card-header::after {
@@ -91,22 +87,20 @@ header .profile-image {
     border: none;
     border-radius: 0 0 0.35rem 0.35rem;
     padding: 0.8rem;
-    z-index: 1;
-    /* box-shadow: 0 2px 8px rgba(0,0,0,0.1); */
-    
-    /* 애니메이션 관련 속성 */
     visibility: hidden;
     opacity: 0;
     transition: all 0.3s ease;
     max-height: 0;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 1;
 }
 
 .card-body.active {
     visibility: visible;
     opacity: 1;
-    max-height: 300px;
-    z-index: 100;
+    max-height: none;
+    z-index: 899;
 }
 
 /* 내부 컨텐츠 페이드인 효과 */
@@ -145,6 +139,8 @@ header .profile-image {
     padding-left: 15px;
     margin-bottom: 30px;
     font-size: 1.4rem;
+    width: 240px;
+    margin-left: 0.75rem;  /* gutter 간격만큼 여백 */
 }
 
 .section-title::before {
@@ -192,7 +188,9 @@ footer {
     color: white;
     text-align: center;
     padding: 10px;
-    margin-top: auto;
+    width: 100%;
+    position: relative;
+    clear: both;
 }
 
 footer a {
@@ -210,15 +208,19 @@ footer a:hover {
     flex: 1;
     display: flex;
     justify-content: center;
-    align-items: center;
     padding: 20px;
+    position: relative;
 }
 
 .container {
     background-color: #313b41;
-    flex: 1;
-    padding: 2rem 0;
+    width: 100%;
     max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
 }
 
 /* 링크 스타일 */
@@ -234,10 +236,21 @@ a:hover {
 /* 카드 그리드 조정 */
 .row {
     --bs-gutter-x: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    justify-content: flex-start;
+    position: relative;
 }
 
 .col-lg-3 {
     width: 25%;
+    padding: 0 0.75rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: flex-start;  /* 좌측 정렬 */
 }
 
 /* 반응형 조정 */
@@ -254,23 +267,46 @@ a:hover {
 }
 
 @media (max-width: 576px) {
+    .main-content {
+        padding: 20px 0;
+    }
+    
+    .container {
+        padding: 1rem;
+        min-height: 0;
+    }
+    
+    .row {
+        margin: 0;
+        justify-content: center;
+        padding-bottom: 20px;
+    }
+    
     .col-lg-3 {
         width: 100%;
-        display: flex;
-        justify-content: center;
+        padding: 0;
+        margin-bottom: 2rem;
+        position: relative;
     }
     
     .card {
-        max-width: 240px;
+        width: 240px;
         margin: 0 auto;
     }
     
+    .card-body.active {
+        position: absolute;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
     .section-title {
-        font-size: 1.3rem;
+        width: 240px;
+        margin: 0 auto 30px;
         text-align: center;
     }
-
-    .container {
-        padding: 2rem 1rem;
+    
+    .col-lg-3:last-child .card.active,
+    .col-lg-3:last-child .card-body.active {
+        z-index: 900;
     }
 }

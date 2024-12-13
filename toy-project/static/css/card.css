@@ -1,3 +1,7 @@
+:root {
+    --background-color: #313b41;  /* 배경색 변수 정의 */
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -6,6 +10,7 @@ body {
     flex-direction: column;
     min-height: 100vh;
     overflow-x: hidden;
+    background-color: var(--background-color);
 }
 
 /* 헤더 스타일 */
@@ -209,16 +214,17 @@ footer a:hover {
 
 /* 메인 컨텐츠 영역 */
 .main-content {
-    background-color: #313b41;
+    background-color: var(--background-color);
     flex: 1;
     display: flex;
     justify-content: center;
     padding: 20px;
     position: relative;
+    margin-bottom: 150px;
 }
 
 .container {
-    background-color: #313b41;
+    background-color: var(--background-color);
     width: 100%;
     max-width: 1280px;
     margin: 0 auto;

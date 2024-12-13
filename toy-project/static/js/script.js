@@ -1,3 +1,6 @@
+// 전역 변수로 타이머 ID를 저장
+let cardTimer = null;
+
 function isMobile() {
     const userAgent = navigator.userAgent.toLowerCase();
     const mobileKeywords = [
@@ -26,6 +29,12 @@ function toggleCard(clickedCard, event) {
     const clickedBody = clickedCard.querySelector('.card-body');
     
     if (isMobile()) {
+        // 이전 타이머가 있다면 취소
+        if (cardTimer) {
+            clearTimeout(cardTimer);
+            cardTimer = null;
+        }
+
         if (clickedBody.classList.contains('active')) {
             clickedBody.classList.remove('active');
         } else {
@@ -33,6 +42,12 @@ function toggleCard(clickedCard, event) {
                 body.classList.remove('active');
             });
             clickedBody.classList.add('active');
+            
+            // 5초 후에 카드를 접는 타이머 설정
+            cardTimer = setTimeout(() => {
+                clickedBody.classList.remove('active');
+                cardTimer = null;
+            }, 5000);
         }
     } else {
         document.querySelectorAll('.card-body').forEach(body => {
@@ -63,8 +78,12 @@ document.querySelectorAll('.card').forEach(card => {
     }
 });
 
-// 화면 크기 변경 시 모든 카드 닫기
+// 화면 크기 변경 시 모든 카드 닫기와 타이머 취소
 window.addEventListener('resize', function() {
+    if (cardTimer) {
+        clearTimeout(cardTimer);
+        cardTimer = null;
+    }
     document.querySelectorAll('.card-body').forEach(body => {
         body.classList.remove('active');
     });

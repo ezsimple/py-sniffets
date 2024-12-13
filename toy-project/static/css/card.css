@@ -256,11 +256,21 @@ a:hover {
 @media (max-width: 576px) {
     .col-lg-3 {
         width: 100%;
+        display: flex;
+        justify-content: center;
     }
+    
     .card {
         max-width: 240px;
+        margin: 0 auto;
     }
+    
     .section-title {
         font-size: 1.3rem;
+        text-align: center;
+    }
+
+    .container {
+        padding: 2rem 1rem;
     }
 }

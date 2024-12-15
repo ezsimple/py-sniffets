@@ -23,6 +23,12 @@ personal_projects:
     image: 'image/past-weather-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/past-weather'
 
+  - title: 'React-ERP 화면 설계'
+    description: 'Springboot + thymeleaf로 구현했던, ERP화면을 React로 재설계'
+    tech: 'React, vite, TypeScript, tailwindcss, shadcn-ui, recoil, styled-components'
+    image: 'image/react-erp.png'
+    url: 'https://a1.mkeasy.kro.kr/erp'
+
 participated_projects:
   - title: '한국렌탈'
     description: '렌탈고객정보사이트, 기존 .NET 서비스를 java로 개편, 사내 ERP 연동, BackOffice 제공'

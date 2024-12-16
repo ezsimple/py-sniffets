@@ -119,13 +119,13 @@ async def summary_api(request: Request, city: str, yyyy: str, mm: str):
     summary = get_summary_by_month(city, yyyy, mm)
     return summary
 
-@router.get("/api/get_total_count", response_class=int)
+@router.get("/api/total_count", response_class=JSONResponse)
 async def total_count_api():
     '''
     전체 가공데이터 갯수
     '''
     total_count = get_total_count()
-    return total_count
+    return {'total_count': total_count} if total_count else {'total_count': 0}
 
 @router.get("/{city:str}/{yyyy:str}", response_class=HTMLResponse)
 async def monthly_chart(request: Request, city: str, yyyy: str):

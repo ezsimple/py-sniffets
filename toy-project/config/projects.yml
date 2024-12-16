@@ -38,6 +38,6 @@ participated_projects:
 
   - title: 'e커머스'
     description: '상품관리, 통계, 정산 기능 개발'
-    tech: 'Springboot, JPA, QueryDSL, MyBatis, MySQL, CQRS'
+    tech: 'Springboot, Next.js, JPA, QueryDSL, MyBatis, MySQL, CQRS'
     image: 'image/oround.png'
     url: 'https://oround.com'

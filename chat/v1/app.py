@@ -121,6 +121,10 @@ def get_readme_content(path):
         return '<br>'.join(line.strip() for line in content if not line.startswith('#'))
     return ""
 
+@router.get("/health")
+async def health():
+    return {"status": "OK"}
+
 @router.get("/")
 async def get(request: Request, user_id: str = Cookie(None)):
 

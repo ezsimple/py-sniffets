@@ -8,7 +8,7 @@ from core.model import CustomTemplateResponse, RedirectGetResponse
 from sqlalchemy import extract, func, select
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import and_
-from database.create_tables import engine, MinoWeatherMonthly, MinoWeatherDaily
+from database.create_tables import MinoWeatherHourly, engine, MinoWeatherMonthly, MinoWeatherDaily
 from database.weather_visualization import WeatherVisualization
 from datetime import datetime
 import calendar
@@ -119,6 +119,14 @@ async def summary_api(request: Request, city: str, yyyy: str, mm: str):
     summary = get_summary_by_month(city, yyyy, mm)
     return summary
 
+@router.get("/api/get_total_count", response_class=int)
+async def total_count_api():
+    '''
+    전체 가공데이터 갯수
+    '''
+    total_count = get_total_count()
+    return total_count
+
 @router.get("/{city:str}/{yyyy:str}", response_class=HTMLResponse)
 async def monthly_chart(request: Request, city: str, yyyy: str):
     current_year = datetime.now().year
@@ -170,9 +178,18 @@ async def daily_chart(request: Request, city: str, yyyy: str, mm: str):
     weather_viz = WeatherVisualization(data, 'daily')
     combined_chart = weather_viz.combined_chart().to_json()
     summary = get_summary_by_month(city, yyyy, mm)
+    total_count = get_total_count()
 
     title = f'송악읍 과거 날씨 정보'
-    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart, "selectedMonth": selectedMonth, "min_month": min_month, "max_month": max_month, "years": years, "summary": summary})
+    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart, "selectedMonth": selectedMonth, "min_month": min_month, "max_month": max_month, "years": years, "summary": summary, "total_count": total_count})
+
+def get_total_count():
+    session = SessionLocal()
+    try:
+        result =session.query(func.count(MinoWeatherHourly.id).label('total_count')).one()
+        return result.total_count * 4 # 4 : 강수, 강수형태, 온도, 습도 
+    finally:
+        session.close()
 
 def get_summary_by_month(city: str, year: str, month: str):
 

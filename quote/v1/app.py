@@ -65,6 +65,10 @@ app.add_middleware(
 )
 router = APIRouter(prefix=PREFIX)
 
+@router.get("/health")
+async def health_check():
+    return {"status": "OK"}
+
 @router.get("/random")
 async def get_random_quote():
     async with async_session() as session:

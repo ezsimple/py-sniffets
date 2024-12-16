@@ -31,6 +31,10 @@ def fetch_total_count():
 def create_app():
     app = Flask(__name__)
 
+    @app.route('/health')
+    def health():
+        return 'OK'
+
     @app.route('/old')
     def home():
         return render_template('index.html')

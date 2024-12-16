@@ -30,6 +30,10 @@ async def to_firstpage(request: Request):
     mm = get_max_month_for_year(yyyy)
     return get_redirect_url(city, yyyy, mm)
 
+@router.get("/health", response_class=JSONResponse)
+async def health(request: Request):
+    return JSONResponse(content={"status": "ok"})
+
 @router.get("/api/{city:str}/{yyyy:str}", response_class=JSONResponse)
 async def monthly_api(request: Request, city: str, yyyy: str):
     '''

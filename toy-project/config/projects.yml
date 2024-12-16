@@ -18,7 +18,7 @@ personal_projects:
     url: 'https://a1.mkeasy.kro.kr/chat/'
 
   - title: '송악읍 과거 날씨'
-    description: '공공데이터 시계열 자료 사용, 10년치(380,436건)'
+    description: '공공데이터 시계열 자료 사용, 10년치(382,752건)'
     tech: '고속 데이터 전처리, FastAPI, pandas, SQLAlchemy, PostgreSQL, vega-lite'
     image: 'image/past-weather-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/past-weather'

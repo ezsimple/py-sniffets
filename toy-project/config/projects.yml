@@ -24,7 +24,7 @@ personal_projects:
     url: 'https://a1.mkeasy.kro.kr/past-weather'
 
   - title: 'ERP 화면'
-    description: 'Springboot(thymeleaf)로 구현 했었던 다중탭 화면을, React로 재구현 (UI 공통기능)'
+    description: 'Springboot(thymeleaf,jQuery)로 구현 했었던 다중탭 화면을, React로 재구현 (UI 공통기능)'
     tech: 'React, vite, TypeScript, tailwindcss, shadcn, recoil, styled-components'
     image: 'image/react-erp.png'
     url: 'https://a1.mkeasy.kro.kr/erp'

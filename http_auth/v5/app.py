@@ -214,6 +214,10 @@ async def logout(request: Request):
 
     return response
 
+@router.get("/health", response_class=JSONResponse)
+async def health(request: Request):
+    return JSONResponse(content={"status": "ok"})
+
 @router.get("/", response_class=RedirectResponse)
 async def redirect_to_dl(request: Request):
     if request.state.user:

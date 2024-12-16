@@ -41,6 +41,7 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
         # 특정경로 인증 생략
         if request.url.path.startswith(f"{settings.PREFIX}/token") \
                 or request.url.path.startswith(f"{settings.PREFIX}/auth/callback") \
+                or request.url.path.startswith("/health") \
                 or request.url.path.startswith("/static/"):
             response = await call_next(request)
             return response

@@ -1,0 +1,34 @@
+OS : Ubuntu 22.04 LTS
+
+# golang 최신 버전 설치
+sudo apt remove --autoremove golang-go # 이전 버전 1.8 삭제
+sudo snap install go --classic # 최신 버전 설치 1.23
+go version
+
+# 환경변수 설정
+export GOROOT=/snap/go/current
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+
+# nginx-prometheus-exporter 설치
+go install github.com/nginxinc/nginx-prometheus-exporter@latest
+nginx-prometheus-exporter --version
+
+# 정보 수집
+nohup nginx-prometheus-exporter --nginx.scrape-uri=https://a1.mkeasy.kro.kr/metrics &
+
+
+# prometheus 설치
+sudo apt install prometheus
+sudo vi /etc/prometheus/prometheus.yml
+sudo service prometheus restart
+
+# grafana-server 설치
+wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/grafana.gpg > /dev/null
+echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com beta main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+sudo apt update
+sudo apt install grafana
+
+
+

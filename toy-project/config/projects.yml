@@ -31,7 +31,7 @@ personal_projects:
 
 participated_projects:
   - title: '한국렌탈'
-    description: '렌탈고객정보사이트, 기존 .NET 서비스를 java로 개편, 사내 ERP 연동, BackOffice 제공'
+    description: '렌탈고객 포털 사이트, 기존 .NET 서비스를 java로 개편, 사내 ERP 연동, BackOffice 제공'
     tech: 'Springboot, Thymeleaf, MyBatis, MSSQL, jQuery, dxGrid(devExpress)'
     image: 'image/krsmart.png'
     url: 'https://www.krsmart.com'

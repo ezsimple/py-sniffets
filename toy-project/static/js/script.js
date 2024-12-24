@@ -1,6 +1,6 @@
 // 전역 변수로 타이머 ID를 저장
 let cardTimer = null;
-const cardTimerDuration = 3000;
+const cardTimerDuration = 5000;
 
 function isMobile() {
     const userAgent = navigator.userAgent.toLowerCase();

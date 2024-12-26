@@ -42,10 +42,16 @@
       const max_width = 1280;
       const width = window.innerWidth > max_width ? max_width : window.innerWidth;
       const spec = {{ chart | safe }}
+			spec.config.axis = {
+			 	"grid": true,
+				"gridColor": "grey",
+				"gridDash": [4, 2],
+			};
       spec.config.view = {
         continuousHeight: 200,
         continuousWidth: width - 100 // 현재 페이지의 넓이를 사용
       };
+			// console.log(JSON.stringify(spec.config,null,2));
       const embedOpt = {"mode": "vega-lite"};
 
       function showError(el, error){

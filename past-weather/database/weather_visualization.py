@@ -15,6 +15,7 @@ class WeatherVisualization(alt.Chart):
         super().__init__(data)
         self.type = type
         self.df = pd.DataFrame(data)
+        self.df['일자'] = pd.to_datetime(self.df['일자']).dt.tz_localize('Asia/Seoul').dt.strftime('%Y-%m-%dT00:00:00Z')
 
     def temperature_chart(self):
         temperature_chart = alt.Chart(self.df).mark_line(color='red').encode(

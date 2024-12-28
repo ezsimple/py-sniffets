@@ -2,6 +2,10 @@
     --background-color: #313b41;  /* 배경색 변수 정의 */
 }
 
+::-webkit-scrollbar {
+    display: none; /* 모든 스크롤바 숨기기 */
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;

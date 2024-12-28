@@ -12,13 +12,13 @@ personal_projects:
     url: 'https://a1.mkeasy.kro.kr/v1'
 
   - title: '명언 카드'
-    description: '명언 API 서버 구현, 한글 해석 및 공유기능 제공'
+    description: '명언({count_quotes}개) API 서버 구현 및 연동, 한글 해석, share 제공'
     tech: 'FastAPI, SQLAlchemy, PostgreSQL, websocket, mqtt, deep-L translator'
     image: 'image/famous-quotes-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/chat/'
 
   - title: '송악읍 과거 날씨'
-    description: '공공데이터 시계열 자료 사용, 10년치 자료 분석 (총 {total_count}건)'
+    description: '공공데이터 시계열 자료 사용, 10년치 자료 분석 (총 {count_weather_data}건)'
     tech: '고속 데이터 전처리, FastAPI, pandas, SQLAlchemy, PostgreSQL, vega-lite'
     image: 'image/past-weather-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/past-weather'

@@ -19,12 +19,21 @@ def load_projects():
         print(f"Error parsing YAML file: {e}")
         return {"personal_projects": [], "participated_projects": []}
 
-def fetch_total_count():
+def get_past_weather_count():
     try:
         response = requests.get('https://a1.mkeasy.kro.kr/past-weather/api/total_count')
         response.raise_for_status()  # Raise an error for bad responses
-        total_count = response.json().get('total_count', '0')
-        return '{:,}'.format(int(total_count))  # Format with commas
+        count = response.json().get('total_count', '0')
+        return '{:,}'.format(int(count))  # Format with commas
+    except (requests.RequestException, ValueError):
+        return '0'  # Default value in case of an error
+
+def get_quotes_count():
+    try:
+        response = requests.get('https://a1.mkeasy.kro.kr/quotes/total')
+        response.raise_for_status()  # Raise an error for bad responses
+        count = response.json().get('count', '0')
+        return '{:,}'.format(int(count))  # Format with commas
     except (requests.RequestException, ValueError):
         return '0'  # Default value in case of an error
 
@@ -46,10 +55,11 @@ def create_app():
     @app.route('/')
     def projects():
         projects_data = load_projects()
-        total_count = fetch_total_count()
+        count_weather_data = get_past_weather_count()
+        count_quotes = get_quotes_count()
 
         for project in projects_data['personal_projects']:
-            project['description'] = project['description'].format(total_count=total_count)
+            project['description'] = project['description'].format(count_weather_data=count_weather_data, count_quotes=count_quotes)
 
         return render_template('card.html', 
                              personal_projects=projects_data['personal_projects'],

@@ -69,6 +69,19 @@ router = APIRouter(prefix=PREFIX)
 async def health_check():
     return {"status": "OK"}
 
+@router.get("/total")
+async def get_total_quotes():
+    async with async_session() as session:
+        total_quotes_query = select(func.count(MinoQuote.id))
+        result = await session.execute(total_quotes_query)
+        total_quotes = result.scalar().all()
+
+        if total_quotes is None:
+            logger.error("#ERROR# Total quotes not found.")
+            raise HTTPException(status_code=404, detail="Total quotes not found.")
+
+        return {"total_quotes": total_quotes}
+
 @router.get("/random")
 async def get_random_quote():
     async with async_session() as session:

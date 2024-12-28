@@ -72,15 +72,20 @@ async def health_check():
 @router.get("/total")
 async def get_total_quotes():
     async with async_session() as session:
-        total_quotes_query = select(func.count(MinoQuote.id))
+        # select count(*), max(reg_date) from public."MinoQuotes" mq
+        total_quotes_query = select(
+            func.count(MinoQuote.id),
+            func.date_trunc("day", func.max(MinoQuote.reg_date)).label("latest_date")
+        )
         result = await session.execute(total_quotes_query)
-        total_quotes = result.scalar()
+        total_quotes = result.first()
 
         if total_quotes is None:
             logger.error("#ERROR# Total quotes not found.")
             raise HTTPException(status_code=404, detail="Total quotes not found.")
 
-        return {"count": total_quotes}
+        latest_date = total_quotes[1].strftime("%Y-%m-%d")
+        return {"count": total_quotes[0], "latest_date": latest_date}
 
 @router.get("/random")
 async def get_random_quote():

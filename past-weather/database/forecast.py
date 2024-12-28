@@ -8,6 +8,7 @@ def generate_csv_row(base_time, data):
 
     final_values = {}
 
+
     for item in items:
       # Store the last values for each category
       category = item['category']
@@ -22,8 +23,8 @@ def generate_csv_row(base_time, data):
     csv_row = []
     for _, values in final_values.items():
       values['RN1'] = ({
-          '강수없음': 0,
-          '1mm 미만': 1,
+          '강수없음': 0.0,
+          '1mm 미만': 1.0,
           '30~50mm': 30.0,
           '50mm 이상': 50.0
       }.get(values['RN1'].strip(), lambda x: x))(values['RN1'])
@@ -84,6 +85,7 @@ def fetch_weather_data():
             time.sleep(0.2)
             try:
                 data = response.json()
+                print(json.dumps(data, indent=2))
                 csv_row_string = generate_csv_row(base_time, data)
                 if not csv_row_string:
                     continue

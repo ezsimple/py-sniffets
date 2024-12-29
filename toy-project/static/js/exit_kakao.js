@@ -29,8 +29,8 @@ function getRedirectPath() {
     return params.get('r'); // 'redirect' 파라미터의 값을 가져옴
 }
 
+hideAllElements()
 // 페이지가 로드되면 자동으로 실행됩니다.
-    hideAllElements()
 window.onload = function() {
     const redirectPath = getRedirectPath(); // redirect 파라미터 값 가져오기
     if (!redirectPath) {

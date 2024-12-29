@@ -7,6 +7,7 @@ body {
     align-items: center;
     padding: 20px;
     margin: 0; /* 기본 마진 제거 */
+    min-height: 100vh; /* Ensure body takes full height */
 }
 
 h1 {
@@ -103,6 +104,17 @@ li {
     width: 100%; /* 폭을 100%로 설정 */
     max-width: 720px; /* ul과 동일한 최대 너비 설정 */
     box-sizing: border-box; /* 패딩과 테두리를 포함한 폭 계산 */
+}
+
+.footer {
+    background-color: #f0f8ff; /* 연한 파란색 배경 */
+    color: #333; /* 기본 텍스트 색상 */
+    text-align: right; /* Align text to the right */
+    padding: 0;
+    position: relative; /* Change to relative to keep it at the bottom */
+    margin-top: auto; /* Push footer to the bottom of the page */
+    width: 100%; /* Full width */
+    z-index: 10; /* Ensure it appears above other content */
 }
 
 /* 부서지는 효과를 위한 CSS */

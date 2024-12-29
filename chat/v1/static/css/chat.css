@@ -116,14 +116,8 @@ li {
     width: 100%; /* Full width */
     z-index: 10; /* Ensure it appears above other content */
 }
-
 .footer a {
-    text-decoration: none;
-    color: inherit;
-}
-
-.footer a:link, .footer a:visited, .footer a:hover, .footer a:active {
-    text-decoration: none;
+    text-decoration: inherit;
     color: inherit;
 }
 

@@ -34,9 +34,9 @@ hideAllElements()
 window.onload = function() {
     const redirectPath = getRedirectPath(); // redirect 파라미터 값 가져오기
     if (!redirectPath) {
-                showAllElements();
-                return;
-            }
+        showAllElements();
+        return;
+    }
 
     let targetUrl = new URL(window.location.origin); // 현재 도메인으로 생성
     targetUrl.pathname = redirectPath; // redirectPath를 경로로 설정

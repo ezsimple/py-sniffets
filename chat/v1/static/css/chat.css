@@ -1,78 +1,80 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: Arial, sans-serif; /* 기본 폰트 설정 */
     background-color: #f0f8ff; /* 연한 파란색 배경 */
     color: #333; /* 기본 텍스트 색상 */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
+    display: flex; /* 플렉스 박스 레이아웃 사용 */
+    flex-direction: column; /* 세로 방향으로 요소 정렬 */
+    align-items: center; /* 중앙 정렬 */
+    padding: 20px; /* 내부 여백 설정 */
     margin: 0; /* 기본 마진 제거 */
-    min-height: 100vh; /* Ensure body takes full height */
+    min-height: calc(100vh - 50px); /* footer의 최소 높이를 뷰포트 높이로 설정 */
+    /* min-height: 100vh; /* 최소 높이를 뷰포트 높이로 설정 */
+    /* overflow: hidden; /* 불필요한 스크롤바 숨기기 */
 }
 
 h1 {
-    color: #4a90e2; /* 제목 색상 */
-    font-size: 2rem; /* 반응형 제목 크기 */
-    margin-bottom: 20px;
+    color: #4a90e2; /* 제목 색상 설정 */
+    font-size: 2rem; /* 제목 크기 설정 */
+    margin-bottom: 20px; /* 제목 아래 여백 설정 */
 }
 
 button {
-    background-color: #4a90e2;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 10px; /* 곡률 설정 */
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s, color 0.3s;
+    background-color: #4a90e2; /* 버튼 배경색 설정 */
+    color: white; /* 버튼 텍스트 색상 설정 */
+    border: none; /* 버튼 테두리 제거 */
+    padding: 10px 20px; /* 버튼 내부 여백 설정 */
+    border-radius: 10px; /* 버튼 모서리 둥글게 설정 */
+    cursor: pointer; /* 마우스 커서 포인터로 변경 */
+    font-size: 16px; /* 버튼 텍스트 크기 설정 */
+    transition: background-color 0.3s, color 0.3s; /* 배경색과 텍스트 색상 변화에 대한 트랜지션 설정 */
     width: 100%; /* 버튼 폭을 100%로 설정 */
-    max-width: 720px; /* 최대 너비 설정 */
+    max-width: 720px; /* 버튼 최대 너비 설정 */
 }
 
 button:disabled {
-    background-color: gray; /* 비활성화 상태의 배경색 */
-    cursor: not-allowed; /* 커서 변경 */
+    background-color: gray; /* 비활성화 상태의 배경색 설정 */
+    cursor: not-allowed; /* 비활성화 상태에서 커서 변경 */
 }
 
 ul {
-    list-style-type: none;
-    padding: 15px 0;
-    width: 100%;
-    max-width: 720px; /* 최대 너비 설정 */
-    margin: 0; /* 기본 마진 제거 */
+    list-style-type: none; /* 리스트 스타일 제거 */
+    padding: 15px 0; /* 리스트 내부 여백 설정 */
+    width: 100%; /* 리스트 폭을 100%로 설정 */
+    max-width: 720px; /* 리스트 최대 너비 설정 */
+    margin: 0; /* 리스트 기본 마진 제거 */
 }
 
 li {
     position: relative; /* 버튼 위치 조정을 위해 relative 설정 */
-    margin: 10px 0;
-    padding: 15px;
-    border-radius: 10px; /* 곡률 설정 */
-    transition: color 0.3s, background-color 0.3s;
-    word-wrap: break-word; /* 긴 단어 줄 바꿈 */
-    display: flex;
+    margin: 10px 0; /* 리스트 아이템 마진 설정 */
+    padding: 15px; /* 리스트 아이템 내부 여백 설정 */
+    border-radius: 10px; /* 리스트 아이템 모서리 둥글게 설정 */
+    transition: color 0.3s, background-color 0.3s; /* 색상과 배경색 변화에 대한 트랜지션 설정 */
+    word-wrap: break-word; /* 긴 단어 줄 바꿈 설정 */
+    display: flex; /* 플렉스 박스 레이아웃 사용 */
     justify-content: space-between; /* 왼쪽과 오른쪽 영역을 나누기 위해 사용 */
 }
 
 .message-container {
     flex: 1; /* 메시지 영역이 가능한 공간을 차지하도록 설정 */
-    padding-top: 7px;
+    padding-top: 7px; /* 메시지 컨테이너 상단 여백 설정 */
     padding-right: 10px; /* 오른쪽 버튼과 간격을 위해 패딩 추가 */
 }
 
 .button-container {
     display: flex; /* 버튼들을 세로로 정렬 */
     flex-direction: column; /* 세로 방향으로 정렬 */
-    align-items: flex-end; /* 오른쪽 정렬 */
+    align-items: flex-end; /* 버튼 오른쪽 정렬 */
     gap: 1px; /* 버튼 사이 간격을 1px로 설정 */
     padding-top: 0; /* 상단 패딩 0으로 설정 */
 }
 
 .copy-btn, .delete-btn, .like-btn, .share-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
+    background: none; /* 버튼 배경색 제거 */
+    border: none; /* 버튼 테두리 제거 */
+    cursor: pointer; /* 마우스 커서 포인터로 변경 */
     margin-top: 0; /* 버튼의 최상단 정렬을 위해 마진 제거 */
-    padding: 3px 5px;
+    padding: 3px 5px; /* 버튼 패딩 설정 */
     transition: background-color 0.3s; /* 배경색 변화에 대한 트랜지션 추가 */
 }
 
@@ -82,13 +84,13 @@ li {
 }
 
 #like-notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: rgba(255, 255, 255, 0.8);  /* 반투명 흰색 배경 */
-    color: black;  /* 글자 색상을 검은색으로 설정 */
-    padding: 10px;
-    border-radius: 5px;
+    position: fixed; /* 고정 위치 설정 */
+    top: 20px; /* 상단 위치 설정 */
+    right: 20px; /* 오른쪽 위치 설정 */
+    background-color: rgba(255, 255, 255, 0.8); /* 반투명 흰색 배경 */
+    color: black; /* 글자 색상을 검은색으로 설정 */
+    padding: 10px; /* 내부 여백 설정 */
+    border-radius: 5px; /* 모서리 둥글게 설정 */
     display: none; /* 기본적으로 숨김 */
     z-index: 1000; /* 다른 요소 위에 표시 */
     transition: opacity 0.5s ease; /* 부드럽게 나타나고 사라짐 */
@@ -97,10 +99,10 @@ li {
 .readme-box {
     background-color: #e7f3fe; /* 연한 파란색 배경 */
     border-left: 6px solid #2196F3; /* 파란색 왼쪽 테두리 */
-    padding: 15px;
+    padding: 15px; /* 내부 여백 설정 */
     margin: 20px 0; /* 위아래 마진 추가, 좌우 마진 제거 */
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 5px; /* 모서리 둥글게 설정 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 그림자 효과 설정 */
     width: 100%; /* 폭을 100%로 설정 */
     max-width: 720px; /* ul과 동일한 최대 너비 설정 */
     box-sizing: border-box; /* 패딩과 테두리를 포함한 폭 계산 */
@@ -109,51 +111,52 @@ li {
 .footer {
     background-color: #f0f8ff; /* 연한 파란색 배경 */
     color: #333; /* 기본 텍스트 색상 */
-    text-align: right; /* Align text to the right */
-    padding: 0;
+    text-align: right; /* 텍스트를 오른쪽 정렬 */
+    padding: 0; /* 여백 제거 */
     position: relative; /* Change to relative to keep it at the bottom */
-    margin-top: auto; /* Push footer to the bottom of the page */
+    margin-top: auto; /* 푸터가 항상 아래에 위치하도록 설정 */
     width: 100%; /* Full width */
-    z-index: 10; /* Ensure it appears above other content */
+    max-height: 50px; /* 푸터의 최대 너비 설정 */
 }
+
 .footer a {
-    text-decoration: inherit;
-    color: inherit;
+    text-decoration: inherit; /* 링크의 기본 텍스트 장식 제거 */
+    color: inherit; /* 링크의 기본 색상 상속 */
 }
 
 /* 부서지는 효과를 위한 CSS */
 @keyframes shatter {
     0% {
-        transform: scale(1);
-        opacity: 1;
+        transform: scale(1); /* 초기 크기 설정 */
+        opacity: 1; /* 초기 투명도 설정 */
     }
     50% {
-        transform: scale(1.1);
-        opacity: 0.5;
+        transform: scale(1.1); /* 확대 설정 */
+        opacity: 0.5; /* 투명도 설정 */
     }
     100% {
-        transform: scale(0);
-        opacity: 0;
+        transform: scale(0); /* 최종 크기 설정 */
+        opacity: 0; /* 최종 투명도 설정 */
     }
 }
 
 /* 부서지는 효과를 위한 CSS */
 @keyframes shatter {
     0% {
-        transform: scale(1) rotate(0deg);
-        opacity: 1;
+        transform: scale(1) rotate(0deg); /* 초기 크기와 회전 설정 */
+        opacity: 1; /* 초기 투명도 설정 */
     }
     30% {
-        transform: scale(1.1) rotate(10deg);
-        opacity: 0.8;
+        transform: scale(1.1) rotate(10deg); /* 확대와 회전 설정 */
+        opacity: 0.8; /* 투명도 설정 */
     }
     60% {
-        transform: scale(0.9) rotate(-10deg);
-        opacity: 0.5;
+        transform: scale(0.9) rotate(-10deg); /* 축소와 회전 설정 */
+        opacity: 0.5; /* 투명도 설정 */
     }
     100% {
-        transform: scale(0) rotate(0deg);
-        opacity: 0;
+        transform: scale(0) rotate(0deg); /* 최종 크기와 회전 설정 */
+        opacity: 0; /* 최종 투명도 설정 */
     }
 }
 
@@ -164,10 +167,10 @@ li {
 /* 테두리 애니메이션 */
 @keyframes fadeOutBorder {
     0% {
-        border: 1px solid black;
+        border: 1px solid black; /* 초기 테두리 설정 */
     }
     100% {
-        border: none;
+        border: none; /* 최종 테두리 설정 */
     }
 }
 

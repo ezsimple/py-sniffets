@@ -117,6 +117,16 @@ li {
     z-index: 10; /* Ensure it appears above other content */
 }
 
+.footer a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.footer a:link, .footer a:visited, .footer a:hover, .footer a:active {
+    text-decoration: none;
+    color: inherit;
+}
+
 /* 부서지는 효과를 위한 CSS */
 @keyframes shatter {
     0% {

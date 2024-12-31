@@ -101,9 +101,8 @@ async def get_random_eng_quote():
 @router.get("/krandom")
 async def get_random_kor_quote():
     quote = await get_random_quote()
-    kquote = {'q':quote.q, 'a':quote.a, 't':quote.t}
-    if not quote is None:
-        kquote['q'] += '\n' + await translate_quote(kquote['q'])
+    kquote = {'q':quote.q, 'k':'', 'a':quote.a, 't':quote.t}
+    kquote['k'] = await translate_quote(kquote['q'])
     res = [kquote]
     return res
 

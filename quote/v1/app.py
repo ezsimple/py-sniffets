@@ -11,6 +11,9 @@ from datetime import datetime
 import os, sys
 from fastapi.middleware.cors import CORSMiddleware
 
+import asyncio
+from deep_translator import GoogleTranslator
+
 # 현재 스크립트의 경로를 기준으로 PYTHONPATH 추가
 current_dir = os.path.dirname(os.path.abspath(__file__))  # 현재 파일의 절대 경로
 parent_dir = os.path.abspath(os.path.join(current_dir, '../../'))  # 부모 디렉토리 경로
@@ -87,7 +90,23 @@ async def get_total_quotes():
         latest_date = total_quotes[1].strftime("%Y-%m-%d")
         return {"count": total_quotes[0], "latest_date": latest_date}
 
+
 @router.get("/random")
+async def get_random_eng_quote():
+    quote = await get_random_quote()
+    # 응답 포맷팅
+    res = [{"q": quote.q, "a": quote.a, "t": quote.t, "quote_id": quote.id, "like_count": quote.like_count }]
+    return res
+
+@router.get("/krandom")
+async def get_random_kor_quote():
+    quote = await get_random_quote()
+    kquote = {'q':quote.q, 'a':quote.a, 't':quote.t}
+    if not quote is None:
+        kquote['q'] += '\n' + await translate_quote(kquote['q'])
+    res = [kquote]
+    return res
+
 async def get_random_quote():
     async with async_session() as session:
         # 총 인용구 ID 목록 조회
@@ -113,9 +132,16 @@ async def get_random_quote():
             logger.error(f"#ERROR# Quote not found. random_quote_id: {random_quote_id}")
             raise HTTPException(status_code=404, detail="Quote not found.")
 
-        # 응답 포맷팅
-        res = [{"q": quote.q, "a": quote.a, "t": quote.t, "quote_id": quote.id, "like_count": quote.like_count }]
-        return res
+        # quote 는 MinoQuote 의 객체이다.
+        return quote
+
+async def translate_quote(str_quote):
+    '''
+    deep-L 라이브러리를 사용하여 번역하는 함수
+    좀 더 자연어에 가까운 번역결과를 보여줌 
+    '''
+    translated_text = await asyncio.to_thread(GoogleTranslator(source='en', target='ko').translate, str_quote)
+    return translated_text  # 번역된 텍스트 반환
 
 app.include_router(router)
 

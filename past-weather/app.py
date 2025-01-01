@@ -142,18 +142,10 @@ async def monthly_chart(request: Request, city: str, yyyy: str):
         yyyy = max_year  # 유효하지 않으면 현재년도로 대체
         return get_redirect_url(city, yyyy, None)
 
-    json_data = await monthly_api(request, city, yyyy)
-    data = json_data.body.decode('utf-8')
-    data = json.loads(data)
-    weather_viz = WeatherVisualization(data)
-    combined_chart = weather_viz.combined_chart().to_json()
-
-    min_month, max_month = get_min_max_month()
-    years = calculate_year_difference(min_month, max_month)
-    months = get_months_for_year(yyyy)
-    selectedMonth = yyyy + '-' + months[-1]
-    title = f'송악읍 과거 날씨 정보'
-    return CustomTemplateResponse("chart.html", {"request": request, "title": title, "chart": combined_chart, "selectedMonth": selectedMonth, "min_month": min_month, "max_month": max_month, "years":years })
+    # max_year의 max_month(yyyy-mm)을 구하기
+    max_month = session.query(func.max(MinoWeatherMonthly.measure_month).label('max_month')).filter(MinoWeatherMonthly.measure_month.like(f"{yyyy}%")).scalar()
+    mm = max_month.split('-')[1]
+    return get_redirect_url(city, yyyy, mm)
 
 @router.get("/{city:str}/{yyyy:str}/{mm:str}", response_class=HTMLResponse)
 async def daily_chart(request: Request, city: str, yyyy: str, mm: str):

@@ -134,6 +134,10 @@ async def total_count_api():
 @router.get("/{city:str}/{yyyy:str}", response_class=HTMLResponse)
 async def monthly_chart(request: Request, city: str, yyyy: str):
 
+    # 도시명 검증
+    if city != CITY:
+        return get_redirect_url(CITY, yyyy, None)
+
     # measure_month(yyyy-mm) 의 값중 마지막 (가장큰) 년도 yyyy를 구해줘.
     session = SessionLocal()
     max_year = session.query(func.max(MinoWeatherMonthly.measure_month).label('max_year')).scalar()
@@ -149,6 +153,11 @@ async def monthly_chart(request: Request, city: str, yyyy: str):
 
 @router.get("/{city:str}/{yyyy:str}/{mm:str}", response_class=HTMLResponse)
 async def daily_chart(request: Request, city: str, yyyy: str, mm: str):
+
+    # 도시명 검증
+    if city != CITY:
+        return get_redirect_url(CITY, yyyy, mm)
+
     # 현재 년도 가져오기
     selectedMonth = yyyy + '-' + mm
     min_month, max_month = get_min_max_month()

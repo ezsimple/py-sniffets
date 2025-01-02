@@ -54,6 +54,8 @@ from sqlalchemy import text, MetaData, Table
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
 import sys
+import logging
+import inspect
 
 START_YEAR=2014
 END_YEAR=2024
@@ -125,7 +127,19 @@ def make_correct_csv_file(directory):
                         start_month = int(start_date[4:6])
                         continue
 
-                    day, hour, value = int(row[0]), int(row[1]), float(row[2])
+                    if not row or len(row) < 3:
+                        logging.error(f"Skipping row with invalid data: {row} in {__file__} at line {inspect.currentframe().f_lineno}")
+                        continue
+                    
+                    try:
+                        day, hour, value = row[0].strip(), row[1].strip(), row[2].strip()
+                        if day and hour and value:  # Ensure none are empty
+                            day, hour, value = int(day), int(hour), float(value)
+                    except:
+                        logging.error(f"Skipping row with invalid data: {row} in {__file__} at line {inspect.currentframe().f_lineno}")
+                        session.rollback()
+                        sys.exit(-1)
+
                     # measure_date 생성
                     measure_date = datetime(
                         year=start_year,

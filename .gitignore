@@ -190,3 +190,4 @@ pyrightconfig.json
 nohup.out
 cookies.json
 master.pid
+.idea/

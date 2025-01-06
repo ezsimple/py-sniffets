@@ -29,6 +29,12 @@ personal_projects:
     image: 'image/react-erp.png'
     url: 'https://a1.mkeasy.kro.kr/erp'
 
+  - title: '달력 한장'
+    description: '출력용 일년치 달력 (한국 휴일 표시)'
+    tech: 'React, vite, TypeScript, tailwindcss, nestjs(BFF) API'
+    image: 'image/calendar-thumbnail.png'
+    url: 'https://a1.mkeasy.kro.kr/calendar'
+
 participated_projects:
   - title: '한국렌탈'
     description: '렌탈고객 포털 사이트, 기존 .NET 서비스를 java로 개편, 사내 ERP 연동, BackOffice 제공'

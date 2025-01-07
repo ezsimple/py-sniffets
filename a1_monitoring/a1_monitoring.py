@@ -13,6 +13,7 @@ URIs = {
     "/past-weather/health": "past weather", # past weather
     "/v1/health": "http_auth", # personal file downloader
     "/auth/health": "keycloak", # keycloak
+    "/holiday/health": "holiday", # calendar api
 }
 
 async def send_message(text):

@@ -1,3 +1,4 @@
+# %%
 import aiohttp
 import asyncio
 import requests
@@ -32,9 +33,8 @@ async def send_message(text):
 async def fetch_status(session, url):
     async with session.get(url) as response:
         if response.status != 200:
-            print(f"{url} is down! Status code: {response.status}")
-            server = URIs[url] + 'is down!'
-            await send_message(f"{server} is down! Status code: {response.status}")
+            msg = f"{url} is down! Status code: {response.status}"
+            await send_message(msg)
 
 async def check_urls(urls):
     async with aiohttp.ClientSession() as session:

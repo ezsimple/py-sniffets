@@ -6,7 +6,7 @@ import requests
 # 주의 : 버츄얼 호스트수(len(URLs))가 10을 넘으면 nginx.limit_req burst=10으로 인해 503 발생함.
 HOST = "https://a1.mkeasy.kro.kr"
 URIs = {
-    "/health": "toy-project", # toy_project
+    "/health": "toy-project", # toy-project
     "/erp/health": "react-erp", # react-erp
     "/hr/health": "hr-server", # hr statistics
     "/quotes/health": "quotes", # famous sayings api
@@ -14,7 +14,7 @@ URIs = {
     "/past-weather/health": "past weather", # past weather
     "/v1/health": "http_auth", # personal file downloader
     "/auth/health": "keycloak", # keycloak
-    "/holiday/health": "holiday", # calendar api
+    "/holiday/health": "calendar api", # calendar api
 }
 
 async def send_message(text):
@@ -34,7 +34,9 @@ async def fetch_status(session, url):
     async with session.get(url) as response:
         if response.status != 200:
             msg = f"{url} is down! Status code: {response.status}"
-            await send_message(msg)
+            desc = URIs[url]
+            service_name = list(URIs.keys())[list(URIs.values()).index(desc)]
+            await send_message(f'{msg} ({service_name})')
 
 async def check_urls(urls):
     async with aiohttp.ClientSession() as session:

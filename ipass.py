@@ -6,11 +6,17 @@
 
 import secrets
 import string
+import sys
 
 def generate_password(length=16):
-		# special_characters = "!@#$%^&*()_+-=[]{}|;:'\",.<>?/"
     alphabet = string.ascii_letters + string.digits
     return ''.join(secrets.choice(alphabet) for i in range(length))
 
-password = generate_password()
+# 파라미터가 주어지면 길이를 32로 설정
+if len(sys.argv) > 1:
+    password_length = 32
+else:
+    password_length = 16
+
+password = generate_password(password_length)
 print(f"임시암호 : {password}")

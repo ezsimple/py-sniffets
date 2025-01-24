@@ -44,9 +44,9 @@ def create_app():
     def health():
         return 'OK'
 
-    @app.route('/old')
-    def home():
-        return render_template('index.html')
+    @app.route('/protect')
+    def protect_terms():
+        return render_template('protect.html')
 
     @app.route('/skill')
     def skill_tree():

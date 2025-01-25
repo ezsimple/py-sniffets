@@ -48,6 +48,10 @@ def create_app():
     def protect_terms():
         return render_template('protect.html')
 
+    @app.route('/privacy-policy')
+    def protect_terms():
+        return render_template('privacy-policy.html')
+
     @app.route('/skill')
     def skill_tree():
         return render_template('skill.html')

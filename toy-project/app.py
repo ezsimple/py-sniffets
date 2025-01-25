@@ -44,9 +44,9 @@ def create_app():
     def health():
         return 'OK'
 
-    @app.route('/protect')
-    def protect_terms():
-        return render_template('protect.html')
+    # @app.route('/protect')
+    # def protect_terms():
+    #     return render_template('protect.html')
 
     @app.route('/privacy-policy')
     def protect_terms():

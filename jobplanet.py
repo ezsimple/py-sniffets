@@ -7,8 +7,13 @@ from dotenv import load_dotenv
 from playwright.sync_api import Playwright, sync_playwright, expect
 import sys
 
-# .env 파일에서 환경 변수 로드
-load_dotenv()
+HEADLESS=False
+
+# 현재 스크립트의 경로를 가져옵니다.
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# 현재 경로에 있는 .env 파일을 로드합니다.
+load_dotenv(os.path.join(current_dir, '.env'))
 
 def wait_for_loading(page):
     # 페이지 로딩이 완료될 때까지 대기하는 함수
@@ -27,7 +32,7 @@ def login(page):
     page.get_by_role("button", name="이메일로 로그인").click()
 
 def run(playwright: Playwright, search_query: str) -> None:
-    browser = playwright.chromium.launch(headless=True)
+    browser = playwright.chromium.launch(headless=HEADLESS)
     context = browser.new_context()
     page = context.new_page()
 

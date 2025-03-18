@@ -2,6 +2,7 @@ from flask import Flask, render_template
 import yaml
 import os
 import requests
+import time
 
 def load_projects():
     # config 디렉토리 내의 projects.yml 파일 경로
@@ -50,7 +51,7 @@ def create_app():
 
     @app.route('/skill')
     def skill_tree():
-        return render_template('skill.html')
+        return render_template('skill.html', time=int(time.time()))
 
     @app.route('/')
     def projects():
@@ -63,7 +64,8 @@ def create_app():
 
         return render_template('card.html', 
                              personal_projects=projects_data['personal_projects'],
-                             participated_projects=projects_data['participated_projects'])
+                             participated_projects=projects_data['participated_projects'],
+                             time=int(time.time()))
 
     return app
 

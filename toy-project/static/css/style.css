@@ -64,7 +64,7 @@ header .description {
     margin: 5px 0 0 0; /* 위쪽 마진 추가, 아래쪽 마진 제거 */
     color: white; /* 글자 색상 설정 (배경에 맞게 조정) */
     font-size: 0.5em; /* 글자 크기 설정 */
-    font-weight: 100;
+    font-weight: 400;
     font-family: gothic;
     font-style: italic;
     text-align: left; /* 좌측 정렬 */

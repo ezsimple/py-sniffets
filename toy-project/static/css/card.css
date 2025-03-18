@@ -268,6 +268,35 @@ a:hover {
     justify-content: flex-start;  /* 좌측 정렬 */
 }
 
+.link {
+  color: white; /* 기본 링크 색상 */
+  text-decoration: underline; /* 밑줄 표시 */
+  font-weight: bold;
+  transition: color 0.3s ease-in-out;
+}
+
+.link {
+  position: relative;
+  color: white;
+  text-decoration: none; /* 기본 밑줄 제거 */
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background-color: white;
+  left: 0;
+  bottom: -2px;
+  transform: scaleX(0); /* 처음에는 밑줄 숨김 */
+  transition: transform 0.3s ease-in-out;
+}
+
+.link:hover::after {
+  transform: scaleX(1); /* 마우스를 올리면 밑줄 나타남 */
+}
+
 /* 반응형 조정 */
 @media (max-width: 1200px) {
     .col-lg-3 {

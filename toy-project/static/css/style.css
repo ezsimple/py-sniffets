@@ -206,6 +206,28 @@ footer a:hover {
     text-decoration: underline; /* 호버 시 밑줄 추가 */
 }
 
+.link {
+  position: relative;
+  color: white;
+  text-decoration: none; /* 기본 밑줄 제거 */
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background-color: white;
+  left: 0;
+  bottom: -2px;
+  transform: scaleX(0); /* 처음에는 밑줄 숨김 */
+  transition: transform 0.3s ease-in-out;
+}
+
+.link:hover::after {
+  transform: scaleX(1); /* 마우스를 올리면 밑줄 나타남 */
+}
+
 /* 미디어 쿼리: 화면 크기에 따른 카드 수 조정 */
 @media (max-width: 1200px) {
     .card {

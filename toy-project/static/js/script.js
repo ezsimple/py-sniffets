@@ -83,26 +83,23 @@ function toggleCard(clickedCard, event = null) {
 // 이벤트 리스너 설정
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.card').forEach(card => {
-        if (isMobile()) {
-            card.addEventListener('click', function(e) {
-                if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                toggleCard(this, e);
-            });
-        } else {
-            card.addEventListener('mouseover', function() {
-                toggleCard(this);
-            });
+				card.addEventListener('click', function(e) {
+						if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+								e.preventDefault();
+								e.stopPropagation();
+						}
+						toggleCard(this, e);
+				});
+				card.addEventListener('mouseover', function() {
+						toggleCard(this);
+				});
 
-            card.addEventListener('mouseout', function() {
-                const body = this.querySelector('.card-body');
-                body.classList.remove('active');
-                this.classList.remove('active');
-                removeAllGrayscale();
-            });
-        }
+				card.addEventListener('mouseout', function() {
+						const body = this.querySelector('.card-body');
+						body.classList.remove('active');
+						this.classList.remove('active');
+						removeAllGrayscale();
+				});
     });
 });
 

@@ -39,7 +39,7 @@ function removeAllGrayscale() {
     });
 }
 
-function toggleCard(clickedCard, event) {
+function toggleCard(clickedCard, event = null) {
     if (event && (event.target.tagName === 'A' || event.target.tagName === 'BUTTON')) {
         return;
     }

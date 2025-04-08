@@ -7,8 +7,10 @@ import requests
 import urllib3
 import json
 import requests
+from http import HTTPStatus
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
+from kakaotrans import Translator
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -33,6 +35,10 @@ LANGUAGES = {
     "nl": "dutch",
 }
 
+def get_status_message(status_code: int) -> str:
+    status_message = HTTPStatus(status_code).phrase
+    return status_message
+
 
 class DaumTranslator(object):
     """
@@ -56,6 +62,7 @@ class DaumTranslator(object):
             "Accept-Encoding": "gzip, deflate, br",
             "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,la;q=0.6",
         }
+
 
     def translate(
         self,
@@ -99,6 +106,13 @@ class DaumTranslator(object):
         if src == tgt:
             raise ValueError("Source language and Target language cannot be same")
 
+        # from kakaotrans import Translator
+        # DAUM_REST_API_KEY="3abfad9c3630cebd1cc0cb28d0de6751"
+        # translator = Translator()
+        # result = translator.translate(query, src=src, tgt=tgt)
+        # print(result)
+
+
         # Send the POST request
         params = {"queryLanguage": src, "resultLanguage": tgt, "q": query}
         response = requests.post(
@@ -106,8 +120,10 @@ class DaumTranslator(object):
         )
 
         # Check whether the status code is 200
-        if response.status_code != 200:
-            raise Exception("Response Error")
+        status_code = response.status_code
+        if status_code != 200:
+            status_message = get_status_message(status_code)
+            raise Exception(f"Response Error: {self.service_url} -> {status_code}: {status_message}")
 
         translated_lines = response.json()["result"]["output"][0]
 

@@ -119,9 +119,12 @@ def get_content(url):
             response.raise_for_status()
             # 올바른 인코딩 감지
             if 'charset' in response.headers.get('content-type', '').lower():
-                response.encoding = response.headers['content-type'].split('=')[-1]
+                detected_encoding = response.headers['content-type'].split('=')[-1]
             else:
-                response.encoding = 'utf-8'  # 기본값으로 UTF-8 사용
+                detected_encoding = response.apparent_encoding
+            if detected_encoding.lower() == 'euc-kr':
+                detected_encoding = 'cp949'
+            response.encoding = detected_encoding
 
             # Extract content
             soup = BeautifulSoup(response.text, 'html.parser')
@@ -174,12 +177,13 @@ def append_to_json_file(data, file_path):
 
 def main():
     # Load bookmarks
-    with open('dev.json', 'r', encoding='utf-8') as f:
+    INPUT_FILE = 'parsed_bookmarks.json'
+    with open(INPUT_FILE, 'r', encoding='utf-8') as f:
         bookmarks = json.load(f)
     
     total_bookmarks = len(bookmarks)
     
-    save_file_path = 'bookmark_crawling.json'
+    save_file_path = 'parsed_crawling.json'
     existing_urls = set()
     try:
         with open(save_file_path, 'r', encoding='utf-8') as f:
@@ -193,6 +197,7 @@ def main():
         title = bookmark['title']
         if url in existing_urls:
             logging.info(f"Skipping existing URL: {url}")
+            logging.info(f"Progress: {progress:.1f}% ({i+1}/{total_bookmarks})")
             continue
 
         try:
@@ -206,12 +211,12 @@ def main():
                 append_to_json_file(data, save_file_path)
                 logging.info(f"Successfully crawled and saved: {url}")
                 
+        except Exception as e:
+            logging.error(f"Error processing bookmark {i}: {str(e)}")
+        finally:
             # Show progress
             progress = (i + 1) / total_bookmarks * 100
             logging.info(f"Progress: {progress:.1f}% ({i+1}/{total_bookmarks})")
-            
-        except Exception as e:
-            logging.error(f"Error processing bookmark {i}: {str(e)}")
         
         # Rate limiting
         time.sleep(MIN_WAIT)

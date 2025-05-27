@@ -15,7 +15,7 @@ URIs = {
     "/past-weather/health": "past weather", # past weather
     "/v1/health": "http_auth", # personal file downloader
     "/auth/health": "keycloak", # keycloak
-    "/holiday/health": "calendar api", # calendar api
+    "/calendar/health": "calendar api", # calendar api
 }
 async def check_nginx_status():
     try:
@@ -76,7 +76,7 @@ async def main():
 
     except Exception as e:
         msg = '#오류# service is not running!'
-        await send_message(f'{msg}')
+        await send_message(f'{e}')
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()

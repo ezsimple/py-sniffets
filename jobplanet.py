@@ -17,7 +17,9 @@ load_dotenv(os.path.join(current_dir, '.env'))
 
 def wait_for_loading(page):
     # 페이지 로딩이 완료될 때까지 대기하는 함수
-    page.wait_for_load_state("networkidle")
+    # page.wait_for_load_state("networkidle")
+    # 추가 대기 시간
+    page.wait_for_timeout(2000)  # 2초 대기
 
 def login(page):
     email = os.getenv("JOBPLANET_ID")
@@ -36,17 +38,19 @@ def run(playwright: Playwright, search_query: str) -> None:
     context = browser.new_context()
     page = context.new_page()
 
-    login(page)
-
+    # login(page)
+    print('잡프래닛 이동')
+    page.goto("https://www.jobplanet.co.kr/job")
     wait_for_loading(page)
+    print('잡프래닛 이동 완료')
 
     # 검색바 클릭 및 검색어 입력
+    print('검색바 클릭 및 검색어 입력')
     search_bar = page.locator("#search_bar_search_query")
-    search_bar.click()
     search_bar.fill(search_query)
     search_bar.press("Enter")
-
     wait_for_loading(page)
+    print('검색바 완료')
 
     # 결과 목록 요소 대기
     results_list_xpath = "/html/body/div[1]/main/div[1]/div/div/div[1]/div[2]/ul"
@@ -54,19 +58,26 @@ def run(playwright: Playwright, search_query: str) -> None:
         # XPath를 사용하여 결과 리스트 대기
         page.locator(f"xpath={results_list_xpath}").wait_for(state="visible")
 
-        # 기업명과 평점 추출
-        company_name_xpath = "/html/body/div[1]/main/div[1]/div/div/div[1]/div[2]/ul/a[1]/div/div/div[2]/div[1]/span"
-        company_rating_xpath = "/html/body/div[1]/main/div[1]/div/div/div[1]/div[2]/ul/a[1]/div/div/div[2]/div[2]/div[2]/div/div[2]/span"
-
-        company_name = page.locator(f"xpath={company_name_xpath}").inner_text()
-        company_rating = page.locator(f"xpath={company_rating_xpath}").inner_text()
+        # 모든 기업 결과 가져오기
+        results = []
+        company_elements = page.locator(f"xpath={results_list_xpath}/a").all()
+        for company in company_elements:
+            try:
+                # 기업명과 평점 추출
+                company_name = company.locator("xpath=.//div/div/div[2]/div[1]/span").inner_text()
+                company_rating = company.locator("xpath=.//div/div/div[2]/div[2]/div[2]/div/div[2]/span").inner_text()
+                
+                result = {
+                    "기업명": company_name,
+                    "기업 평점": company_rating
+                }
+                results.append(result)
+                print(result)
+            except Exception as e:
+                continue
 
         # JSON 형식으로 출력
-        result = {
-            "기업명": company_name,
-            "기업 평점": company_rating
-        }
-        print(json.dumps(result, ensure_ascii=False))
+        print(json.dumps(results, ensure_ascii=False, indent=2))
 
     except Exception as e:
         print(f"{search_query} 검색 결과가 존재하지 않습니다.")

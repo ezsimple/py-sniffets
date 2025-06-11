@@ -35,6 +35,12 @@ personal_projects:
     image: 'image/calendar-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/calendar'
 
+  - title: 'ES를 이용한 RAG기반 챗봇'
+    description: 'React -> FastAPI -> RAG -> LangChain -> LLM, ES 연계'
+    tech: 'FastAPI, Elasticsearch, Jinja2, LangChain, HuggingFace, RAG, React, vite, TypeScript, tailwindcss'
+    image: 'image/rag2-thumbnail.png'
+    url: 'https://a1.mkeasy.kro.kr/rag2/'
+
 participated_projects:
   - title: '한국렌탈'
     description: '렌탈고객 포털 사이트, 기존 .NET 서비스를 java로 개편, 사내 ERP 연동, BackOffice 제공'

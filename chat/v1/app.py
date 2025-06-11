@@ -92,11 +92,18 @@ async def send_message_to_clients(message_data, user_id):
         logger.error(f"Error sending message to client: {e}")
 
 async def get_random_quote():
-    async with httpx.AsyncClient() as client:
-        response = await client.get(API_SERVER)
-        if response.status_code == 200:
-            data = response.json()
-            return data
+    try:
+        async with httpx.AsyncClient() as client:
+            logger.debug(f"Attempting to fetch quote from {API_SERVER}")
+            response = await client.get(API_SERVER)
+            if response.status_code == 200:
+                data = response.json()
+                logger.debug(f"Successfully fetched quote: {data}")
+                return data
+            logger.error(f"Failed to fetch quote. Status code: {response.status_code}")
+            return {"q": "격언을 가져오는 데 실패했습니다.", "a": "알 수 없음"}
+    except Exception as e:
+        logger.error(f"Error in get_random_quote: {str(e)}")
         return {"q": "격언을 가져오는 데 실패했습니다.", "a": "알 수 없음"}
 
 # async def translate_quote(quote):
@@ -106,12 +113,14 @@ async def get_random_quote():
 #     return translated_text
 
 async def translate_quote(quote):
-    '''
-    deep-L 라이브러리를 사용하여 번역하는 함수
-    좀 더 자연어에 가까운 번역결과를 보여줌 
-    '''
-    translated_text = await asyncio.to_thread(GoogleTranslator(source='en', target='ko').translate, quote['q'])
-    return translated_text  # 번역된 텍스트 반환
+    try:
+        logger.debug(f"Attempting to translate quote: {quote['q']}")
+        translated_text = await asyncio.to_thread(GoogleTranslator(source='en', target='ko').translate, quote['q'])
+        logger.debug(f"Successfully translated quote: {translated_text}")
+        return translated_text
+    except Exception as e:
+        logger.error(f"Error in translate_quote: {str(e)}")
+        return "번역에 실패했습니다."
 
 def get_readme_content(path):
     readme_path = os.path.join(path, '.README')
@@ -199,24 +208,37 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None), s
                 continue
 
             # 랜덤한 격언 선택
-            quote_data = await get_random_quote()
-            # 격언 데이터 가져오기
-            quote_id = quote_data[0]['quote_id'] # 격언 ID
-            quote_content = quote_data[0]['q']  # 격언 내용
-            quote_author = quote_data[0]['a']    # 격언 저자
-            quote_like_count = quote_data[0]['like_count'] # 좋아요 수
-            translated_quote = await translate_quote(quote_data[0])  # 격언 번역
-            quote_message_data = {
-                'id': 'server', # from
-                'user_id': f'{user_id}', # to
-                'quote_id': f'{quote_id}',
-                'msg': f"명언: {quote_content}\n번역: {translated_quote}\n\n- {quote_author} -",
-                'like_count': f'{quote_like_count}',
-                'read': True
-            }
-            # 서버에서 격언 메시지 전송
-            mqtt_client.publish(mqtt_topic, json.dumps(quote_message_data))
-            logger.debug(f'Sent quote: {quote_message_data}')
+            try:
+                quote_data = await get_random_quote()
+                if not quote_data or not isinstance(quote_data, list) or len(quote_data) == 0:
+                    logger.error("Invalid quote data received")
+                    continue
+
+                # 격언 데이터 가져오기
+                quote_id = quote_data[0].get('quote_id', 'unknown') # 격언 ID
+                quote_content = quote_data[0].get('q', '')  # 격언 내용
+                quote_author = quote_data[0].get('a', '')    # 격언 저자
+                quote_like_count = quote_data[0].get('like_count', 0) # 좋아요 수
+
+                if not quote_content:
+                    logger.error("Empty quote content received")
+                    continue
+
+                translated_quote = await translate_quote(quote_data[0])
+                quote_message_data = {
+                    'id': 'server', # from
+                    'user_id': f'{user_id}', # to
+                    'quote_id': f'{quote_id}',
+                    'msg': f"명언: {quote_content}\n번역: {translated_quote}\n\n- {quote_author} -",
+                    'like_count': f'{quote_like_count}',
+                    'read': True
+                }
+                # 서버에서 격언 메시지 전송
+                mqtt_client.publish(mqtt_topic, json.dumps(quote_message_data))
+                logger.debug(f'Sent quote: {quote_message_data}')
+            except Exception as e:
+                logger.error(f"Error processing quote for user {user_id}: {str(e)}")
+                continue
     except WebSocketDisconnect:
         logger.error(f"User disconnected: {user_id}")
         del clients[user_id]  # 사용자 ID로 연결 제거

@@ -195,7 +195,12 @@ def main():
         # PostgreSQL에 저장
         try:
             import subprocess
-            subprocess.run(['python', 'save_to_db.py', output_file], check=True)
+            import os
+            # 현재 스크립트의 디렉토리 경로 가져오기
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            # save_to_db.py의 절대 경로 생성
+            save_to_db_path = os.path.join(current_dir, 'save_to_db.py')
+            subprocess.run(['python', save_to_db_path, output_file], check=True)
         except subprocess.CalledProcessError as e:
             print(f"데이터베이스 저장 중 오류: {str(e)}")
         except Exception as e:

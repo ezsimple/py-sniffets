@@ -186,10 +186,20 @@ def main():
         print("-" * 50)
     
     # JSON 파일로 저장
-    output_file = f"jobplanet_{query}.json"
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(companies, f, ensure_ascii=False, indent=2)
-    print(f"\n결과가 {output_file}에 저장되었습니다.")
+    if len(companies) > 0:
+        output_file = f"/tmp/jobplanet_{query}.json"
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(companies, f, ensure_ascii=False, indent=2)
+        print(f"\n결과가 {output_file}에 저장되었습니다.")
+        
+        # PostgreSQL에 저장
+        try:
+            import subprocess
+            subprocess.run(['python', 'save_to_db.py', output_file], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"데이터베이스 저장 중 오류: {str(e)}")
+        except Exception as e:
+            print(f"데이터베이스 저장 중 오류: {str(e)}")
 
 if __name__ == "__main__":
     main()

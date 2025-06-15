@@ -27,7 +27,7 @@ async def close_popup_with_esc(page, attempts=3):
                     bubbles: true
                 }));
             """)
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.3)
         except Exception as e:
             print(f"#ERROR# ESC 키 입력 중 오류: {str(e)}")
             continue
@@ -134,13 +134,16 @@ async def search_companies(query):
                             if rating_match:
                                 rating = rating_match.group(1)
                         
-                        # 회사명에 특수문자나 숫자가 포함된 경우 제외
-                        if re.search(r'[0-9+\-]', name):
-                            print(f"#WARN# 특수문자/숫자 포함된 회사명 제외: {name}")
+                        # 회사명에서 (주) 제거 및 트리밍
+                        clean_name = name.replace('(주)', '').strip()
+                        
+                        # 회사명에 특수문자가 포함된 경우 제외 (숫자는 허용)
+                        if re.search(r'[+\-]', clean_name):
+                            print(f"#WARN# 특수문자 포함된 회사명 제외: {clean_name}")
                             continue
                         
-                        # 중복 제거
-                        if not any(c['name'] == name for c in companies):
+                        # 중복 제거 (clean_name으로 비교)
+                        if not any(c['name'].replace('(주)', '').strip() == clean_name for c in companies):
                             companies.append({
                                 'name': name,
                                 'rating': rating

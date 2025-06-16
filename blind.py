@@ -239,10 +239,11 @@ async def search_companies(query):
                     # 자동완성 결과가 나타날 때까지 대기
                     try:
                         # 자동완성 드롭다운이 나타날 때까지 대기
-                        await page.wait_for_selector('xpath=//div[contains(@class, "search_result") or contains(@class, "search-results")]', timeout=5000)
-                        await asyncio.sleep(0.5)  # 결과 안정화 대기
+                        await page.wait_for_selector('div.auto_wp', timeout=5000)
+                        print("[DEBUG] 자동완성 드롭다운 감지됨")
+                        await asyncio.sleep(0.3)  # 결과 안정화 대기
                     except Exception as e:
-                        print(f"#WARN# 자동완성 결과 대기 중 타임아웃: {str(e)}")
+                        print(f"[DEBUG] 자동완성 드롭다운 대기 실패: {str(e)}")
                         continue
                 print("[5/7] 검색어 입력 완료")
                 
@@ -576,7 +577,7 @@ def main():
             # 현재 스크립트의 디렉토리 경로 가져오기
             current_dir = os.path.dirname(os.path.abspath(__file__))
             # save_to_db.py의 절대 경로 생성
-            save_to_db_path = os.path.join(current_dir, 'save_to_db.py')
+            save_to_db_path = os.path.join(current_dir, 'save_for_blind.py')
             subprocess.run(['python', save_to_db_path, output_file], check=True)
         except subprocess.CalledProcessError as e:
             print(f"#ERROR# 데이터베이스 저장 중 오류: {str(e)}")

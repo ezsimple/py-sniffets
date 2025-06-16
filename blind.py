@@ -149,30 +149,30 @@ async def search_companies(query):
             # 페이지 로드
             try:
                 # 기업 리뷰 페이지 로드
-                print("[2/7] 기업 리뷰 페이지 로딩 중...")
+                # print("[2/7] 기업 리뷰 페이지 로딩 중...")
                 response = await page.goto(search_url, wait_until='domcontentloaded', timeout=10000)
                 await asyncio.sleep(3)  # 페이지 로딩 대기
                 if not response:
                     print("#ERROR# 기업 리뷰 페이지 로드 실패")
                     await browser.close()
                     return []
-                print("[2/7] 기업 리뷰 페이지 로딩 완료")
+                # print("[2/7] 기업 리뷰 페이지 로딩 완료")
                 
                 # 페이지 로딩 완료 대기
-                print("[3/7] 페이지 안정화 대기 중...")
+                # print("[3/7] 페이지 안정화 대기 중...")
                 if not await wait_for_page_load(page):
                     print("#ERROR# 기업 리뷰 페이지 로딩 시간 초과")
                     await browser.close()
                     return []
-                print("[3/7] 페이지 안정화 완료")
+                # print("[3/7] 페이지 안정화 완료")
                 
                 # ESC 키로 팝업 닫기 시도
-                print("[4/7] 팝업 닫기 시도 중...")
+                # print("[4/7] 팝업 닫기 시도 중...")
                 await close_popup_with_esc(page)
-                print("[4/7] 팝업 닫기 완료")
+                # print("[4/7] 팝업 닫기 완료")
                 
                 # 검색창 찾기 및 검색어 입력
-                print("[5/7] 검색창 찾는 중...")
+                # print("[5/7] 검색창 찾는 중...")
                 search_input = await page.query_selector('xpath=/html/body/div/div/div/main/section/div/div[1]/div/div[1]/div/div/input')
                 if not search_input:
                     print("#ERROR# 검색창을 찾을 수 없습니다.")
@@ -185,7 +185,7 @@ async def search_companies(query):
                 await asyncio.sleep(0.5)
                 
                 # 검색어 입력 (키보드 이벤트로 한 글자씩 입력)
-                print("[5/7] 검색어 입력 중...")
+                # print("[5/7] 검색어 입력 중...")
                 
                 # tqdm 진행바 설정
                 pbar = tqdm(query, desc="검색어 입력", unit="글자")
@@ -252,7 +252,7 @@ async def search_companies(query):
                         pbar.set_postfix(status=f"자동완성 실패: {str(e)}")
                         continue
                 
-                print("[5/7] 검색어 입력 완료")
+                # print("[5/7] 검색어 입력 완료")
                 
                 # 최종 자동완성 결과 대기
                 print("[6/7] 최종 자동완성 결과 대기 중...")

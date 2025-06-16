@@ -263,7 +263,7 @@ async def search_companies(query):
                     await asyncio.sleep(1)  # 결과 안정화 대기
                 except Exception as e:
                     print("#ERROR# 자동완성 결과를 찾을 수 없습니다.")
-                    await pause()  # 디버깅을 위한 일시 정지
+                    # await pause()  # 디버깅을 위한 일시 정지
                     await browser.close()
                     return []
                 
@@ -380,7 +380,7 @@ async def search_companies(query):
                     name_element = await page.query_selector('xpath=/html/body/div/div/div/main/section/div/div/div[1]/header/div/div[1]/div[2]')
                     if not name_element:
                         print("#WARN# 회사명 요소를 찾을 수 없음")
-                        await pause()
+                        # await pause()
                         await browser.close()
                         return []
                         

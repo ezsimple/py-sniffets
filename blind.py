@@ -540,7 +540,7 @@ def format_summary(text: str) -> str:
 def main():
     """메인 함수"""
     if len(sys.argv) != 2:
-        print("사용법: python jpl.py <검색어>")
+        print("사용법: python blind.py <검색어>")
         sys.exit(1)
     
     query = sys.argv[1]

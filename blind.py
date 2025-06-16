@@ -14,6 +14,7 @@ from tqdm import tqdm
 import groq
 from typing import List, Dict
 from dotenv import load_dotenv
+from datetime import datetime
 
 # .env 파일 로드
 load_dotenv()
@@ -125,7 +126,7 @@ async def search_companies(query):
         async with async_playwright() as p:
             # 브라우저 설정
             browser = await p.chromium.launch(
-                headless=False,
+                headless=True,
                 args=['--disable-dev-shm-usage']
             )
             
@@ -175,8 +176,8 @@ async def search_companies(query):
                 search_input = await page.query_selector('xpath=/html/body/div/div/div/main/section/div/div[1]/div/div[1]/div/div/input')
                 if not search_input:
                     print("#ERROR# 검색창을 찾을 수 없습니다.")
-                    await browser.close()
-                    return []
+                    return False
+                
                 print(f"[5/7] 검색창 발견, 검색어 입력: {query}")
                 
                 # 검색창 클릭하여 포커스
@@ -185,7 +186,12 @@ async def search_companies(query):
                 
                 # 검색어 입력 (키보드 이벤트로 한 글자씩 입력)
                 print("[5/7] 검색어 입력 중...")
-                for char in query:
+                
+                # tqdm 진행바 설정
+                pbar = tqdm(query, desc="검색어 입력", unit="글자")
+                
+                for char in pbar:
+                    pbar.set_description(f"입력 중: {char}")
                     # 키보드 이벤트 발생
                     await page.evaluate(f'''
                         (char) => {{
@@ -240,11 +246,12 @@ async def search_companies(query):
                     try:
                         # 자동완성 드롭다운이 나타날 때까지 대기
                         await page.wait_for_selector('div.auto_wp', timeout=5000)
-                        print("[DEBUG] 자동완성 드롭다운 감지됨")
+                        pbar.set_postfix(status="자동완성 감지")
                         await asyncio.sleep(0.3)  # 결과 안정화 대기
                     except Exception as e:
-                        print(f"[DEBUG] 자동완성 드롭다운 대기 실패: {str(e)}")
+                        pbar.set_postfix(status=f"자동완성 실패: {str(e)}")
                         continue
+                
                 print("[5/7] 검색어 입력 완료")
                 
                 # 최종 자동완성 결과 대기

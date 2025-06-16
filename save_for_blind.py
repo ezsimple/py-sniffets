@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine, Column, String, Float, DateTime, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from urllib.parse import quote_plus
+from tqdm import tqdm
 
 # .env 파일 로드
 load_dotenv()
@@ -92,14 +93,16 @@ def save_companies_to_db(json_file):
         # 현재 시간
         now = datetime.now()
         
+        # tqdm 진행바 설정
+        pbar = tqdm(companies, desc="회사 정보 저장 중", unit="회사")
+        
         # 회사 정보 저장
-        for company in companies:
+        for company in pbar:
             try:
                 # 회사 정보 추출
-                # print(f"\n[DEBUG] 처리 중인 회사 정보: {json.dumps(company, ensure_ascii=False, indent=2)}")
-                # input()
-                
                 company_name = company['name']
+                pbar.set_description(f"처리 중: {company_name}")
+                
                 company_score = float(company['rating']) if company['rating'] != '정보 없음' else None
                 
                 # 회사 소개 정보 추출 및 포맷팅
@@ -126,13 +129,6 @@ def save_companies_to_db(json_file):
                 company_reviews = json.dumps(company.get('reviews', []), ensure_ascii=False)
                 company_review_summary = company.get('review_summary', '')
                 
-                # print(f"[DEBUG] 추출된 정보:")
-                # print(f"- 회사명: {company_name}")
-                # print(f"- 평점: {company_score}")
-                # print(f"- 소개: {company_info_str}")
-                # print(f"- 리뷰 수: {len(json.loads(company_reviews)) if company_reviews else 0}")
-                # print(f"- 요약: {company_review_summary[:100]}...")
-                
                 # 기존 회사 정보 조회
                 existing_company = session.query(MinoCompanyScoreOnBlind).filter_by(company_name=company_name).first()
                 
@@ -143,7 +139,7 @@ def save_companies_to_db(json_file):
                     existing_company.company_reviews = company_reviews
                     existing_company.company_review_summary = company_review_summary
                     existing_company.mod_at = now
-                    print(f"[INFO] 회사 정보 업데이트: {company_name}")
+                    pbar.set_postfix(status="업데이트")
                 else:
                     # 새로운 회사 정보 추가
                     new_company = MinoCompanyScoreOnBlind(
@@ -156,18 +152,18 @@ def save_companies_to_db(json_file):
                         mod_at=now
                     )
                     session.add(new_company)
-                    print(f"[INFO] 새로운 회사 정보 추가: {company_name}")
+                    pbar.set_postfix(status="추가")
                 
             except Exception as e:
-                print(f"[ERROR] 회사 정보 저장 중 오류 ({company_name}): {str(e)}")
+                pbar.set_postfix(status=f"오류: {str(e)}")
                 continue
         
         # 변경사항 저장
         session.commit()
-        print("\n[INFO] 모든 회사 정보가 데이터베이스에 저장되었습니다.")
+        print("\n[완료] 모든 회사 정보가 데이터베이스에 저장되었습니다.")
         
     except Exception as e:
-        print(f"[ERROR] 데이터베이스 저장 중 오류: {str(e)}")
+        print(f"\n[오류] 데이터베이스 저장 중 오류: {str(e)}")
         if session:
             session.rollback()
     

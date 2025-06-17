@@ -8,6 +8,7 @@ fake_useragent==1.5.1
 fastapi==0.115.6
 Flask==3.1.0
 googletrans
+git+https://github.com/ssut/py-hanspell.git
 kakaotrans==0.1.2
 lxml==5.1.0
 matplotlib==3.10.0

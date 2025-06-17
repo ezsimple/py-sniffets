@@ -15,9 +15,15 @@ import groq
 from typing import List, Dict
 from dotenv import load_dotenv
 from datetime import datetime
+from hanspell import spell_checker
+import logging
 
 # .env 파일 로드
 load_dotenv()
+
+# 로깅 설정
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 async def pause():
     """디버깅을 위한 일시 정지"""
@@ -55,6 +61,41 @@ async def wait_for_page_load(page, timeout=10):
     except Exception as e:
         print(f"#ERROR# 페이지 로딩 대기 중 오류: {str(e)}")
         return False
+
+def convert_hanja_to_hangul(text: str) -> str:
+    """
+    한자가 포함된 텍스트를 한글로 변환합니다.
+    
+    Args:
+        text (str): 변환할 텍스트
+        
+    Returns:
+        str: 한글로 변환된 텍스트
+    """
+    # 한자 패턴 (CJK Unified Ideographs)
+    hanja_pattern = re.compile(r'[\u4E00-\u9FFF]')
+    
+    # 한자가 없는 경우 바로 반환
+    if not hanja_pattern.search(text):
+        logger.debug(f"한자가 없는 텍스트입니다: {text[:100]}...")
+        return text
+        
+    try:
+        logger.info(f"한자-한글 변환 시작: {text[:100]}...")
+        
+        # hanspell을 사용하여 맞춤법 검사 및 한자 변환
+        result = spell_checker.check(text)
+        converted_text = result.checked
+        hanja_count = len(hanja_pattern.findall(text))
+                
+        logger.info(f"한자-한글 변환 완료: {hanja_count}개의 한자 변환됨")
+        logger.debug(f"변환 결과: {converted_text[:100]}...")
+        
+        return converted_text
+    except Exception as e:
+        logger.error(f"한자 변환 중 오류 발생: {str(e)}")
+        logger.error(f"변환 실패한 텍스트: {text[:100]}...")
+        return text
 
 async def summarize_reviews(reviews: List[str], company_name: str) -> str:
     """GROQ를 사용하여 리뷰 요약"""
@@ -108,7 +149,12 @@ async def summarize_reviews(reviews: List[str], company_name: str) -> str:
         
         summary = completion.choices[0].message.content
         print(f"[DEBUG] 요약 생성 완료 (길이: {len(summary)} 문자)")
-        return summary
+        
+        # 한자-한글 변환
+        converted_summary = convert_hanja_to_hangul(summary)
+        print(f"[DEBUG] 한자-한글 변환 완료 (길이: {len(converted_summary)} 문자)")
+        
+        return converted_summary
         
     except groq.GroqError as e:
         print(f"#ERROR# GROQ API 오류 발생: {str(e)}")

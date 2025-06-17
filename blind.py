@@ -586,6 +586,46 @@ def format_summary(text: str) -> str:
     
     return '\n'.join(formatted_sections)
 
+def run_jobplanet_search(query: str) -> None:
+    """
+    jobplanet 검색을 실행합니다.
+    
+    Args:
+        query (str): 검색할 회사명
+    """
+    try:
+        print("\njobplanet 검색을 시작합니다...")
+        # 현재 스크립트의 디렉토리 경로 가져오기
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # jpl.py의 절대 경로 생성
+        jpl_path = os.path.join(current_dir, 'jpl.py')
+        
+        # subprocess로 jpl.py 실행
+        result = subprocess.run(['python', jpl_path, query], 
+                             capture_output=True, 
+                             text=True, 
+                             check=True)
+        
+        # 결과 출력
+        if result.stdout:
+            print("\njobplanet 검색 결과:")
+            print(result.stdout)
+        
+        if result.stderr:
+            print("\njobplanet 검색 중 오류 발생:")
+            print(result.stderr)
+            
+    except subprocess.CalledProcessError as e:
+        print(f"\n#ERROR# jobplanet 검색 중 오류 발생: {str(e)}")
+        if e.stdout:
+            print("출력:")
+            print(e.stdout)
+        if e.stderr:
+            print("오류:")
+            print(e.stderr)
+    except Exception as e:
+        print(f"\n#ERROR# jobplanet 검색 중 오류 발생: {str(e)}")
+
 def main():
     """메인 함수"""
     if len(sys.argv) != 2:
@@ -599,7 +639,8 @@ def main():
     companies = asyncio.run(search_companies(query))
     
     if not companies:
-        print("검색 결과가 없습니다.")
+        print("blind 검색 결과가 없습니다.")
+        run_jobplanet_search(query)
         sys.exit(1)
     
     # 결과 출력

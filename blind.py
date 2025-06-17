@@ -23,7 +23,10 @@ load_dotenv()
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
+logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
+
+# httpx 로깅 레벨 설정
 
 async def pause():
     """디버깅을 위한 일시 정지"""
@@ -291,12 +294,12 @@ async def search_companies(query):
                     # 자동완성 결과가 나타날 때까지 대기
                     try:
                         # 자동완성 드롭다운이 나타날 때까지 대기
-                        await page.wait_for_selector('div.auto_wp', timeout=5000)
+                        await page.wait_for_selector('div.auto_wp', timeout=3000)
                         pbar.set_postfix(status="자동완성 감지")
-                        await asyncio.sleep(0.3)  # 결과 안정화 대기
+                        await asyncio.sleep(0.2)  # 결과 안정화 대기
                     except Exception as e:
                         pbar.set_postfix(status=f"자동완성 실패: {str(e)}")
-                        continue
+                        break
                 
                 # print("[5/7] 검색어 입력 완료")
                 

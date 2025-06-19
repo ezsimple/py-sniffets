@@ -665,7 +665,7 @@ def main():
         sys.exit(1)
     
     query = ''.join(sys.argv[1:])
-    # print(f"검색어: {query}")
+    print(f"검색어: {query}")
     
     # 비동기 함수 실행
     companies = asyncio.run(search_companies(query))

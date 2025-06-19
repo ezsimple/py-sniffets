@@ -65,7 +65,7 @@ async def wait_for_page_load(page, timeout=10):
         print(f"#ERROR# 페이지 로딩 대기 중 오류: {str(e)}")
         return False
 
-def convert_hanja_to_hangul(text: str) -> str:
+async def convert_hanja_to_hangul(text: str) -> str:
     """
     한자가 포함된 텍스트를 한글로 변환합니다.
     
@@ -94,6 +94,10 @@ def convert_hanja_to_hangul(text: str) -> str:
         logger.info(f"한자-한글 변환 완료: {hanja_count}개의 한자 변환됨")
         logger.debug(f"변환 결과: {converted_text[:100]}...")
         
+        # 빈 문자열 반환 방지: 변환 결과가 없으면 원본 반환
+        if not converted_text.strip():
+            logger.warning("한자 변환 결과가 빈 문자열입니다. 원본 텍스트를 반환합니다.")
+            return text
         return converted_text
     except Exception as e:
         logger.error(f"한자 변환 중 오류 발생: {str(e)}")
@@ -154,7 +158,7 @@ async def summarize_reviews(reviews: List[str], company_name: str) -> str:
         print(f"[DEBUG] 요약 생성 완료 (길이: {len(summary)} 문자)")
         
         # 한자-한글 변환
-        converted_summary = convert_hanja_to_hangul(summary)
+        converted_summary = await convert_hanja_to_hangul(summary)
         print(f"[DEBUG] 한자-한글 변환 완료 (길이: {len(converted_summary)} 문자)")
         
         return converted_summary

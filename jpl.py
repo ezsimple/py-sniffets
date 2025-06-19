@@ -15,7 +15,7 @@ from tqdm import tqdm
 async def close_popup_with_esc(page, attempts=3):
     """ESC 키를 사용하여 팝업 닫기 시도"""
     # print("ESC 키로 팝업 닫기 시도 중...")
-    for i in tqdm(range(attempts), desc="팝업 닫기"):
+    for i in tqdm(range(attempts), desc="팝업 닫기", disable=not sys.stdout.isatty()):
         try:
             # 키보드 이벤트를 직접 발생시킴
             await page.evaluate("""
@@ -108,7 +108,7 @@ async def search_companies(query):
                 # 회사 정보 추출
                 companies = []
                 
-                for element in tqdm(company_elements, desc="회사 정보 추출"):
+                for element in tqdm(company_elements, desc="회사 정보 추출", disable=not sys.stdout.isatty()):
                     try:
                         # 회사명 찾기 (정확한 XPath 사용)
                         name_element = await element.query_selector('xpath=./div/div[1]/div[2]/div/h4')

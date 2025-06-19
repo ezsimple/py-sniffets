@@ -664,7 +664,7 @@ def main():
         print("사용법: python blind.py <검색어>")
         sys.exit(1)
     
-    query = sys.argv[1]
+    query = ''.join(sys.argv[1:])
     # print(f"검색어: {query}")
     
     # 비동기 함수 실행

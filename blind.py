@@ -17,6 +17,8 @@ from dotenv import load_dotenv
 from datetime import datetime
 from hanspell import spell_checker
 import logging
+import hanja
+import jaconv
 
 # .env 파일 로드
 load_dotenv()
@@ -65,6 +67,31 @@ async def wait_for_page_load(page, timeout=10):
         print(f"#ERROR# 페이지 로딩 대기 중 오류: {str(e)}")
         return False
 
+# 가타카나 → 한글 매핑 (대표적인 외래어 예시)
+def roman_to_hangul(roman):
+    mapping = {
+        'sutairu': '스타일',
+        'konpyu-ta-': '컴퓨터',
+        'terebi': '텔레비전',
+        'kamera': '카메라',
+        # 필요한 단어 추가
+    }
+    return mapping.get(roman, roman)
+
+# 가타카나 → 한글 변환 함수
+def katakana_to_hangul(text):
+    hira = jaconv.kata2hira(text)
+    roman = jaconv.hira2roma(hira)
+    hangul = roman_to_hangul(roman)
+    return hangul
+
+# 전체 텍스트에서 가타카나를 한글로 변환
+def convert_katakana_in_text(text):
+    katakana_pattern = re.compile(r'[\u30A0-\u30FF]+')
+    def repl(match):
+        return katakana_to_hangul(match.group(0))
+    return katakana_pattern.sub(repl, text)
+
 async def convert_hanja_to_hangul(text: str) -> str:
     """
     한자가 포함된 텍스트를 한글로 변환합니다.
@@ -85,19 +112,20 @@ async def convert_hanja_to_hangul(text: str) -> str:
         
     try:
         logger.info(f"한자-한글 변환 시작: {text[:100]}...")
-        
         # hanspell을 사용하여 맞춤법 검사 및 한자 변환
         result = spell_checker.check(text)
         converted_text = result.checked
         hanja_count = len(hanja_pattern.findall(text))
-                
         logger.info(f"한자-한글 변환 완료: {hanja_count}개의 한자 변환됨")
         logger.debug(f"변환 결과: {converted_text[:100]}...")
-        
         # 빈 문자열 반환 방지: 변환 결과가 없으면 원본 반환
         if not converted_text.strip():
             logger.warning("한자 변환 결과가 빈 문자열입니다. 원본 텍스트를 반환합니다.")
-            return text
+            converted_text = text
+        # python-hanja로 한자 자동 변환 (substitution)
+        converted_text = hanja.translate(converted_text, 'substitution')
+        # 가타카나 → 한글 자동 변환
+        converted_text = convert_katakana_in_text(converted_text)
         return converted_text
     except Exception as e:
         logger.error(f"한자 변환 중 오류 발생: {str(e)}")

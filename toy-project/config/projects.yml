@@ -36,7 +36,7 @@ personal_projects:
     url: 'https://a1.mkeasy.kro.kr/calendar'
 
   - title: 'AI 성경 RAG기반 챗봇'
-    description: '성경 31,091개 구절을 임베딩 시킨 ElasticSearch(vectorStore)와 LLM(AI)을 RAG기반으로 연계한 서비스, 출처 지원'
+    description: '성경 31,091개 구절을 임베딩 시킨 elasticSearch와 LLM(AI)을, RAG기반으로 연계한 서비스, 출처 지원, 이전 대화 (30일치) 지원, 고속 임베딩(re-index) 처리'
     tech: 'FastAPI, Elasticsearch(vectorstore), ORM(chatting), Jinja2, LangChain, HuggingFace, RAG, nori_tokenizer, konlpy(okt), React, vite, TypeScript, tailwindcss'
     image: 'image/bible-rag-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/rag2/'

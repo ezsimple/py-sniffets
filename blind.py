@@ -660,7 +660,7 @@ def run_jobplanet_search(query: str) -> None:
 
 def main():
     """메인 함수"""
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2:
         print("사용법: python blind.py <검색어>")
         sys.exit(1)
     

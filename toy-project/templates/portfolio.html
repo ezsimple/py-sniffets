@@ -11,7 +11,7 @@
 </head>
 <body>
     <header>
-        <h1>Portfolio
+        <h1>Minho's Portfolio
             <a href="/portfolio">
                 <p class="description link">Springboot, Python 웹 전문가 ▷</p>
             </a>
@@ -24,13 +24,13 @@
     </header>
     <div class="main-content">
         <div class="container-fluid py-5" style="display:flex; flex-direction:column; align-items:center;">
-            <h2 class="section-title mb-4">포트폴리오</h2>
             <div class="row g-4 mb-5" style="width:100%;">
+                <h2 class="section-title mb-4">포트폴리오</h2>
                 {% for p in portfolios %}
                 <div class="col-12" style="display:flex; justify-content:center;">
                     <div class="card h-100 portfolio-card" style="width:1000px; max-width:100vw;">
                         <div class="card-header bg-white border-0">
-                            <h5 class="card-title mt-2">{{ p.title }}</h5>
+                            <h5 class="card-title mt-2 mb-2">{{ p.title }}</h5>
                             <div id="carousel-{{ loop.index }}" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false">
                                 <div class="carousel-inner">
                                     {% for img in p.images %}
@@ -63,8 +63,8 @@
                 {% endfor %}
             </div>
 
-            <h2 class="section-title mb-4" style="margin-top: 80px;">스킬트리</h2>
             <div class="row g-4 mb-5" style="width:100%;">
+            <h2 class="section-title mb-4" style="margin-top: 80px;">스킬트리</h2>
                 <div class="skill-tree">
                     <img src="{{ url_for('static', filename='image/skill_tree.png') }}" alt="스킬트리" class="skill-tree">
                 </div>
@@ -77,6 +77,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        document.body.style.display = '';
         document.querySelectorAll('.carousel').forEach(function(carousel) {
             var bsCarousel = bootstrap.Carousel.getOrCreateInstance(carousel, { interval: false, ride: false, pause: false, wrap: true });
             bsCarousel.pause();

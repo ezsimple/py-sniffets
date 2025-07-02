@@ -65,8 +65,8 @@ portfolios:
     url: 'https://a1.mkeasy.kro.kr/v1'
     time: '1s'
     images:
-      - 'image/portfolio/fileserver/fileserver_01.jpg'
       - 'image/portfolio/fileserver/fileserver_02.jpg'
+      - 'image/portfolio/fileserver/fileserver_01.jpg'
 
   - title: '명언 카드'
     description: '명언({count_quotes}개) API 서버 구현 및 연동, 한글 해석, 공유기능, 명언 크롤링, 카카오 링크 클릭시 타사 브라우져 전환 기능, 반응형'
@@ -90,9 +90,9 @@ portfolios:
     url: 'https://a1.mkeasy.kro.kr/erp'
     time: '1s'
     images:
-      - 'image/portfolio/erp_ui/erp_00.jpg'
       - 'image/portfolio/erp_ui/erp_01.jpg'
       - 'image/portfolio/erp_ui/erp_02.jpg'
+      - 'image/portfolio/erp_ui/erp_00.jpg'
 
   - title: '달력 한장'
     description: '출력용 일년치 달력 (한국 휴일 표시)'

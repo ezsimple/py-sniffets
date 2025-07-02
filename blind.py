@@ -685,7 +685,7 @@ def main():
         print(company['company_info'])
         print("-" * 50)
         
-        print("\n리뷰 요약:")
+        print(f"\n리뷰 요약: 평점: {company['rating']}")
         print("=" * 50)
         if company['review_summary']:
             print(format_summary(company['review_summary']))

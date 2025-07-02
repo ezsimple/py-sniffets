@@ -66,3 +66,29 @@
     margin: 0 auto;
     display: block;
 }
+.section-title {
+    color: #fff;
+    padding: 16px 32px;
+    border-radius: 0.5rem;
+    margin-bottom: 30px;
+    font-size: 1.4rem;
+    width: auto;
+    margin-left: 0;
+    margin-right: auto;
+    text-align: left;
+}
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #23292d;
+    letter-spacing: -1px;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    line-height: 1.2;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border-left: 6px solid #007bff;
+    padding-left: 16px;
+    /* background: linear-gradient(90deg, #f8f9fa 80%, #e3f0ff 100%); */
+    border-radius: 0.25rem;
+    display: inline-block;
+}

@@ -1,0 +1,87 @@
+{% set static = url_for('static', filename='') %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>minho's portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/card.css') }}?_={{ time }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/portfolio.css') }}?_={{ time }}">
+</head>
+<body>
+    <header>
+        <h1>Portfolio
+            <a href="/portfolio">
+                <p class="description link">Springboot, Python 웹 전문가 ▷</p>
+            </a>
+        </h1>
+        <a href="/portfolio">
+            <img src="{{ url_for('static', filename='image/profile-thumbnail.png') }}" 
+                 alt="프로필 이미지" 
+                 class="profile-image">
+        </a>
+    </header>
+    <div class="main-content">
+        <div class="container-fluid py-5" style="display:flex; flex-direction:column; align-items:center;">
+            <h2 class="section-title mb-4">포트폴리오</h2>
+            <div class="row g-4 mb-5" style="width:100%;">
+                {% for p in portfolios %}
+                <div class="col-12" style="display:flex; justify-content:center;">
+                    <div class="card h-100 portfolio-card" style="width:1000px; max-width:100vw;">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="card-title mt-2">{{ p.title }}</h5>
+                            <div id="carousel-{{ loop.index }}" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false">
+                                <div class="carousel-inner">
+                                    {% for img in p.images %}
+                                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                        <div class="portfolio-img-container">
+                                            <img src="{{ url_for('static', filename=img) }}" class="portfolio-img" alt="{{ p.title }} 이미지 {{ loop.index }}">
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% if p.images|length > 1 %}
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ loop.index }}" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">이전</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ loop.index }}" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">다음</span>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="portfolio-info">
+                            <p class="text-success">설명 : {{ p.description }}</p>
+                            <p class="text-success">사용기술: {{ p.tech }}</p>
+                            <a href="{{ p.url }}" class="btn btn-primary w-100" target="_blank">바로가기</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <h2 class="section-title mb-4" style="margin-top: 80px;">스킬트리</h2>
+            <div class="row g-4 mb-5" style="width:100%;">
+                <div class="skill-tree">
+                    <img src="{{ url_for('static', filename='image/skill_tree.png') }}" alt="스킬트리" class="skill-tree">
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <a href="mailto:minho0883.lee@gmail.com">@minho0883.lee</a>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.carousel').forEach(function(carousel) {
+            var bsCarousel = bootstrap.Carousel.getOrCreateInstance(carousel, { interval: false, ride: false, pause: false, wrap: true });
+            bsCarousel.pause();
+        });
+    });
+    </script>
+</body>
+</html> 

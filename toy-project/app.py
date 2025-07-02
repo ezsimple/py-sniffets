@@ -4,6 +4,25 @@ import os  # 운영 체제와 상호작용하기 위해 os 모듈을 임포트�
 import requests  # HTTP 요청을 보내기 위해 requests 모듈을 임포트합니다.
 import time  # 현재 시간을 가져오기 위해 time 모듈을 임포트합니다.
 
+def load_portfolios():
+    """
+    config/portfolio.yml 을 로드해서 포트폴리오 관련 데이터를 반환한다.
+    파일이 없거나 파싱에 실패할 경우 기본값을 반환한다.
+    """
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    yaml_path = os.path.join(current_dir, 'config', 'portfolio.yml')
+
+    try:
+        with open(yaml_path, 'r', encoding='utf-8') as file:
+            portfolios = yaml.safe_load(file)
+        return portfolios
+    except FileNotFoundError:
+        print(f"Error: portfolio.yml file not found at {yaml_path}")
+        return {"portfolios": []}
+    except yaml.YAMLError as e:
+        print(f"Error parsing YAML file: {e}")
+        return {"portfolios": []}
+
 def load_projects():
     """
     config 디렉토리 내의 projects.yml 파일을 로드하여 프로젝트 데이터를 반환합니다.
@@ -105,6 +124,24 @@ def create_app():
                              personal_projects=projects_data['personal_projects'],
                              participated_projects=projects_data['participated_projects'],
                              time=int(time.time()))
+
+    @app.route('/portfolio')
+    def portfolio():
+        """
+        포트폴리오 데이터를 로드하여 템플릿에 전달하는 엔드포인트입니다.
+        """
+        portfolios_data = load_portfolios()
+        count_weather_data = get_past_weather_count()  # 과거 날씨 데이터의 총 개수를 가져옵니다.
+        count_quotes = get_quotes_count()  # 명언 데이터의 총 개수를 가져옵니다.
+        # description 변수 치환
+        for p in portfolios_data.get('portfolios', []):
+            if 'description' in p:
+                p['description'] = p['description'].format(count_weather_data=count_weather_data, count_quotes=count_quotes)
+        return render_template('portfolio.html', 
+                            portfolios=portfolios_data.get('portfolios', []), 
+                            count_weather_data=count_weather_data,
+                            count_quotes=count_quotes,
+                            time=int(time.time()))
 
     return app  # 생성된 Flask 애플리케이션 인스턴스를 반환합니다.
 

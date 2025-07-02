@@ -47,6 +47,7 @@ portfolios:
     url: 'https://a1.mkeasy.kro.kr/hr_list'
     time: '1s'
     images: 
+      - 'image/portfolio/recruite/월별 고용 성장율.jpg'
       - 'image/portfolio/recruite/월별 입사자수.jpg'
       - 'image/portfolio/recruite/전체 입사자수 .vs. 퇴사자수.jpg'
       - 'image/portfolio/recruite/월별 퇴사자수.jpg'
@@ -55,7 +56,6 @@ portfolios:
       - 'image/portfolio/recruite/전체 입사율, 퇴사율.jpg'
       - 'image/portfolio/recruite/직급별 바로 퇴사자수.jpg'
       - 'image/portfolio/recruite/부서별 입사자수 .vs. 퇴사자수.jpg'
-      - 'image/portfolio/recruite/월별 고용 성장율.jpg'
       - 'image/portfolio/recruite/인력 변경율, 채용 성공율.jpg'
       - 'image/portfolio/recruite/부서별 바로 퇴사자수.jpg'
 

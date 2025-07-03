@@ -1,0 +1,5 @@
+2024-12-12 22:48:36,246 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/da15ed01-b43b-4971-99b3-c9409ae736f2
+2024-12-12 22:48:36,248 - DEBUG - logger - app.py - line:163 - User connected: da15ed01-b43b-4971-99b3-c9409ae736f2
+2024-12-12 22:48:36,266 - DEBUG - logger - app.py - line:177 - Received message from da15ed01-b43b-4971-99b3-c9409ae736f2: {"MAX_ROW":3,"liCount":"0"}
+2024-12-12 22:48:36,610 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': 'da15ed01-b43b-4971-99b3-c9409ae736f2', 'quote_id': '1126', 'msg': '명언: Life without love is like a tree without blossoms or fruit.\n번역: 사랑이 없는 삶은 꽃도 열매도 없는 나무와 같습니다.\n\n- Kahlil Gibran -', 'like_count': '0', 'read': True}
+2024-12-12 22:48:38,149 - ERROR - logger - app.py - line:217 - User disconnected: da15ed01-b43b-4971-99b3-c9409ae736f2

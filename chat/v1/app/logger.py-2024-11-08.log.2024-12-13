@@ -1,0 +1,14 @@
+2024-12-13 22:06:33,246 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/da15ed01-b43b-4971-99b3-c9409ae736f2
+2024-12-13 22:06:33,248 - DEBUG - logger - app.py - line:163 - User connected: da15ed01-b43b-4971-99b3-c9409ae736f2
+2024-12-13 22:06:33,261 - DEBUG - logger - app.py - line:177 - Received message from da15ed01-b43b-4971-99b3-c9409ae736f2: {"MAX_ROW":3,"liCount":"0"}
+2024-12-13 22:06:34,654 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': 'da15ed01-b43b-4971-99b3-c9409ae736f2', 'quote_id': '543', 'msg': "명언: To live fully is to be always in no-man's-land, to experience each moment as completely new and fresh.\n번역: 충만하게 사는 것은 항상 무인지대에 있는 것이고, 매 순간을 완전히 새롭고 신선하게 경험하는 것입니다.\n\n- Pema Chodron -", 'like_count': '0', 'read': True}
+2024-12-13 22:06:38,408 - ERROR - logger - app.py - line:217 - User disconnected: da15ed01-b43b-4971-99b3-c9409ae736f2
+2024-12-13 23:41:19,331 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/394717a6-b75b-44a1-a556-10eb321cbc0f
+2024-12-13 23:41:19,333 - DEBUG - logger - app.py - line:163 - User connected: 394717a6-b75b-44a1-a556-10eb321cbc0f
+2024-12-13 23:41:19,380 - DEBUG - logger - app.py - line:177 - Received message from 394717a6-b75b-44a1-a556-10eb321cbc0f: {"MAX_ROW":3,"liCount":"0"}
+2024-12-13 23:41:20,113 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '394717a6-b75b-44a1-a556-10eb321cbc0f', 'quote_id': '8528', 'msg': '명언: Death is as sure for that which is born, as birth is for that which is dead. Therefore grieve not for what is inevitable.\n번역: 죽음은 태어난 자에게는 확실한 것이고, 태어난 자에게는 죽은 자에게는 확실한 것입니다. 그러므로 피할 수 없는 일에 대해 슬퍼하지 마십시오.\n\n- Bhagavad Gita -', 'like_count': '0', 'read': True}
+2024-12-13 23:41:44,489 - DEBUG - logger - app.py - line:177 - Received message from 394717a6-b75b-44a1-a556-10eb321cbc0f: {"MAX_ROW":3,"liCount":"1"}
+2024-12-13 23:41:45,690 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '394717a6-b75b-44a1-a556-10eb321cbc0f', 'quote_id': '4957', 'msg': '명언: The more you give, the more comes back to you.\n번역: 당신이 더 많이 줄수록, 더 많은 것이 당신에게 돌아옵니다.\n\n- Napoleon Hill -', 'like_count': '0', 'read': True}
+2024-12-13 23:41:53,767 - DEBUG - logger - app.py - line:177 - Received message from 394717a6-b75b-44a1-a556-10eb321cbc0f: {"MAX_ROW":3,"liCount":"2"}
+2024-12-13 23:41:55,164 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '394717a6-b75b-44a1-a556-10eb321cbc0f', 'quote_id': '1114', 'msg': '명언: No duty is more urgent than that of returning thanks.\n번역: 감사를 드리는 것보다 더 시급한 의무는 없습니다.\n\n- James Allen -', 'like_count': '0', 'read': True}
+2024-12-13 23:42:03,936 - ERROR - logger - app.py - line:217 - User disconnected: 394717a6-b75b-44a1-a556-10eb321cbc0f

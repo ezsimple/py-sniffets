@@ -1,0 +1,6 @@
+2024-12-16 22:43:03,198 - INFO - logger - app.py - line:53 - WS_SERVER : wss://a1.mkeasy.kro.kr/chat/ws
+2024-12-16 23:24:28,017 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/c354a68b-89f0-45e9-863d-ad7a5df1acd0
+2024-12-16 23:24:28,017 - DEBUG - logger - app.py - line:167 - User connected: c354a68b-89f0-45e9-863d-ad7a5df1acd0
+2024-12-16 23:24:28,033 - DEBUG - logger - app.py - line:181 - Received message from c354a68b-89f0-45e9-863d-ad7a5df1acd0: {"MAX_ROW":3,"liCount":"0"}
+2024-12-16 23:24:28,880 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': 'c354a68b-89f0-45e9-863d-ad7a5df1acd0', 'quote_id': '1355', 'msg': "명언: Don't allow your mind to tell your heart what to do. The mind gives up easily.\n번역: 마음이 당신의 가슴에 무엇을 해야 할지 말하도록 내버려 두지 마세요. 마음은 쉽게 포기합니다.\n\n- Paulo Coelho -", 'like_count': '0', 'read': True}
+2024-12-16 23:24:34,059 - ERROR - logger - app.py - line:221 - User disconnected: c354a68b-89f0-45e9-863d-ad7a5df1acd0

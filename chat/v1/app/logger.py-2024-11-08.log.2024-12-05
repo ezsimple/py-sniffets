@@ -1,0 +1,60 @@
+2024-12-05 00:29:17,228 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-05 00:29:17,230 - DEBUG - logger - app.py - line:163 - User connected: 0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-05 00:29:17,247 - DEBUG - logger - app.py - line:177 - Received message from 0e4c470e-5e4c-470c-b61c-3818b805e709: {"MAX_ROW":3,"liCount":"0"}
+2024-12-05 00:29:17,547 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '0e4c470e-5e4c-470c-b61c-3818b805e709', 'quote_id': '7818', 'msg': '명언: Presents are made for the pleasure of who gives them, not the merits of who receives them.\n번역: 선물은 받는 사람의 공로가 아닌 주는 사람의 기쁨을 위해 만들어집니다.\n\n- Carlos Ruiz Zafon -', 'like_count': '0', 'read': True}
+2024-12-05 00:29:38,487 - ERROR - logger - app.py - line:217 - User disconnected: 0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-05 10:11:48,052 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 10:11:48,052 - DEBUG - logger - app.py - line:163 - User connected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 10:11:48,113 - DEBUG - logger - app.py - line:177 - Received message from 062a8ff2-b754-4d58-ac43-e875dcb6349a: {"MAX_ROW":3,"liCount":"0"}
+2024-12-05 10:11:48,452 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '062a8ff2-b754-4d58-ac43-e875dcb6349a', 'quote_id': '944', 'msg': "명언: You just can't beat the person who never gives up. \n번역: 절대 포기하지 않는 사람을 이길 수는 없습니다.\n\n- Babe Ruth -", 'like_count': '0', 'read': True}
+2024-12-05 10:12:34,967 - ERROR - logger - app.py - line:217 - User disconnected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 10:12:44,722 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 10:12:44,723 - DEBUG - logger - app.py - line:163 - User connected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 10:12:44,771 - DEBUG - logger - app.py - line:177 - Received message from 062a8ff2-b754-4d58-ac43-e875dcb6349a: {"MAX_ROW":3,"liCount":"0"}
+2024-12-05 10:12:45,056 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '062a8ff2-b754-4d58-ac43-e875dcb6349a', 'quote_id': '658', 'msg': '명언: Until you make the unconscious conscious, it will direct your life and you will call it fate.\n번역: 무의식을 의식화할 때까지 무의식이 당신의 삶을 지배하게 되고, 당신은 그것을 운명이라고 부르게 될 것입니다.\n\n- Carl Jung -', 'like_count': '0', 'read': True}
+2024-12-05 10:13:25,582 - ERROR - logger - app.py - line:217 - User disconnected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 15:21:42,580 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 15:21:42,581 - DEBUG - logger - app.py - line:163 - User connected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 15:21:42,632 - DEBUG - logger - app.py - line:177 - Received message from 062a8ff2-b754-4d58-ac43-e875dcb6349a: {"MAX_ROW":3,"liCount":"0"}
+2024-12-05 15:21:43,167 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '062a8ff2-b754-4d58-ac43-e875dcb6349a', 'quote_id': '4259', 'msg': "명언: Think how really precious is the time you have to spend, whether it's at work or with your family. Every minute should be enjoyed and savored.\n번역: 직장에서든 가족과 함께든, 당신이 보낼 수 있는 시간이 얼마나 소중한지 생각해보세요. 매 순간을 즐기고 음미해야 합니다.\n\n- Earl Nightingale -", 'like_count': '0', 'read': True}
+2024-12-05 15:23:07,524 - ERROR - logger - app.py - line:217 - User disconnected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 15:24:15,712 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-05 15:24:15,712 - DEBUG - logger - app.py - line:163 - User connected: 0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-05 15:24:15,727 - DEBUG - logger - app.py - line:177 - Received message from 0e4c470e-5e4c-470c-b61c-3818b805e709: {"MAX_ROW":3,"liCount":"0"}
+2024-12-05 15:24:16,282 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '0e4c470e-5e4c-470c-b61c-3818b805e709', 'quote_id': '6854', 'msg': '명언: Being wrong opens us up to the possibility of change.\n번역: 틀렸다는 것은 우리에게 변화의 가능성을 열어준다.\n\n- Mark Manson -', 'like_count': '0', 'read': True}
+2024-12-05 15:27:15,011 - ERROR - logger - app.py - line:217 - User disconnected: 0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-05 15:33:14,024 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 15:33:14,025 - DEBUG - logger - app.py - line:163 - User connected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 15:33:14,073 - DEBUG - logger - app.py - line:177 - Received message from 062a8ff2-b754-4d58-ac43-e875dcb6349a: {"MAX_ROW":3,"liCount":"1"}
+2024-12-05 15:33:14,393 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '062a8ff2-b754-4d58-ac43-e875dcb6349a', 'quote_id': '3853', 'msg': '명언: The meaning of life is to find your gift. The purpose of life is to give it away.\n번역: 삶의 의미는 당신의 선물을 찾는 것입니다. 삶의 목적은 그것을 주는 것입니다.\n\n- Pablo Picasso -', 'like_count': '0', 'read': True}
+2024-12-05 15:33:27,847 - ERROR - logger - app.py - line:217 - User disconnected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 19:50:16,019 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 19:50:16,020 - DEBUG - logger - app.py - line:163 - User connected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 19:50:16,045 - DEBUG - logger - app.py - line:177 - Received message from 062a8ff2-b754-4d58-ac43-e875dcb6349a: {"MAX_ROW":3,"liCount":"0"}
+2024-12-05 19:50:16,819 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '062a8ff2-b754-4d58-ac43-e875dcb6349a', 'quote_id': '6864', 'msg': '명언: You are always your own best guru, your own best teacher, the answers are always inside you.\n번역: 당신은 항상 당신 자신의 최고의 구루이며, 당신 자신의 최고의 선생님입니다. 답은 항상 당신 내면에 있습니다.\n\n- Sathya Sai Baba -', 'like_count': '0', 'read': True}
+2024-12-05 19:51:52,832 - ERROR - logger - app.py - line:217 - User disconnected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 19:54:14,338 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 19:54:14,339 - DEBUG - logger - app.py - line:163 - User connected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 19:54:14,357 - DEBUG - logger - app.py - line:177 - Received message from 062a8ff2-b754-4d58-ac43-e875dcb6349a: {"MAX_ROW":3,"liCount":"1"}
+2024-12-05 19:54:14,897 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '062a8ff2-b754-4d58-ac43-e875dcb6349a', 'quote_id': '87', 'msg': '명언: I want the fishing rod, not the fish.\n번역: 내가 원하는 것은 물고기가 아니라 낚싯대다.\n\n- Yanni -', 'like_count': '0', 'read': True}
+2024-12-05 19:54:35,647 - ERROR - logger - app.py - line:217 - User disconnected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 20:45:36,332 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 20:45:36,332 - DEBUG - logger - app.py - line:163 - User connected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 20:45:36,373 - DEBUG - logger - app.py - line:177 - Received message from 062a8ff2-b754-4d58-ac43-e875dcb6349a: {"MAX_ROW":3,"liCount":"0"}
+2024-12-05 20:45:36,896 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '062a8ff2-b754-4d58-ac43-e875dcb6349a', 'quote_id': '9713', 'msg': '명언: Blessed is he who expects nothing, for he shall be disappointed.\n번역: 아무것도 기대하지 않는 사람은 행복하다. 그는 실망할 것이기 때문이다.\n\n- Jonathan Swift -', 'like_count': '0', 'read': True}
+2024-12-05 20:48:05,698 - ERROR - logger - app.py - line:217 - User disconnected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 20:52:51,440 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 20:52:51,441 - DEBUG - logger - app.py - line:163 - User connected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 20:52:51,459 - DEBUG - logger - app.py - line:177 - Received message from 062a8ff2-b754-4d58-ac43-e875dcb6349a: {"MAX_ROW":3,"liCount":"1"}
+2024-12-05 20:52:51,905 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '062a8ff2-b754-4d58-ac43-e875dcb6349a', 'quote_id': '649', 'msg': '명언: Things cannot forever go downward. There are limits to everything—even the cold, and the darkness, and the wind, and the dying.\n번역: 모든 것이 영원히 아래로 내려갈 수는 없습니다. 모든 것에는 한계가 있습니다. 추위, 어둠, 바람, 죽음에도 한계가 있습니다.\n\n- Ming-Dao Deng -', 'like_count': '0', 'read': True}
+2024-12-05 20:52:55,807 - ERROR - logger - app.py - line:217 - User disconnected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 22:18:32,172 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-05 22:18:32,173 - DEBUG - logger - app.py - line:163 - User connected: 0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-05 22:18:32,189 - DEBUG - logger - app.py - line:177 - Received message from 0e4c470e-5e4c-470c-b61c-3818b805e709: {"MAX_ROW":3,"liCount":"0"}
+2024-12-05 22:18:32,845 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '0e4c470e-5e4c-470c-b61c-3818b805e709', 'quote_id': '5376', 'msg': "명언: A man's worth is no greater than his ambitions.\n번역: 인간의 가치는 그의 야망보다 크지 않습니다.\n\n- Marcus Aurelius -", 'like_count': '0', 'read': True}
+2024-12-05 22:18:45,981 - ERROR - logger - app.py - line:217 - User disconnected: 0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-05 22:31:50,082 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 22:31:50,082 - DEBUG - logger - app.py - line:163 - User connected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-05 22:31:50,100 - DEBUG - logger - app.py - line:177 - Received message from 062a8ff2-b754-4d58-ac43-e875dcb6349a: {"MAX_ROW":3,"liCount":"0"}
+2024-12-05 22:31:51,015 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '062a8ff2-b754-4d58-ac43-e875dcb6349a', 'quote_id': '3129', 'msg': '명언: Real loss is only possible when you love something more than you love yourself.\n번역: 진정한 상실은 자신보다 누군가를 더 사랑할 때만 가능합니다.\n\n- Robin Williams -', 'like_count': '0', 'read': True}
+2024-12-05 22:31:59,245 - ERROR - logger - app.py - line:217 - User disconnected: 062a8ff2-b754-4d58-ac43-e875dcb6349a

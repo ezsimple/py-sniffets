@@ -1,0 +1,5 @@
+2024-12-06 13:59:35,169 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/2a8c2f5a-cd0d-402e-aee6-16d8d5000a7b
+2024-12-06 13:59:35,172 - DEBUG - logger - app.py - line:163 - User connected: 2a8c2f5a-cd0d-402e-aee6-16d8d5000a7b
+2024-12-06 13:59:35,196 - DEBUG - logger - app.py - line:177 - Received message from 2a8c2f5a-cd0d-402e-aee6-16d8d5000a7b: {"MAX_ROW":3,"liCount":"0"}
+2024-12-06 13:59:35,839 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '2a8c2f5a-cd0d-402e-aee6-16d8d5000a7b', 'quote_id': '3613', 'msg': '명언: Anyone who wants to achieve a dream must stay strong, focused and steady.\n번역: 꿈을 이루고자 하는 사람은 누구나 강하고, 집중하고, 꾸준해야 합니다.\n\n- Estee Lauder -', 'like_count': '0', 'read': True}
+2024-12-06 13:59:47,106 - ERROR - logger - app.py - line:217 - User disconnected: 2a8c2f5a-cd0d-402e-aee6-16d8d5000a7b

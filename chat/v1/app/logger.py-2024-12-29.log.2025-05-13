@@ -1,0 +1,12 @@
+2025-05-13 12:18:07,737 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/7c4d7d6a-56e9-4c96-8fe1-c7b53adca481
+2025-05-13 12:18:07,740 - DEBUG - logger - app.py - line:167 - User connected: 7c4d7d6a-56e9-4c96-8fe1-c7b53adca481
+2025-05-13 12:18:08,561 - DEBUG - logger - app.py - line:181 - Received message from 7c4d7d6a-56e9-4c96-8fe1-c7b53adca481: {"MAX_ROW":3,"liCount":"0"}
+2025-05-13 12:18:09,219 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': '7c4d7d6a-56e9-4c96-8fe1-c7b53adca481', 'quote_id': '5183', 'msg': '명언: Hope is a waking dream.\n번역: 희망은 깨어있는 꿈입니다.\n\n- Aristotle -', 'like_count': '0', 'read': True}
+2025-05-13 12:18:34,580 - ERROR - logger - app.py - line:221 - User disconnected: 7c4d7d6a-56e9-4c96-8fe1-c7b53adca481
+2025-05-13 12:18:36,663 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/7c4d7d6a-56e9-4c96-8fe1-c7b53adca481
+2025-05-13 12:18:36,664 - DEBUG - logger - app.py - line:167 - User connected: 7c4d7d6a-56e9-4c96-8fe1-c7b53adca481
+2025-05-13 12:18:37,451 - DEBUG - logger - app.py - line:181 - Received message from 7c4d7d6a-56e9-4c96-8fe1-c7b53adca481: {"MAX_ROW":3,"liCount":"0"}
+2025-05-13 12:18:38,544 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': '7c4d7d6a-56e9-4c96-8fe1-c7b53adca481', 'quote_id': '449', 'msg': '명언: Always dream and shoot higher than you know you can do. Do not bother just to be better than your contemporaries or predecessors. Try to be better than yourself.\n번역: 당신이 할 수있는 것보다 항상 꿈을 꾸고 촬영하십시오. 동시대 인이나 전임자보다 더 나은 것을 귀찮게하지 마십시오. 자신보다 더 나아 지려고 노력하십시오.\n\n- William Faulkner -', 'like_count': '0', 'read': True}
+2025-05-13 12:18:52,974 - DEBUG - logger - app.py - line:181 - Received message from 7c4d7d6a-56e9-4c96-8fe1-c7b53adca481: {"MAX_ROW":3,"liCount":"1"}
+2025-05-13 12:18:53,453 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': '7c4d7d6a-56e9-4c96-8fe1-c7b53adca481', 'quote_id': '1824', 'msg': '명언: Throw your heart over the bar and your body will follow.\n번역: 술집 위로 마음을 던지면 몸이 뒤 따릅니다.\n\n- Norman Vincent Peale -', 'like_count': '0', 'read': True}
+2025-05-13 12:19:19,205 - ERROR - logger - app.py - line:221 - User disconnected: 7c4d7d6a-56e9-4c96-8fe1-c7b53adca481

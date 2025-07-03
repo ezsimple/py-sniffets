@@ -1,0 +1,9 @@
+2025-06-24 14:22:28,085 - DEBUG - logger - app.py - line:169 - Subscribed to MQTT topic: chat/messages/57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-24 14:22:28,087 - DEBUG - logger - app.py - line:176 - User connected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-24 14:22:28,102 - DEBUG - logger - app.py - line:190 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"0"}
+2025-06-24 14:22:28,148 - DEBUG - logger - app.py - line:97 - Attempting to fetch quote from http://127.0.0.1:3355/quotes/random
+2025-06-24 14:22:28,171 - DEBUG - logger - app.py - line:101 - Successfully fetched quote: [{'q': 'Acknowledging the good that you already have in your life is the foundation for all abundance.', 'a': 'Eckhart Tolle', 't': '<blockquote>&ldquo;Acknowledging the good that you already have in your life is the foundation for all abundance.&rdquo; &mdash; <footer>Eckhart Tolle</footer></blockquote>', 'quote_id': 717, 'like_count': 0}]
+2025-06-24 14:22:28,172 - DEBUG - logger - app.py - line:117 - Attempting to translate quote: Acknowledging the good that you already have in your life is the foundation for all abundance.
+2025-06-24 14:22:29,324 - DEBUG - logger - app.py - line:119 - Successfully translated quote: 당신이 이미 당신의 인생에서 가지고있는 선을 인정하는 것은 모든 풍요 로움의 기초입니다.
+2025-06-24 14:22:29,325 - DEBUG - logger - app.py - line:238 - Sent quote: {'id': 'server', 'user_id': '57bc6e7a-e363-4579-9a0e-0c7dfd7d4553', 'quote_id': '717', 'msg': '명언: Acknowledging the good that you already have in your life is the foundation for all abundance.\n번역: 당신이 이미 당신의 인생에서 가지고있는 선을 인정하는 것은 모든 풍요 로움의 기초입니다.\n\n- Eckhart Tolle -', 'like_count': '0', 'read': True}
+2025-06-24 15:01:31,613 - ERROR - logger - app.py - line:243 - User disconnected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553

@@ -1,0 +1,91 @@
+2025-06-11 13:53:32,472 - INFO - logger - app.py - line:53 - WS_SERVER : wss://a1.mkeasy.kro.kr/chat/ws
+2025-06-11 13:53:44,977 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 13:53:44,978 - DEBUG - logger - app.py - line:167 - User connected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 13:53:44,989 - DEBUG - logger - app.py - line:181 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"0"}
+2025-06-11 13:53:45,039 - ERROR - logger - app.py - line:224 - Error in websocket handling for user 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: All connection attempts failed
+2025-06-11 13:54:52,275 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 13:54:52,276 - DEBUG - logger - app.py - line:167 - User connected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 13:54:52,294 - DEBUG - logger - app.py - line:181 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"0"}
+2025-06-11 13:54:52,341 - ERROR - logger - app.py - line:224 - Error in websocket handling for user 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: All connection attempts failed
+2025-06-11 13:59:37,647 - INFO - logger - app.py - line:53 - WS_SERVER : wss://a1.mkeasy.kro.kr/chat/ws
+2025-06-11 13:59:42,210 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 13:59:42,211 - DEBUG - logger - app.py - line:167 - User connected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 13:59:42,230 - DEBUG - logger - app.py - line:181 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"0"}
+2025-06-11 13:59:42,278 - ERROR - logger - app.py - line:224 - Error in websocket handling for user 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: All connection attempts failed
+2025-06-11 14:03:59,590 - INFO - logger - app.py - line:53 - WS_SERVER : wss://a1.mkeasy.kro.kr/chat/ws
+2025-06-11 14:04:10,328 - INFO - logger - app.py - line:53 - WS_SERVER : wss://a1.mkeasy.kro.kr/chat/ws
+2025-06-11 14:04:23,945 - DEBUG - logger - app.py - line:169 - Subscribed to MQTT topic: chat/messages/57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:04:23,946 - DEBUG - logger - app.py - line:176 - User connected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:04:23,966 - DEBUG - logger - app.py - line:190 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"0"}
+2025-06-11 14:04:24,012 - DEBUG - logger - app.py - line:97 - Attempting to fetch quote from http://127.0.0.1:3355/quotes/random
+2025-06-11 14:04:24,013 - ERROR - logger - app.py - line:106 - Error in get_random_quote: All connection attempts failed
+2025-06-11 14:04:24,014 - ERROR - logger - app.py - line:214 - Invalid quote data received
+2025-06-11 14:04:45,913 - ERROR - logger - app.py - line:243 - User disconnected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:05:58,148 - INFO - logger - app.py - line:53 - WS_SERVER : wss://a1.mkeasy.kro.kr/chat/ws
+2025-06-11 14:06:19,331 - DEBUG - logger - app.py - line:169 - Subscribed to MQTT topic: chat/messages/57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:06:19,332 - DEBUG - logger - app.py - line:176 - User connected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:06:19,353 - DEBUG - logger - app.py - line:190 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"0"}
+2025-06-11 14:06:19,432 - DEBUG - logger - app.py - line:97 - Attempting to fetch quote from http://127.0.0.1:3355/quotes/random
+2025-06-11 14:06:19,558 - DEBUG - logger - app.py - line:101 - Successfully fetched quote: [{'q': 'Progress lies not in enhancing what is, but in advancing toward what will be.', 'a': 'Kahlil Gibran', 't': '<blockquote>&ldquo;Progress lies not in enhancing what is, but in advancing toward what will be.&rdquo; &mdash; <footer>Kahlil Gibran</footer></blockquote>', 'quote_id': 1146, 'like_count': 0}]
+2025-06-11 14:06:19,559 - DEBUG - logger - app.py - line:117 - Attempting to translate quote: Progress lies not in enhancing what is, but in advancing toward what will be.
+2025-06-11 14:06:20,472 - DEBUG - logger - app.py - line:119 - Successfully translated quote: 진보는 무엇인지를 향상시키는 것이 아니라 무엇이 될지 향해 나아가는 데 있습니다.
+2025-06-11 14:06:20,473 - DEBUG - logger - app.py - line:238 - Sent quote: {'id': 'server', 'user_id': '57bc6e7a-e363-4579-9a0e-0c7dfd7d4553', 'quote_id': '1146', 'msg': '명언: Progress lies not in enhancing what is, but in advancing toward what will be.\n번역: 진보는 무엇인지를 향상시키는 것이 아니라 무엇이 될지 향해 나아가는 데 있습니다.\n\n- Kahlil Gibran -', 'like_count': '0', 'read': True}
+2025-06-11 14:06:44,382 - ERROR - logger - app.py - line:243 - User disconnected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:06:48,651 - INFO - logger - app.py - line:53 - WS_SERVER : wss://a1.mkeasy.kro.kr/chat/ws
+2025-06-11 14:06:48,802 - DEBUG - logger - app.py - line:169 - Subscribed to MQTT topic: chat/messages/57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:06:48,804 - DEBUG - logger - app.py - line:176 - User connected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:06:48,824 - DEBUG - logger - app.py - line:190 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"1"}
+2025-06-11 14:06:48,870 - DEBUG - logger - app.py - line:97 - Attempting to fetch quote from http://127.0.0.1:3355/quotes/random
+2025-06-11 14:06:48,886 - DEBUG - logger - app.py - line:101 - Successfully fetched quote: [{'q': "Even if you stumble and fall down, it doesn't mean you've chosen the wrong path.", 'a': 'Zen Proverb', 't': "<blockquote>&ldquo;Even if you stumble and fall down, it doesn't mean you've chosen the wrong path.&rdquo; &mdash; <footer>Zen Proverb</footer></blockquote>", 'quote_id': 6160, 'like_count': 0}]
+2025-06-11 14:06:48,886 - DEBUG - logger - app.py - line:117 - Attempting to translate quote: Even if you stumble and fall down, it doesn't mean you've chosen the wrong path.
+2025-06-11 14:06:49,559 - DEBUG - logger - app.py - line:119 - Successfully translated quote: 우연히 넘어 지더라도 잘못된 길을 선택했다는 의미는 아닙니다.
+2025-06-11 14:06:49,559 - DEBUG - logger - app.py - line:238 - Sent quote: {'id': 'server', 'user_id': '57bc6e7a-e363-4579-9a0e-0c7dfd7d4553', 'quote_id': '6160', 'msg': "명언: Even if you stumble and fall down, it doesn't mean you've chosen the wrong path.\n번역: 우연히 넘어 지더라도 잘못된 길을 선택했다는 의미는 아닙니다.\n\n- Zen Proverb -", 'like_count': '0', 'read': True}
+2025-06-11 14:06:58,444 - ERROR - logger - app.py - line:243 - User disconnected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:06:58,670 - DEBUG - logger - app.py - line:169 - Subscribed to MQTT topic: chat/messages/57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:06:58,670 - DEBUG - logger - app.py - line:176 - User connected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:06:58,688 - DEBUG - logger - app.py - line:190 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"0"}
+2025-06-11 14:06:58,734 - DEBUG - logger - app.py - line:97 - Attempting to fetch quote from http://127.0.0.1:3355/quotes/random
+2025-06-11 14:06:58,748 - DEBUG - logger - app.py - line:101 - Successfully fetched quote: [{'q': 'Your world is a living expression of how you are using and have used your mind.', 'a': 'Earl Nightingale', 't': '<blockquote>&ldquo;Your world is a living expression of how you are using and have used your mind.&rdquo; &mdash; <footer>Earl Nightingale</footer></blockquote>', 'quote_id': 996, 'like_count': 0}]
+2025-06-11 14:06:58,749 - DEBUG - logger - app.py - line:117 - Attempting to translate quote: Your world is a living expression of how you are using and have used your mind.
+2025-06-11 14:06:59,629 - DEBUG - logger - app.py - line:119 - Successfully translated quote: 당신의 세상은 당신이 어떻게 사용하고 당신의 마음을 사용했는지에 대한 살아있는 표현입니다.
+2025-06-11 14:06:59,631 - DEBUG - logger - app.py - line:238 - Sent quote: {'id': 'server', 'user_id': '57bc6e7a-e363-4579-9a0e-0c7dfd7d4553', 'quote_id': '996', 'msg': '명언: Your world is a living expression of how you are using and have used your mind.\n번역: 당신의 세상은 당신이 어떻게 사용하고 당신의 마음을 사용했는지에 대한 살아있는 표현입니다.\n\n- Earl Nightingale -', 'like_count': '0', 'read': True}
+2025-06-11 14:07:07,250 - ERROR - logger - app.py - line:243 - User disconnected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:08:55,611 - DEBUG - logger - app.py - line:169 - Subscribed to MQTT topic: chat/messages/57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:08:55,611 - DEBUG - logger - app.py - line:176 - User connected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:08:55,625 - DEBUG - logger - app.py - line:190 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"0"}
+2025-06-11 14:08:55,671 - DEBUG - logger - app.py - line:97 - Attempting to fetch quote from http://127.0.0.1:3355/quotes/random
+2025-06-11 14:08:55,686 - DEBUG - logger - app.py - line:101 - Successfully fetched quote: [{'q': 'The Truth is realized in an instant; the Act is practiced step by step.', 'a': 'Seungsahn', 't': '<blockquote>&ldquo;The Truth is realized in an instant; the Act is practiced step by step.&rdquo; &mdash; <footer>Seungsahn</footer></blockquote>', 'quote_id': 795, 'like_count': 0}]
+2025-06-11 14:08:55,687 - DEBUG - logger - app.py - line:117 - Attempting to translate quote: The Truth is realized in an instant; the Act is practiced step by step.
+2025-06-11 14:08:56,492 - DEBUG - logger - app.py - line:119 - Successfully translated quote: 진실은 순간적으로 실현됩니다. 이 법은 단계적으로 실행됩니다.
+2025-06-11 14:08:56,493 - DEBUG - logger - app.py - line:238 - Sent quote: {'id': 'server', 'user_id': '57bc6e7a-e363-4579-9a0e-0c7dfd7d4553', 'quote_id': '795', 'msg': '명언: The Truth is realized in an instant; the Act is practiced step by step.\n번역: 진실은 순간적으로 실현됩니다. 이 법은 단계적으로 실행됩니다.\n\n- Seungsahn -', 'like_count': '0', 'read': True}
+2025-06-11 14:10:12,646 - ERROR - logger - app.py - line:243 - User disconnected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:14:48,529 - DEBUG - logger - app.py - line:169 - Subscribed to MQTT topic: chat/messages/57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:14:48,529 - DEBUG - logger - app.py - line:176 - User connected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 14:14:48,553 - DEBUG - logger - app.py - line:190 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"0"}
+2025-06-11 14:14:48,600 - DEBUG - logger - app.py - line:97 - Attempting to fetch quote from http://127.0.0.1:3355/quotes/random
+2025-06-11 14:14:48,618 - DEBUG - logger - app.py - line:101 - Successfully fetched quote: [{'q': "It's not what you've got; it's what you do that makes the difference.", 'a': 'Celestine Chua', 't': "<blockquote>&ldquo;It's not what you've got; it's what you do that makes the difference.&rdquo; &mdash; <footer>Celestine Chua</footer></blockquote>", 'quote_id': 972, 'like_count': 0}]
+2025-06-11 14:14:48,618 - DEBUG - logger - app.py - line:117 - Attempting to translate quote: It's not what you've got; it's what you do that makes the difference.
+2025-06-11 14:14:49,908 - DEBUG - logger - app.py - line:119 - Successfully translated quote: 당신이 가진 것이 아닙니다. 그것이 당신이하는 일입니다.
+2025-06-11 14:14:49,909 - DEBUG - logger - app.py - line:238 - Sent quote: {'id': 'server', 'user_id': '57bc6e7a-e363-4579-9a0e-0c7dfd7d4553', 'quote_id': '972', 'msg': "명언: It's not what you've got; it's what you do that makes the difference.\n번역: 당신이 가진 것이 아닙니다. 그것이 당신이하는 일입니다.\n\n- Celestine Chua -", 'like_count': '0', 'read': True}
+2025-06-11 14:21:01,665 - DEBUG - logger - app.py - line:190 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"1"}
+2025-06-11 14:21:01,711 - DEBUG - logger - app.py - line:97 - Attempting to fetch quote from http://127.0.0.1:3355/quotes/random
+2025-06-11 14:21:01,727 - DEBUG - logger - app.py - line:101 - Successfully fetched quote: [{'q': 'Ever tried. Ever failed. No matter. Try Again. Fail again. Fail better. ', 'a': 'Samuel Beckett', 't': '<blockquote>&ldquo;Ever tried. Ever failed. No matter. Try Again. Fail again. Fail better. &rdquo; &mdash; <footer>Samuel Beckett</footer></blockquote>', 'quote_id': 1043, 'like_count': 0}]
+2025-06-11 14:21:01,727 - DEBUG - logger - app.py - line:117 - Attempting to translate quote: Ever tried. Ever failed. No matter. Try Again. Fail again. Fail better. 
+2025-06-11 14:21:02,549 - DEBUG - logger - app.py - line:119 - Successfully translated quote: 시도한 적이 있습니다. 실패했습니다. 상관없이. 다시 시도하십시오. 다시 실패합니다. 더 잘 실패합니다.
+2025-06-11 14:21:02,549 - DEBUG - logger - app.py - line:238 - Sent quote: {'id': 'server', 'user_id': '57bc6e7a-e363-4579-9a0e-0c7dfd7d4553', 'quote_id': '1043', 'msg': '명언: Ever tried. Ever failed. No matter. Try Again. Fail again. Fail better. \n번역: 시도한 적이 있습니다. 실패했습니다. 상관없이. 다시 시도하십시오. 다시 실패합니다. 더 잘 실패합니다.\n\n- Samuel Beckett -', 'like_count': '0', 'read': True}
+2025-06-11 14:21:13,281 - DEBUG - logger - app.py - line:190 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"2"}
+2025-06-11 14:21:13,331 - DEBUG - logger - app.py - line:97 - Attempting to fetch quote from http://127.0.0.1:3355/quotes/random
+2025-06-11 14:21:13,350 - DEBUG - logger - app.py - line:101 - Successfully fetched quote: [{'q': 'Change begets change. Nothing propagates so fast.', 'a': 'Charles Dickens', 't': '<blockquote>&ldquo;Change begets change. Nothing propagates so fast.&rdquo; &mdash; <footer>Charles Dickens</footer></blockquote>', 'quote_id': 1714, 'like_count': 0}]
+2025-06-11 14:21:13,350 - DEBUG - logger - app.py - line:117 - Attempting to translate quote: Change begets change. Nothing propagates so fast.
+2025-06-11 14:21:14,077 - DEBUG - logger - app.py - line:119 - Successfully translated quote: 변화가 변경됩니다. 그렇게 빨리 전파되는 것은 없습니다.
+2025-06-11 14:21:14,078 - DEBUG - logger - app.py - line:238 - Sent quote: {'id': 'server', 'user_id': '57bc6e7a-e363-4579-9a0e-0c7dfd7d4553', 'quote_id': '1714', 'msg': '명언: Change begets change. Nothing propagates so fast.\n번역: 변화가 변경됩니다. 그렇게 빨리 전파되는 것은 없습니다.\n\n- Charles Dickens -', 'like_count': '0', 'read': True}
+2025-06-11 14:28:59,703 - ERROR - logger - app.py - line:243 - User disconnected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 23:59:27,355 - INFO - logger - app.py - line:53 - WS_SERVER : wss://a1.mkeasy.kro.kr/chat/ws
+2025-06-11 23:59:34,498 - DEBUG - logger - app.py - line:169 - Subscribed to MQTT topic: chat/messages/57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 23:59:34,498 - DEBUG - logger - app.py - line:176 - User connected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-11 23:59:34,523 - DEBUG - logger - app.py - line:190 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"0"}
+2025-06-11 23:59:34,599 - DEBUG - logger - app.py - line:97 - Attempting to fetch quote from http://127.0.0.1:3355/quotes/random
+2025-06-11 23:59:34,718 - DEBUG - logger - app.py - line:101 - Successfully fetched quote: [{'q': 'A successful man is one who can lay a firm foundation with the bricks others have thrown at him.  ', 'a': 'David Brinkley', 't': '<blockquote>&ldquo;A successful man is one who can lay a firm foundation with the bricks others have thrown at him.  &rdquo; &mdash; <footer>David Brinkley</footer></blockquote>', 'quote_id': 82, 'like_count': 0}]
+2025-06-11 23:59:34,718 - DEBUG - logger - app.py - line:117 - Attempting to translate quote: A successful man is one who can lay a firm foundation with the bricks others have thrown at him.  
+2025-06-11 23:59:35,481 - DEBUG - logger - app.py - line:119 - Successfully translated quote: 성공적인 사람은 다른 사람들이 그에게 던진 벽돌로 확고한 기초를 놓을 수있는 사람입니다.
+2025-06-11 23:59:35,481 - DEBUG - logger - app.py - line:238 - Sent quote: {'id': 'server', 'user_id': '57bc6e7a-e363-4579-9a0e-0c7dfd7d4553', 'quote_id': '82', 'msg': '명언: A successful man is one who can lay a firm foundation with the bricks others have thrown at him.  \n번역: 성공적인 사람은 다른 사람들이 그에게 던진 벽돌로 확고한 기초를 놓을 수있는 사람입니다.\n\n- David Brinkley -', 'like_count': '0', 'read': True}

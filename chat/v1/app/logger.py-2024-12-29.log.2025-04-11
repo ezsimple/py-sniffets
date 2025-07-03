@@ -1,0 +1,5 @@
+2025-04-11 01:17:59,318 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/37d655f1-7d31-46dd-a9ba-a54012a92773
+2025-04-11 01:17:59,321 - DEBUG - logger - app.py - line:167 - User connected: 37d655f1-7d31-46dd-a9ba-a54012a92773
+2025-04-11 01:17:59,478 - DEBUG - logger - app.py - line:181 - Received message from 37d655f1-7d31-46dd-a9ba-a54012a92773: {"MAX_ROW":3,"liCount":"0"}
+2025-04-11 01:18:00,298 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': '37d655f1-7d31-46dd-a9ba-a54012a92773', 'quote_id': '2394', 'msg': '명언: Winners never quit and quitters never win.\n번역: 우승자는 결코 그만 두지 않으며 금연은 결코 이기지 않습니다.\n\n- Vince Lombardi -', 'like_count': '0', 'read': True}
+2025-04-11 01:18:05,145 - ERROR - logger - app.py - line:221 - User disconnected: 37d655f1-7d31-46dd-a9ba-a54012a92773

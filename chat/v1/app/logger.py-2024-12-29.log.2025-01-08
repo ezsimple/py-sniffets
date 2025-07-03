@@ -1,0 +1,5 @@
+2025-01-08 10:32:37,501 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/61e58526-b425-42d9-b7ad-7619344a4f01
+2025-01-08 10:32:37,503 - DEBUG - logger - app.py - line:167 - User connected: 61e58526-b425-42d9-b7ad-7619344a4f01
+2025-01-08 10:32:37,580 - DEBUG - logger - app.py - line:181 - Received message from 61e58526-b425-42d9-b7ad-7619344a4f01: {"MAX_ROW":3,"liCount":"0"}
+2025-01-08 10:32:39,030 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': '61e58526-b425-42d9-b7ad-7619344a4f01', 'quote_id': '1035', 'msg': '명언: Exceptional thinkers ignore their critics and go about their business making history.\n번역: 뛰어난 사상가들은 비판을 무시하고 역사를 만드는 데 전념합니다.\n\n- John Eliot -', 'like_count': '0', 'read': True}
+2025-01-08 10:34:36,801 - ERROR - logger - app.py - line:221 - User disconnected: 61e58526-b425-42d9-b7ad-7619344a4f01

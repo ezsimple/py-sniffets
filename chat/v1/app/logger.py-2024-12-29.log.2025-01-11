@@ -1,0 +1,7 @@
+2025-01-11 13:40:23,917 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/efccb503-9f63-41aa-9878-fdf9f4399fe3
+2025-01-11 13:40:23,919 - DEBUG - logger - app.py - line:167 - User connected: efccb503-9f63-41aa-9878-fdf9f4399fe3
+2025-01-11 13:40:23,933 - DEBUG - logger - app.py - line:181 - Received message from efccb503-9f63-41aa-9878-fdf9f4399fe3: {"MAX_ROW":3,"liCount":"0"}
+2025-01-11 13:40:24,991 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': 'efccb503-9f63-41aa-9878-fdf9f4399fe3', 'quote_id': '9793', 'msg': '명언: Every person, all the events of your life are there because you have drawn them there. What you choose to do with them is up to you.\n번역: 모든 사람, 당신의 삶의 모든 사건은 당신이 그들을 끌어들였기 때문에 거기에 있습니다. 당신이 그들과 함께 무엇을 할지 선택하는 것은 당신에게 달려 있습니다.\n\n- Richard Bach -', 'like_count': '0', 'read': True}
+2025-01-11 13:40:31,068 - DEBUG - logger - app.py - line:181 - Received message from efccb503-9f63-41aa-9878-fdf9f4399fe3: {"MAX_ROW":3,"liCount":"1"}
+2025-01-11 13:40:31,955 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': 'efccb503-9f63-41aa-9878-fdf9f4399fe3', 'quote_id': '1563', 'msg': '명언: The thing about smart people is that they seem like crazy people to dumb people.\n번역: 똑똑한 사람에 대한 의문은, 멍청한 사람이 보면 미친 사람처럼 보인다는 점입니다.\n\n- Stephen Hawking -', 'like_count': '0', 'read': True}
+2025-01-11 14:01:19,676 - ERROR - logger - app.py - line:221 - User disconnected: efccb503-9f63-41aa-9878-fdf9f4399fe3

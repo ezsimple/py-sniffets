@@ -1,0 +1,22 @@
+2025-01-10 11:15:35,778 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/bb3de0c9-7e96-4511-bb18-8d8b699dfcb3
+2025-01-10 11:15:35,779 - DEBUG - logger - app.py - line:167 - User connected: bb3de0c9-7e96-4511-bb18-8d8b699dfcb3
+2025-01-10 11:15:35,814 - DEBUG - logger - app.py - line:181 - Received message from bb3de0c9-7e96-4511-bb18-8d8b699dfcb3: {"MAX_ROW":3,"liCount":"0"}
+2025-01-10 11:15:36,637 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': 'bb3de0c9-7e96-4511-bb18-8d8b699dfcb3', 'quote_id': '3398', 'msg': '명언: If we learn to open our hearts, anyone, including the people who drive us crazy, can be our teacher.\n번역: 우리가 마음을 여는 법을 배우면, 우리를 미치게 만드는 사람들을 포함해 누구든지 우리의 선생님이 될 수 있습니다.\n\n- Pema Chodron -', 'like_count': '0', 'read': True}
+2025-01-10 11:15:45,556 - ERROR - logger - app.py - line:221 - User disconnected: bb3de0c9-7e96-4511-bb18-8d8b699dfcb3
+2025-01-10 11:44:46,676 - ERROR - logger - app.py - line:232 - Decryption error: 
+2025-01-10 11:44:47,990 - ERROR - logger - app.py - line:232 - Decryption error: 
+2025-01-10 11:44:49,031 - ERROR - logger - app.py - line:232 - Decryption error: 
+2025-01-10 11:44:49,986 - ERROR - logger - app.py - line:232 - Decryption error: 
+2025-01-10 11:44:50,088 - ERROR - logger - app.py - line:232 - Decryption error: 
+2025-01-10 11:44:51,009 - ERROR - logger - app.py - line:232 - Decryption error: 
+2025-01-10 11:44:51,091 - ERROR - logger - app.py - line:232 - Decryption error: 
+2025-01-10 21:57:36,070 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/b5fa06f1-f150-4706-b7ff-328e745e993c
+2025-01-10 21:57:36,071 - DEBUG - logger - app.py - line:167 - User connected: b5fa06f1-f150-4706-b7ff-328e745e993c
+2025-01-10 21:57:36,117 - DEBUG - logger - app.py - line:181 - Received message from b5fa06f1-f150-4706-b7ff-328e745e993c: {"MAX_ROW":3,"liCount":"0"}
+2025-01-10 21:57:36,534 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': 'b5fa06f1-f150-4706-b7ff-328e745e993c', 'quote_id': '2394', 'msg': '명언: Winners never quit and quitters never win.\n번역: 승자는 결코 포기하지 않고, 포기하는 사람은 결코 이기지 못합니다.\n\n- Vince Lombardi -', 'like_count': '0', 'read': True}
+2025-01-10 22:13:25,417 - ERROR - logger - app.py - line:221 - User disconnected: b5fa06f1-f150-4706-b7ff-328e745e993c
+2025-01-10 22:55:48,390 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/b5fa06f1-f150-4706-b7ff-328e745e993c
+2025-01-10 22:55:48,391 - DEBUG - logger - app.py - line:167 - User connected: b5fa06f1-f150-4706-b7ff-328e745e993c
+2025-01-10 22:55:48,434 - DEBUG - logger - app.py - line:181 - Received message from b5fa06f1-f150-4706-b7ff-328e745e993c: {"MAX_ROW":3,"liCount":"1"}
+2025-01-10 22:55:48,797 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': 'b5fa06f1-f150-4706-b7ff-328e745e993c', 'quote_id': '1126', 'msg': '명언: Life without love is like a tree without blossoms or fruit.\n번역: 사랑이 없는 삶은 꽃도 열매도 없는 나무와 같습니다.\n\n- Kahlil Gibran -', 'like_count': '0', 'read': True}
+2025-01-10 22:55:52,179 - ERROR - logger - app.py - line:221 - User disconnected: b5fa06f1-f150-4706-b7ff-328e745e993c

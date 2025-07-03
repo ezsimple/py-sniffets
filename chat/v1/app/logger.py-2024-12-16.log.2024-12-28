@@ -1,0 +1,10 @@
+2024-12-28 13:17:19,329 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/9f2668f6-45d8-4673-a71b-098763ed08dd
+2024-12-28 13:17:19,330 - DEBUG - logger - app.py - line:167 - User connected: 9f2668f6-45d8-4673-a71b-098763ed08dd
+2024-12-28 13:17:19,345 - DEBUG - logger - app.py - line:181 - Received message from 9f2668f6-45d8-4673-a71b-098763ed08dd: {"MAX_ROW":3,"liCount":"0"}
+2024-12-28 13:17:19,942 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': '9f2668f6-45d8-4673-a71b-098763ed08dd', 'quote_id': '218', 'msg': '명언: Nature is pleased with simplicity. And nature is no dummy.\n번역: 자연은 단순함에 기뻐한다. 그리고 자연은 바보가 아니다.\n\n- Isaac Newton -', 'like_count': '0', 'read': True}
+2024-12-28 13:25:20,047 - ERROR - logger - app.py - line:221 - User disconnected: 9f2668f6-45d8-4673-a71b-098763ed08dd
+2024-12-28 15:45:42,530 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/9f2668f6-45d8-4673-a71b-098763ed08dd
+2024-12-28 15:45:42,531 - DEBUG - logger - app.py - line:167 - User connected: 9f2668f6-45d8-4673-a71b-098763ed08dd
+2024-12-28 15:45:42,550 - DEBUG - logger - app.py - line:181 - Received message from 9f2668f6-45d8-4673-a71b-098763ed08dd: {"MAX_ROW":3,"liCount":"0"}
+2024-12-28 15:45:42,877 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': '9f2668f6-45d8-4673-a71b-098763ed08dd', 'quote_id': '2186', 'msg': '명언: What you seek is seeking you.\n번역: 당신이 찾는 것이 당신을 찾고 있습니다.\n\n- Rumi -', 'like_count': '0', 'read': True}
+2024-12-28 16:07:29,494 - ERROR - logger - app.py - line:221 - User disconnected: 9f2668f6-45d8-4673-a71b-098763ed08dd

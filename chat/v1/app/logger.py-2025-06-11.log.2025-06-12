@@ -1,0 +1,31 @@
+2025-06-12 00:01:08,392 - ERROR - logger - app.py - line:243 - User disconnected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-12 00:01:08,570 - DEBUG - logger - app.py - line:169 - Subscribed to MQTT topic: chat/messages/57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-12 00:01:08,570 - DEBUG - logger - app.py - line:176 - User connected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-12 00:01:08,587 - DEBUG - logger - app.py - line:190 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"0"}
+2025-06-12 00:01:08,633 - DEBUG - logger - app.py - line:97 - Attempting to fetch quote from http://127.0.0.1:3355/quotes/random
+2025-06-12 00:01:08,651 - DEBUG - logger - app.py - line:101 - Successfully fetched quote: [{'q': 'To bear trials with a calm mind robs misfortune of its strength and burden.', 'a': 'Seneca', 't': '<blockquote>&ldquo;To bear trials with a calm mind robs misfortune of its strength and burden.&rdquo; &mdash; <footer>Seneca</footer></blockquote>', 'quote_id': 2937, 'like_count': 0}]
+2025-06-12 00:01:08,651 - DEBUG - logger - app.py - line:117 - Attempting to translate quote: To bear trials with a calm mind robs misfortune of its strength and burden.
+2025-06-12 00:01:09,163 - DEBUG - logger - app.py - line:119 - Successfully translated quote: 차분한 마음으로 시련을 겪으려면 힘과 부담에 대한 불행을 강탈합니다.
+2025-06-12 00:01:09,164 - DEBUG - logger - app.py - line:238 - Sent quote: {'id': 'server', 'user_id': '57bc6e7a-e363-4579-9a0e-0c7dfd7d4553', 'quote_id': '2937', 'msg': '명언: To bear trials with a calm mind robs misfortune of its strength and burden.\n번역: 차분한 마음으로 시련을 겪으려면 힘과 부담에 대한 불행을 강탈합니다.\n\n- Seneca -', 'like_count': '0', 'read': True}
+2025-06-12 00:01:11,878 - ERROR - logger - app.py - line:243 - User disconnected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-12 00:32:41,805 - DEBUG - logger - app.py - line:169 - Subscribed to MQTT topic: chat/messages/57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-12 00:32:41,806 - DEBUG - logger - app.py - line:176 - User connected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553
+2025-06-12 00:32:41,829 - DEBUG - logger - app.py - line:190 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"0"}
+2025-06-12 00:32:41,877 - DEBUG - logger - app.py - line:97 - Attempting to fetch quote from http://127.0.0.1:3355/quotes/random
+2025-06-12 00:32:41,900 - DEBUG - logger - app.py - line:101 - Successfully fetched quote: [{'q': 'The less people know, the more stubbornly they know it.', 'a': 'Osho', 't': '<blockquote>&ldquo;The less people know, the more stubbornly they know it.&rdquo; &mdash; <footer>Osho</footer></blockquote>', 'quote_id': 7441, 'like_count': 0}]
+2025-06-12 00:32:41,901 - DEBUG - logger - app.py - line:117 - Attempting to translate quote: The less people know, the more stubbornly they know it.
+2025-06-12 00:32:42,304 - DEBUG - logger - app.py - line:119 - Successfully translated quote: 사람들이 적을수록 더 완고하게 알고 있습니다.
+2025-06-12 00:32:42,304 - DEBUG - logger - app.py - line:238 - Sent quote: {'id': 'server', 'user_id': '57bc6e7a-e363-4579-9a0e-0c7dfd7d4553', 'quote_id': '7441', 'msg': '명언: The less people know, the more stubbornly they know it.\n번역: 사람들이 적을수록 더 완고하게 알고 있습니다.\n\n- Osho -', 'like_count': '0', 'read': True}
+2025-06-12 00:32:46,857 - DEBUG - logger - app.py - line:190 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"1"}
+2025-06-12 00:32:46,903 - DEBUG - logger - app.py - line:97 - Attempting to fetch quote from http://127.0.0.1:3355/quotes/random
+2025-06-12 00:32:46,918 - DEBUG - logger - app.py - line:101 - Successfully fetched quote: [{'q': "It's not what you pay a man, but what he costs you that counts.", 'a': 'Will Rogers', 't': "<blockquote>&ldquo;It's not what you pay a man, but what he costs you that counts.&rdquo; &mdash; <footer>Will Rogers</footer></blockquote>", 'quote_id': 800, 'like_count': 0}]
+2025-06-12 00:32:46,918 - DEBUG - logger - app.py - line:117 - Attempting to translate quote: It's not what you pay a man, but what he costs you that counts.
+2025-06-12 00:32:47,421 - DEBUG - logger - app.py - line:119 - Successfully translated quote: 그것은 당신이 남자에게 지불하는 것이 아니라, 그가 당신에게 비용을 지불하는 비용입니다.
+2025-06-12 00:32:47,421 - DEBUG - logger - app.py - line:238 - Sent quote: {'id': 'server', 'user_id': '57bc6e7a-e363-4579-9a0e-0c7dfd7d4553', 'quote_id': '800', 'msg': "명언: It's not what you pay a man, but what he costs you that counts.\n번역: 그것은 당신이 남자에게 지불하는 것이 아니라, 그가 당신에게 비용을 지불하는 비용입니다.\n\n- Will Rogers -", 'like_count': '0', 'read': True}
+2025-06-12 00:32:48,642 - DEBUG - logger - app.py - line:190 - Received message from 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553: {"MAX_ROW":3,"liCount":"2"}
+2025-06-12 00:32:48,688 - DEBUG - logger - app.py - line:97 - Attempting to fetch quote from http://127.0.0.1:3355/quotes/random
+2025-06-12 00:32:48,702 - DEBUG - logger - app.py - line:101 - Successfully fetched quote: [{'q': "It's just a bad day, not a bad life.", 'a': 'Mary Engelbreit', 't': "<blockquote>&ldquo;It's just a bad day, not a bad life.&rdquo; &mdash; <footer>Mary Engelbreit</footer></blockquote>", 'quote_id': 3084, 'like_count': 0}]
+2025-06-12 00:32:48,703 - DEBUG - logger - app.py - line:117 - Attempting to translate quote: It's just a bad day, not a bad life.
+2025-06-12 00:32:49,268 - DEBUG - logger - app.py - line:119 - Successfully translated quote: 나쁜 삶이 아니라 나쁜 날입니다.
+2025-06-12 00:32:49,269 - DEBUG - logger - app.py - line:238 - Sent quote: {'id': 'server', 'user_id': '57bc6e7a-e363-4579-9a0e-0c7dfd7d4553', 'quote_id': '3084', 'msg': "명언: It's just a bad day, not a bad life.\n번역: 나쁜 삶이 아니라 나쁜 날입니다.\n\n- Mary Engelbreit -", 'like_count': '0', 'read': True}
+2025-06-12 00:33:01,164 - ERROR - logger - app.py - line:243 - User disconnected: 57bc6e7a-e363-4579-9a0e-0c7dfd7d4553

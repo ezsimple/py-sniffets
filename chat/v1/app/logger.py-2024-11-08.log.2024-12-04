@@ -1,0 +1,26 @@
+2024-12-04 11:49:54,346 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-04 11:49:54,348 - DEBUG - logger - app.py - line:163 - User connected: 0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-04 11:49:54,360 - DEBUG - logger - app.py - line:177 - Received message from 0e4c470e-5e4c-470c-b61c-3818b805e709: {"MAX_ROW":3,"liCount":"0"}
+2024-12-04 11:49:54,419 - ERROR - logger - app.py - line:220 - Error in websocket handling for user 0e4c470e-5e4c-470c-b61c-3818b805e709: 0
+2024-12-04 12:10:59,831 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-04 12:10:59,832 - DEBUG - logger - app.py - line:163 - User connected: 0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-04 12:10:59,848 - DEBUG - logger - app.py - line:177 - Received message from 0e4c470e-5e4c-470c-b61c-3818b805e709: {"MAX_ROW":3,"liCount":"0"}
+2024-12-04 12:11:00,630 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '0e4c470e-5e4c-470c-b61c-3818b805e709', 'quote_id': '4532', 'msg': '명언: You are never too old to become younger.\n번역: 젊어지기에 너무 늙었다는 것은 없습니다.\n\n- Mae West -', 'like_count': '0', 'read': True}
+2024-12-04 12:17:36,870 - ERROR - logger - app.py - line:217 - User disconnected: 0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-04 12:17:38,913 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-04 12:17:38,913 - DEBUG - logger - app.py - line:163 - User connected: 0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-04 12:17:38,928 - DEBUG - logger - app.py - line:177 - Received message from 0e4c470e-5e4c-470c-b61c-3818b805e709: {"MAX_ROW":3,"liCount":"0"}
+2024-12-04 12:17:39,455 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '0e4c470e-5e4c-470c-b61c-3818b805e709', 'quote_id': '13737', 'msg': "명언: All human wisdom is contained in these two words - Wait and Hope\n번역: 모든 인간의 지혜는 이 두 단어, 즉 '기다림'과 '희망'에 담겨 있습니다.\n\n- Alexandre Dumas -", 'like_count': '0', 'read': True}
+2024-12-04 12:18:49,457 - DEBUG - logger - app.py - line:177 - Received message from 0e4c470e-5e4c-470c-b61c-3818b805e709: {"MAX_ROW":3,"liCount":"1"}
+2024-12-04 12:18:50,201 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '0e4c470e-5e4c-470c-b61c-3818b805e709', 'quote_id': '7601', 'msg': "명언: What's the point in being smart enough to read, if everything you read makes you dumb?\n번역: 읽는 내용이 모두 당신을 멍청하게 만든다면, 책을 읽을 만큼 똑똑하다는 게 무슨 의미가 있겠는가?\n\n- C. Sean McGee -", 'like_count': '0', 'read': True}
+2024-12-04 12:20:32,734 - ERROR - logger - app.py - line:217 - User disconnected: 0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-04 12:31:39,359 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-04 12:31:39,359 - DEBUG - logger - app.py - line:163 - User connected: 0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-04 12:31:39,375 - DEBUG - logger - app.py - line:177 - Received message from 0e4c470e-5e4c-470c-b61c-3818b805e709: {"MAX_ROW":3,"liCount":"0"}
+2024-12-04 12:31:40,263 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '0e4c470e-5e4c-470c-b61c-3818b805e709', 'quote_id': '2353', 'msg': '명언: Do not fight with pigs - you will be smeared in mud but the pig will like it.\n번역: 돼지와 싸우지 마세요. 진흙투성이가 되겠지만 돼지는 좋아할 겁니다.\n\n- George Bernard Shaw -', 'like_count': '0', 'read': True}
+2024-12-04 12:32:05,681 - ERROR - logger - app.py - line:217 - User disconnected: 0e4c470e-5e4c-470c-b61c-3818b805e709
+2024-12-04 21:04:43,925 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-04 21:04:43,927 - DEBUG - logger - app.py - line:163 - User connected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-04 21:04:43,986 - DEBUG - logger - app.py - line:177 - Received message from 062a8ff2-b754-4d58-ac43-e875dcb6349a: {"MAX_ROW":3,"liCount":"0"}
+2024-12-04 21:04:44,486 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '062a8ff2-b754-4d58-ac43-e875dcb6349a', 'quote_id': '699', 'msg': '명언: We suffer more often in imagination than in reality.\n번역: 우리는 현실보다 상상 속에서 더 자주 고통을 겪는다.\n\n- Seneca -', 'like_count': '0', 'read': True}
+2024-12-04 21:05:03,891 - ERROR - logger - app.py - line:217 - User disconnected: 062a8ff2-b754-4d58-ac43-e875dcb6349a

@@ -194,4 +194,7 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 nohup.out
-.sw*
+*.sw*
+*.pid
+**/log/
+chat/v1/app/*.log*

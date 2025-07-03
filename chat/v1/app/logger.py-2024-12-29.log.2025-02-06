@@ -1,0 +1,9 @@
+2025-02-06 00:49:30,525 - DEBUG - logger - app.py - line:160 - Subscribed to MQTT topic: chat/messages/92dc50f3-0ccd-4b99-9acb-4aabe78ddd4b
+2025-02-06 00:49:30,527 - DEBUG - logger - app.py - line:167 - User connected: 92dc50f3-0ccd-4b99-9acb-4aabe78ddd4b
+2025-02-06 00:49:30,542 - DEBUG - logger - app.py - line:181 - Received message from 92dc50f3-0ccd-4b99-9acb-4aabe78ddd4b: {"MAX_ROW":3,"liCount":"0"}
+2025-02-06 00:49:30,956 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': '92dc50f3-0ccd-4b99-9acb-4aabe78ddd4b', 'quote_id': '163', 'msg': '명언: Surround yourself with only people who are going to lift you higher. \n번역: 당신을 더 높은 곳으로 이끌어 줄 사람들로만 자신을 둘러싸세요.\n\n- Oprah Winfrey -', 'like_count': '0', 'read': True}
+2025-02-06 00:49:41,542 - DEBUG - logger - app.py - line:181 - Received message from 92dc50f3-0ccd-4b99-9acb-4aabe78ddd4b: {"MAX_ROW":3,"liCount":"1"}
+2025-02-06 00:49:43,108 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': '92dc50f3-0ccd-4b99-9acb-4aabe78ddd4b', 'quote_id': '2340', 'msg': '명언: There are dark shadows on the earth, but its lights are stronger in the contrast.\n번역: 지구에는 어두운 그림자가 있지만 대조적으로 빛은 더 강합니다.\n\n- Charles Dickens -', 'like_count': '0', 'read': True}
+2025-02-06 00:49:49,901 - DEBUG - logger - app.py - line:181 - Received message from 92dc50f3-0ccd-4b99-9acb-4aabe78ddd4b: {"MAX_ROW":3,"liCount":"2"}
+2025-02-06 00:49:50,595 - DEBUG - logger - app.py - line:219 - Sent quote: {'id': 'server', 'user_id': '92dc50f3-0ccd-4b99-9acb-4aabe78ddd4b', 'quote_id': '7872', 'msg': '명언: Unexpressed emotions will never die. They are buried alive and will come forth later in uglier ways.\n번역: 표현되지 않은 감정은 결코 죽지 않습니다. 그것은 살아서 묻히고 나중에 더 추한 방식으로 나타날 것입니다.\n\n- Sigmund Freud -', 'like_count': '0', 'read': True}
+2025-02-06 02:02:04,029 - ERROR - logger - app.py - line:221 - User disconnected: 92dc50f3-0ccd-4b99-9acb-4aabe78ddd4b

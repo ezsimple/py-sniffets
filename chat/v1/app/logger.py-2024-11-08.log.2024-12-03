@@ -1,0 +1,56 @@
+2024-12-03 11:27:47,128 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/d0ff3e62-270e-43a1-95df-af44580099aa
+2024-12-03 11:27:47,130 - DEBUG - logger - app.py - line:163 - User connected: d0ff3e62-270e-43a1-95df-af44580099aa
+2024-12-03 11:27:47,158 - DEBUG - logger - app.py - line:177 - Received message from d0ff3e62-270e-43a1-95df-af44580099aa: {"MAX_ROW":3,"liCount":"0"}
+2024-12-03 11:27:47,473 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': 'd0ff3e62-270e-43a1-95df-af44580099aa', 'quote_id': '6733', 'msg': '명언: There is little success where there is little laughter.\n번역: 웃음이 적으면 성공도 적습니다.\n\n- Andrew Carnegie -', 'like_count': '0', 'read': True}
+2024-12-03 11:29:15,781 - ERROR - logger - app.py - line:217 - User disconnected: d0ff3e62-270e-43a1-95df-af44580099aa
+2024-12-03 11:29:49,432 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/d0ff3e62-270e-43a1-95df-af44580099aa
+2024-12-03 11:29:49,433 - DEBUG - logger - app.py - line:163 - User connected: d0ff3e62-270e-43a1-95df-af44580099aa
+2024-12-03 11:29:49,462 - DEBUG - logger - app.py - line:177 - Received message from d0ff3e62-270e-43a1-95df-af44580099aa: {"MAX_ROW":3,"liCount":"1"}
+2024-12-03 11:29:50,105 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': 'd0ff3e62-270e-43a1-95df-af44580099aa', 'quote_id': '3327', 'msg': '명언: Follow your instincts. That is where true wisdom manifests itself.\n번역: 본능을 따르세요. 거기서 진정한 지혜가 드러납니다.\n\n- Oprah Winfrey -', 'like_count': '0', 'read': True}
+2024-12-03 11:51:40,334 - ERROR - logger - app.py - line:217 - User disconnected: d0ff3e62-270e-43a1-95df-af44580099aa
+2024-12-03 14:11:29,623 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:30,913 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:31,953 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:32,933 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:33,126 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:33,923 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:34,073 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:34,281 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:34,970 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:35,251 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:35,551 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:36,044 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:36,682 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:38,133 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:41,561 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:44,861 - ERROR - logger - app.py - line:228 - Decryption error: 
+2024-12-03 14:11:52,574 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/29ed85d9-c861-45bb-832f-f1a36ef4f9d0
+2024-12-03 14:11:52,574 - DEBUG - logger - app.py - line:163 - User connected: 29ed85d9-c861-45bb-832f-f1a36ef4f9d0
+2024-12-03 14:11:52,631 - DEBUG - logger - app.py - line:177 - Received message from 29ed85d9-c861-45bb-832f-f1a36ef4f9d0: {"MAX_ROW":3,"liCount":"0"}
+2024-12-03 14:11:53,196 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '29ed85d9-c861-45bb-832f-f1a36ef4f9d0', 'quote_id': '1822', 'msg': "명언: I'm an optimist by choice not by stupidity.\n번역: 나는 어리석음이 아니라 선택에 의해 낙관주의자가 되었습니다.\n\n- Yanni -", 'like_count': '0', 'read': True}
+2024-12-03 14:12:29,489 - DEBUG - logger - app.py - line:177 - Received message from 29ed85d9-c861-45bb-832f-f1a36ef4f9d0: {"MAX_ROW":3,"liCount":"1"}
+2024-12-03 14:12:30,060 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '29ed85d9-c861-45bb-832f-f1a36ef4f9d0', 'quote_id': '7872', 'msg': '명언: Unexpressed emotions will never die. They are buried alive and will come forth later in uglier ways.\n번역: 표현되지 않은 감정은 결코 죽지 않습니다. 그것은 살아서 묻히고 나중에 더 추한 방식으로 나타날 것입니다.\n\n- Sigmund Freud -', 'like_count': '0', 'read': True}
+2024-12-03 14:14:24,951 - ERROR - logger - app.py - line:217 - User disconnected: 29ed85d9-c861-45bb-832f-f1a36ef4f9d0
+2024-12-03 14:17:37,171 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/29ed85d9-c861-45bb-832f-f1a36ef4f9d0
+2024-12-03 14:17:37,172 - DEBUG - logger - app.py - line:163 - User connected: 29ed85d9-c861-45bb-832f-f1a36ef4f9d0
+2024-12-03 14:18:17,174 - ERROR - logger - app.py - line:217 - User disconnected: 29ed85d9-c861-45bb-832f-f1a36ef4f9d0
+2024-12-03 23:03:08,242 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/33d969f9-d5bc-4c56-ae1c-b7d8ced54f30
+2024-12-03 23:03:08,243 - DEBUG - logger - app.py - line:163 - User connected: 33d969f9-d5bc-4c56-ae1c-b7d8ced54f30
+2024-12-03 23:03:08,255 - DEBUG - logger - app.py - line:177 - Received message from 33d969f9-d5bc-4c56-ae1c-b7d8ced54f30: {"MAX_ROW":3,"liCount":"0"}
+2024-12-03 23:03:09,351 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '33d969f9-d5bc-4c56-ae1c-b7d8ced54f30', 'quote_id': '1532', 'msg': '명언: Do not follow the ideas of others, but learn to listen to the voice within yourself.\n번역: 다른 사람의 생각을 따르지 말고, 자신의 내면의 목소리를 듣는 법을 배우세요.\n\n- Dogen -', 'like_count': '0', 'read': True}
+2024-12-03 23:03:25,149 - ERROR - logger - app.py - line:217 - User disconnected: 33d969f9-d5bc-4c56-ae1c-b7d8ced54f30
+2024-12-03 23:03:28,579 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/33d969f9-d5bc-4c56-ae1c-b7d8ced54f30
+2024-12-03 23:03:28,580 - DEBUG - logger - app.py - line:163 - User connected: 33d969f9-d5bc-4c56-ae1c-b7d8ced54f30
+2024-12-03 23:03:28,598 - DEBUG - logger - app.py - line:177 - Received message from 33d969f9-d5bc-4c56-ae1c-b7d8ced54f30: {"MAX_ROW":3,"liCount":"0"}
+2024-12-03 23:03:28,970 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '33d969f9-d5bc-4c56-ae1c-b7d8ced54f30', 'quote_id': '3302', 'msg': '명언: The prettiest eyes have cried the most.\n번역: 가장 예쁜 눈이 가장 많이 울었다.\n\n- Unknown -', 'like_count': '0', 'read': True}
+2024-12-03 23:03:31,230 - ERROR - logger - app.py - line:217 - User disconnected: 33d969f9-d5bc-4c56-ae1c-b7d8ced54f30
+2024-12-03 23:27:50,401 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-03 23:27:50,402 - DEBUG - logger - app.py - line:163 - User connected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-03 23:27:50,469 - DEBUG - logger - app.py - line:177 - Received message from 062a8ff2-b754-4d58-ac43-e875dcb6349a: {"MAX_ROW":3,"liCount":"0"}
+2024-12-03 23:27:51,068 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '062a8ff2-b754-4d58-ac43-e875dcb6349a', 'quote_id': '3405', 'msg': "명언: Have a vision, trust yourself, break some rules, ignore the naysayers, don't be afraid to fail.\n번역: 비전을 갖고, 자신을 믿고, 규칙을 어기고, 비판하는 사람들을 무시하고, 실패를 두려워하지 마세요.\n\n- Arnold Schwarzenegger -", 'like_count': '0', 'read': True}
+2024-12-03 23:28:28,569 - ERROR - logger - app.py - line:217 - User disconnected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-03 23:29:52,066 - DEBUG - logger - app.py - line:156 - Subscribed to MQTT topic: chat/messages/062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-03 23:29:52,066 - DEBUG - logger - app.py - line:163 - User connected: 062a8ff2-b754-4d58-ac43-e875dcb6349a
+2024-12-03 23:29:52,115 - DEBUG - logger - app.py - line:177 - Received message from 062a8ff2-b754-4d58-ac43-e875dcb6349a: {"MAX_ROW":3,"liCount":"0"}
+2024-12-03 23:29:52,688 - DEBUG - logger - app.py - line:215 - Sent quote: {'id': 'server', 'user_id': '062a8ff2-b754-4d58-ac43-e875dcb6349a', 'quote_id': '4959', 'msg': '명언: Life is ten percent what you experience and ninety percent how you respond to it.\n번역: 인생은 10%는 당신이 경험하는 것이고 90%는 당신이 그것에 어떻게 반응하느냐에 달려 있습니다.\n\n- Unknown -', 'like_count': '0', 'read': True}
+2024-12-03 23:30:03,377 - ERROR - logger - app.py - line:217 - User disconnected: 062a8ff2-b754-4d58-ac43-e875dcb6349a

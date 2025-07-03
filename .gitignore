@@ -197,4 +197,4 @@ nohup.out
 *.sw*
 *.pid
 **/log/
-chat/v1/app/*.log*
+chat/v1/app/logger.py-*.log.*

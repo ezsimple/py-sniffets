@@ -54,9 +54,13 @@
                             </div>
                         </div>
                         <div class="portfolio-info">
-                            <p class="text-success">설명 : {{ p.description }}</p>
-                            <p class="text-success">사용기술: {{ p.tech }}</p>
-                            <a href="{{ p.url }}" class="btn btn-primary w-100" target="_blank">바로가기</a>
+                            <div class="bg-light border rounded p-3 mb-3">
+                                <p class="text-success mb-2">설명 : {{ p.description }}</p>
+                                <p class="text-success mb-0">기술: {{ p.tech }}</p>
+                            </div>
+                            {% if p.url_ok %}
+                            <a href="{{ p.url }}" class="btn btn-primary w-100" target="_blank">사이트 바로가기</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

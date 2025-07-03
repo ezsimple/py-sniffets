@@ -3,6 +3,7 @@ portfolios:
     description: '성경 31,091개 구절을 임베딩 시킨 elasticSearch와 LLM(AI)을, RAG기반으로 연계한 서비스, 출처 지원, 이전 대화 (30일치) 지원, 임베딩(re-index) 처리, Ensemble Retriever(keyword, vector, semantic, hierarchy), score min-max 정규화, 채팅어, 비속어 차단, 반응형'
     tech: 'FastAPI, Elasticsearch(vectorstore), ORM(chatting), Jinja2, LangChain, HuggingFace, RAG, nori_tokenizer, konlpy(okt), React, vite, TypeScript, chakra-ui'
     url: 'https://a1.mkeasy.kro.kr/rag2/'
+    url_ok: True
     time: '1s'
     images:
       - 'image/portfolio/ai_bible/ai_bible_01.jpg'
@@ -12,6 +13,7 @@ portfolios:
     description: '렌탈고객 포털 사이트, 기존 .NET 서비스를 java로 개편, 사내 ERP 연동, BackOffice 제공'
     tech: 'Springboot, Thymeleaf, MyBatis, MSSQL, jQuery, dxGrid(devExpress)'
     url: 'https://www.krsmart.com'
+    url_ok: True
     time: '1s'
     images:
       - 'image/portfolio/krsmart/krsmart_01.jpg'
@@ -33,6 +35,7 @@ portfolios:
     description: '상품관리, 통계, 정산 기능 개발'
     tech: 'Springboot, Next.js, JPA, QueryDSL, MyBatis, MySQL, CQRS'
     url: 'https://oround.com'
+    url_ok: True
     time: '1s'
     images:
       - 'image/portfolio/oround/oround_01.jpg'
@@ -45,6 +48,7 @@ portfolios:
     description: '월간 직원연락망.xls 분석으로 만든 통계용 챠트, 반응형'
     tech: 'Flask, pandas, matplotlib, seaborn'
     url: 'https://a1.mkeasy.kro.kr/hr_list'
+    url_ok: True
     time: '1s'
     images: 
       - 'image/portfolio/recruite/월별 고용 성장율.jpg'
@@ -63,6 +67,7 @@ portfolios:
     description: '개인용 파일 서버(임베딩 처리 및 다운로드) 및 SSO 인증 처리, 반응형'
     tech: 'FastAPI, pydantic, keycloak, cookie, redis, middleware'
     url: 'https://a1.mkeasy.kro.kr/v1'
+    url_ok: True
     time: '1s'
     images:
       - 'image/portfolio/fileserver/fileserver_02.jpg'
@@ -72,6 +77,7 @@ portfolios:
     description: '명언({count_quotes}개) API 서버 구현 및 연동, 한글 해석, 공유기능, 명언 크롤링, 카카오 링크 클릭시 타사 브라우져 전환 기능, 반응형'
     tech: 'FastAPI, SQLAlchemy, PostgreSQL, websocket, mqtt, deep-L translator'
     url: 'https://a1.mkeasy.kro.kr/chat/'
+    url_ok: True
     time: '1s'
     images:
       - 'image/portfolio/quotes/quotes_01.jpg'
@@ -80,6 +86,7 @@ portfolios:
     description: '공공데이터 시계열 자료 사용, 10년치 자료 분석 (총 {count_weather_data}건), 반응형'
     tech: '고속 데이터 전처리, FastAPI, pandas, SQLAlchemy, PostgreSQL, vega-lite'
     url: 'https://a1.mkeasy.kro.kr/past-weather'
+    url_ok: True
     time: '1s'
     images:
       - 'image/portfolio/pastweather/pastweather_01.jpg'
@@ -88,6 +95,7 @@ portfolios:
     description: 'React를 사용해 다중탭 화면 구성'
     tech: 'React, vite, TypeScript, tailwindcss, shadcn, recoil, styled-components'
     url: 'https://a1.mkeasy.kro.kr/erp'
+    url_ok: True
     time: '1s'
     images:
       - 'image/portfolio/erp_ui/erp_01.jpg'
@@ -98,6 +106,7 @@ portfolios:
     description: '출력용 일년치 달력 (한국 휴일 표시)'
     tech: 'React, vite, TypeScript, tailwindcss, nestjs(BFF) API'
     url: 'https://a1.mkeasy.kro.kr/calendar'
+    url_ok: True
     time: '1s'
     images:
       - 'image/portfolio/calendar/cal_01.jpg'

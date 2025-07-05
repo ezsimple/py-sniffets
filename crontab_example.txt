@@ -1,0 +1,21 @@
+# 평생교육이용권 공지 모니터링 crontab 설정 예시
+# 매일 오전 9시에 실행
+0 9 * * * cd /path/to/your/project && /usr/bin/python3 lifelong_edu.py >> /path/to/your/project/cron.log 2>&1
+
+# 매일 오전 9시와 오후 6시에 실행
+0 9,18 * * * cd /path/to/your/project && /usr/bin/python3 lifelong_edu.py >> /path/to/your/project/cron.log 2>&1
+
+# 매시간 실행 (테스트용)
+0 * * * * cd /path/to/your/project && /usr/bin/python3 lifelong_edu.py >> /path/to/your/project/cron.log 2>&1
+
+# crontab 설정 방법:
+# 1. crontab -e 명령으로 편집기 열기
+# 2. 위의 설정 중 하나를 복사하여 붙여넣기
+# 3. 경로를 실제 프로젝트 경로로 수정
+# 4. 저장 후 종료
+
+# crontab 확인:
+# crontab -l
+
+# crontab 삭제:
+# crontab -r 

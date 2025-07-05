@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# 서비스 : https://msg.nurigo.co.kr/
 # 사용법 : python sms.py 01039960883 변작된 발신번호 발송 실패 테스트
 
 import sys

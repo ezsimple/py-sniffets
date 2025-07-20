@@ -17,6 +17,7 @@ ICLOUD_PATH = os.path.expanduser('~/Library/Mobile Documents/iCloud~md~obsidian/
 
 def main():
     if len(sys.argv) != 2:
+        print("옵시디안 카피")
         print("사용법: python ocp.py <복사할_파일경로>")
         sys.exit(1)
 

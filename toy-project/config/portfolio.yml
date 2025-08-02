@@ -1,7 +1,7 @@
 portfolios:
   - title: 'AI 성경 RAG기반 챗봇'
-    description: '성경 31,091개 구절을 임베딩 시킨 elasticSearch와 LLM(AI)을, RAG기반으로 연계한 서비스, 출처 지원, 이전 대화 (30일치) 지원, 임베딩(re-index) 처리, Ensemble Retriever(keyword, vector, semantic, hierarchy), score min-max 정규화, 채팅어, 비속어 차단, 반응형'
-    tech: 'FastAPI, Elasticsearch(vectorstore), ORM(chatting), Jinja2, LangChain, HuggingFace, RAG, nori_tokenizer, konlpy(okt), React, vite, TypeScript, chakra-ui'
+    description: '성경 31,091개 구절을 임베딩 시킨 elasticSearch와 LLM(AI)을, RAG기반으로 연계한 서비스, 출처 지원, 이전 대화 (30일치) 지원, 임베딩(re-index) 처리, Ensemble Retriever(keyword, vector, semantic, hierarchy), score min-max 정규화, 채팅어/비속어 차단, 반응형 웹'
+    tech: 'FastAPI, Elasticsearch(vectorstore), LLM(Groq), ORM(대화기록), Jinja2, LangChain, HuggingFace, RAG, nori_tokenizer, konlpy(okt), React, vite, TypeScript, chakra-ui'
     url: 'https://a1.mkeasy.kro.kr/rag2/'
     url_ok: True
     time: '1s'
@@ -45,7 +45,7 @@ portfolios:
       - 'image/portfolio/oround/oround_05.jpg'
 
   - title: '리쿠르트 통계'
-    description: '월간 직원연락망.xls 분석으로 만든 통계용 챠트, 반응형'
+    description: '월간 직원연락망.xls 분석으로 만든 통계용 챠트, 반응형 웹'
     tech: 'Flask, pandas, matplotlib, seaborn'
     url: 'https://a1.mkeasy.kro.kr/hr_list'
     url_ok: True
@@ -64,7 +64,7 @@ portfolios:
       - 'image/portfolio/recruite/부서별 바로 퇴사자수.jpg'
 
   - title: '파일 서버'
-    description: '개인용 파일 서버(임베딩 처리 및 다운로드) 및 SSO 인증 처리, 반응형'
+    description: '개인용 파일 서버(임베딩 처리 및 다운로드) 및 SSO 인증 처리, 반응형 웹'
     tech: 'FastAPI, pydantic, keycloak, cookie, redis, middleware'
     url: 'https://a1.mkeasy.kro.kr/v1'
     url_ok: True
@@ -74,7 +74,7 @@ portfolios:
       - 'image/portfolio/fileserver/fileserver_01.jpg'
 
   - title: '명언 카드'
-    description: '명언({count_quotes}개) API 서버 구현 및 연동, 한글 해석, 공유기능, 명언 크롤링, 카카오 링크 클릭시 타사 브라우져 전환 기능, 반응형'
+    description: '명언({count_quotes}개) API 서버 구현 및 연동, 한글 해석, 공유기능, 명언 크롤링, 카카오 링크 클릭시 타사 브라우져 전환 기능, 반응형 웹'
     tech: 'FastAPI, SQLAlchemy, PostgreSQL, websocket, mqtt, deep-L translator'
     url: 'https://a1.mkeasy.kro.kr/chat/'
     url_ok: True
@@ -83,7 +83,7 @@ portfolios:
       - 'image/portfolio/quotes/quotes_01.jpg'
 
   - title: '송악읍 과거 날씨'
-    description: '공공데이터 시계열 자료 사용, 10년치 자료 분석 (총 {count_weather_data}건), 반응형'
+    description: '공공데이터 시계열 자료 사용, 10년치 자료 분석 (총 {count_weather_data}건), 반응형 웹'
     tech: '고속 데이터 전처리, FastAPI, pandas, SQLAlchemy, PostgreSQL, vega-lite'
     url: 'https://a1.mkeasy.kro.kr/past-weather'
     url_ok: True

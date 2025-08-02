@@ -20,7 +20,7 @@ URIs = {
 async def check_nginx_status():
     try:
         # Nginx 상태 확인
-        result = subprocess.run(['systemctl', 'is-active', 'nginx'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(['systemctl', 'is-active', 'nginx.service'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return result.stdout.decode('utf-8').strip() == 'active'
     except Exception as e:
         print(f"Error checking Nginx status: {e}")

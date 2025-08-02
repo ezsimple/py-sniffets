@@ -67,7 +67,7 @@ async def check_urls(urls):
 async def main():
     try:
         if not await check_nginx_status():
-            msg = 'Nginx service is not running!'
+            msg = 'Nginx service is not running! Really?!'
             await send_message(f'{msg}')
 
 

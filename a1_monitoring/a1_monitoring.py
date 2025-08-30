@@ -5,6 +5,7 @@ import requests
 import subprocess
 import os
 import socket
+import netifaces
 from dotenv import load_dotenv
 
 # 환경변수 로드
@@ -14,22 +15,26 @@ load_dotenv('.env.dev')
 HOST = "https://a1.mkeasy.kro.kr"
 
 def get_server_ip():
-    """현재 서버의 IP 주소를 자동으로 구함"""
+    """현재 서버의 IP 주소를 자동으로 구함 (netifaces 사용)"""
     try:
-        # 외부 연결을 통해 공인 IP 확인
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        server_ip = s.getsockname()[0]
-        s.close()
-        return server_ip
+        # 기본 게이트웨이 인터페이스의 IP 주소 가져오기
+        gateways = netifaces.gateways()
+        default_gateway = gateways['default'][netifaces.AF_INET][1]  # 인터페이스 이름
+        ip = netifaces.ifaddresses(default_gateway)[netifaces.AF_INET][0]['addr']
+        return ip
     except Exception:
         try:
-            # 호스트명으로 IP 확인
-            hostname = socket.gethostname()
-            server_ip = socket.gethostbyname(hostname)
-            return server_ip
+            # 모든 인터페이스에서 첫 번째 유효한 IP 찾기
+            for interface in netifaces.interfaces():
+                addrs = netifaces.ifaddresses(interface)
+                if netifaces.AF_INET in addrs:
+                    for addr_info in addrs[netifaces.AF_INET]:
+                        ip = addr_info['addr']
+                        if not ip.startswith('127.'):  # localhost 제외
+                            return ip
         except Exception:
-            return "127.0.0.1"  # 기본값
+            pass
+        return "127.0.0.1"  # 기본값
 
 SERVER_IP = get_server_ip()
 URIs = {

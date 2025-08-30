@@ -198,3 +198,4 @@ nohup.out
 *.pid
 **/log/
 chat/v1/app/logger.py-*.log.*
+.env.*

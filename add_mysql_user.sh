@@ -31,9 +31,9 @@ DB_USER_PASS=${3:-Qwer!@34}
 # -p: Prompt for the MySQL root password
 # -e: Execute the following commands
 SQL_COMMANDS="
-CREATE DATABASE IF NOT EXISTS \`$DB_NAME\`;
-CREATE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_USER_PASS';
-GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER'@'localhost';
+CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER '$DB_USER'@'%' IDENTIFIED WITH mysql_native_password BY '$DB_USER_PASS';
+GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER'@'%';
 FLUSH PRIVILEGES;
 "
 

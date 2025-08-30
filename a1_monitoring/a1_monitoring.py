@@ -3,9 +3,35 @@ import aiohttp
 import asyncio
 import requests
 import subprocess
+import os
+import socket
+from dotenv import load_dotenv
+
+# 환경변수 로드
+load_dotenv('.env.dev')
 
 # 주의 : 버츄얼 호스트수(len(URLs))가 10을 넘으면 nginx.limit_req burst=10으로 인해 503 발생함.
 HOST = "https://a1.mkeasy.kro.kr"
+
+def get_server_ip():
+    """현재 서버의 IP 주소를 자동으로 구함"""
+    try:
+        # 외부 연결을 통해 공인 IP 확인
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        server_ip = s.getsockname()[0]
+        s.close()
+        return server_ip
+    except Exception:
+        try:
+            # 호스트명으로 IP 확인
+            hostname = socket.gethostname()
+            server_ip = socket.gethostbyname(hostname)
+            return server_ip
+        except Exception:
+            return "127.0.0.1"  # 기본값
+
+SERVER_IP = get_server_ip()
 URIs = {
     "/health": "toy-project", # toy-project
     "/erp/health": "react-erp", # react-erp
@@ -27,8 +53,12 @@ async def check_nginx_status():
         return False
 
 async def send_message(text):
-    TOKEN = "5758487515:AAFfZ9fZsv7padX_6StJbn3T9zFOvW46jcc"
-    CHAT_ID = "918743728"
+    TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+    CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+    
+    if not TOKEN or not CHAT_ID:
+        raise ValueError("TELEGRAM_BOT_TOKEN 또는 TELEGRAM_CHAT_ID 환경변수가 설정되지 않았습니다.")
+    
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     params = {
         "chat_id": CHAT_ID,
@@ -67,7 +97,7 @@ async def check_urls(urls):
 async def main():
     try:
         if not await check_nginx_status():
-            msg = 'Nginx service is not running! Really?!'
+            msg = f'Nginx service is not running on {HOST} ({SERVER_IP})! Really?!'
             await send_message(f'{msg}')
 
 

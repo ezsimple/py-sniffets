@@ -2,6 +2,11 @@
 let cardTimer = null;
 const cardTimerDuration = 5000;
 
+// 터치 이벤트 관련 변수
+let touchStartTime = 0;
+let touchStartPosition = { x: 0, y: 0 };
+let isTouchDevice = false;
+
 function isMobile() {
     const userAgent = navigator.userAgent.toLowerCase();
     const mobileKeywords = [
@@ -80,26 +85,80 @@ function toggleCard(clickedCard, event = null) {
     }
 }
 
+// 터치 이벤트 처리 함수
+function handleTouchStart(e) {
+    isTouchDevice = true;
+    touchStartTime = Date.now();
+    const touch = e.touches[0];
+    touchStartPosition = { x: touch.clientX, y: touch.clientY };
+}
+
+function handleTouchEnd(e, card) {
+    if (!isTouchDevice) return;
+    
+    const touchEndTime = Date.now();
+    const touchDuration = touchEndTime - touchStartTime;
+    
+    // 터치 시간이 너무 길면 무시 (스크롤 등)
+    if (touchDuration > 500) return;
+    
+    const touch = e.changedTouches[0];
+    const touchEndPosition = { x: touch.clientX, y: touch.clientY };
+    
+    // 터치 이동 거리가 너무 크면 무시 (스크롤 등)
+    const distance = Math.sqrt(
+        Math.pow(touchEndPosition.x - touchStartPosition.x, 2) + 
+        Math.pow(touchEndPosition.y - touchStartPosition.y, 2)
+    );
+    
+    if (distance > 10) return;
+    
+    // 링크나 버튼 클릭은 무시
+    const target = e.target;
+    if (target.tagName === 'A' || target.tagName === 'BUTTON') return;
+    
+    e.preventDefault();
+    e.stopPropagation();
+    
+    toggleCard(card, e);
+}
+
 // 이벤트 리스너 설정
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.card').forEach(card => {
-				card.addEventListener('click', function(e) {
-						if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
-								e.preventDefault();
-								e.stopPropagation();
-						}
-						toggleCard(this, e);
-				});
-				card.addEventListener('mouseover', function() {
-						toggleCard(this);
-				});
+        // 터치 이벤트 리스너 (모바일 우선)
+        card.addEventListener('touchstart', handleTouchStart, { passive: true });
+        card.addEventListener('touchend', function(e) {
+            handleTouchEnd(e, this);
+        }, { passive: false });
+        
+        // 클릭 이벤트 리스너 (데스크톱용)
+        card.addEventListener('click', function(e) {
+            // 터치 디바이스에서는 클릭 이벤트 무시 (중복 방지)
+            if (isTouchDevice) return;
+            
+            if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            toggleCard(this, e);
+        });
+        
+        // 마우스 이벤트 리스너 (데스크톱용)
+        card.addEventListener('mouseover', function() {
+            // 터치 디바이스에서는 마우스 이벤트 무시
+            if (isTouchDevice) return;
+            toggleCard(this);
+        });
 
-				card.addEventListener('mouseout', function() {
-						const body = this.querySelector('.card-body');
-						body.classList.remove('active');
-						this.classList.remove('active');
-						removeAllGrayscale();
-				});
+        card.addEventListener('mouseout', function() {
+            // 터치 디바이스에서는 마우스 이벤트 무시
+            if (isTouchDevice) return;
+            const body = this.querySelector('.card-body');
+            body.classList.remove('active');
+            this.classList.remove('active');
+            removeAllGrayscale();
+        });
     });
 });
 

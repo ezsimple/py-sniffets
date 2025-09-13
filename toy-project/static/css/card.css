@@ -67,6 +67,8 @@ header .profile-image {
     max-width: 100%;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     z-index: 2;
+    touch-action: manipulation; /* 터치 지연 방지 */
+    -webkit-tap-highlight-color: transparent; /* 터치 하이라이트 제거 */
 }
 
 /* grayscale 클래스 추가 */

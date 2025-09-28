@@ -1,4 +1,4 @@
-#!/home/ubuntu/.virtualenvs/머신러닝/bin/python
+#!/home/ubuntu/.pyenv/shims/python
 import os
 import json
 import traceback

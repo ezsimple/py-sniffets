@@ -31,18 +31,19 @@ portfolios:
       - 'image/portfolio/krsmart/krsmart_13.jpg'
       - 'image/portfolio/krsmart/krsmart_14.jpg'
 
-  - title: 'OROUND(e커머스)'
-    description: '상품관리, 통계, 정산 기능 개발'
-    tech: 'Springboot, Next.js, JPA, QueryDSL, MyBatis, MySQL, CQRS'
-    url: 'https://oround.com'
-    url_ok: True
-    time: '1s'
-    images:
-      - 'image/portfolio/oround/oround_01.jpg'
-      - 'image/portfolio/oround/oround_02.jpg'
-      - 'image/portfolio/oround/oround_03.jpg'
-      - 'image/portfolio/oround/oround_04.jpg'
-      - 'image/portfolio/oround/oround_05.jpg'
+#  사이트 폐쇄
+#  - title: 'OROUND(e커머스)'
+#    description: '상품관리, 통계, 정산 기능 개발'
+#    tech: 'Springboot, Next.js, JPA, QueryDSL, MyBatis, MySQL, CQRS'
+#    url: 'https://oround.com'
+#    url_ok: True
+#    time: '1s'
+#    images:
+#      - 'image/portfolio/oround/oround_01.jpg'
+#      - 'image/portfolio/oround/oround_02.jpg'
+#      - 'image/portfolio/oround/oround_03.jpg'
+#      - 'image/portfolio/oround/oround_04.jpg'
+#      - 'image/portfolio/oround/oround_05.jpg'
 
   - title: '리쿠르트 통계'
     description: '월간 직원연락망.xls 분석으로 만든 통계용 챠트, 반응형 웹'

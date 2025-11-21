@@ -48,8 +48,9 @@ participated_projects:
     image: 'image/krsmart.png'
     url: 'https://www.krsmart.com'
 
-  - title: 'e커머스'
-    description: '상품관리, 통계, 정산 기능 개발'
-    tech: 'Springboot, Next.js, JPA, QueryDSL, MyBatis, MySQL, CQRS'
-    image: 'image/oround.png'
-    url: 'https://oround.com'
+# 사이트 폐쇄
+#  - title: 'e커머스'
+#    description: '상품관리, 통계, 정산 기능 개발'
+#    tech: 'Springboot, Next.js, JPA, QueryDSL, MyBatis, MySQL, CQRS'
+#    image: 'image/oround.png'
+#    url: 'https://oround.com'

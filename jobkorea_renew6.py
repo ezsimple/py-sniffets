@@ -1,4 +1,4 @@
-#!/home/ubuntu/.virtualenvs/머신러닝/bin/python
+#!/usr/bin/env python
 import os
 import json
 import traceback

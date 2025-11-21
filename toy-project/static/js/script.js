@@ -6,6 +6,7 @@ const cardTimerDuration = 5000;
 let touchStartTime = 0;
 let touchStartPosition = { x: 0, y: 0 };
 let isTouchDevice = false;
+let isTouchDragging = false;
 
 function isMobile() {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -91,10 +92,31 @@ function handleTouchStart(e) {
     touchStartTime = Date.now();
     const touch = e.touches[0];
     touchStartPosition = { x: touch.clientX, y: touch.clientY };
+    isTouchDragging = false;
+}
+
+function handleTouchMove(e) {
+    if (!isTouchDevice || isTouchDragging) return;
+    
+    const touch = e.touches[0];
+    const currentPosition = { x: touch.clientX, y: touch.clientY };
+    
+    const distance = Math.sqrt(
+        Math.pow(currentPosition.x - touchStartPosition.x, 2) + 
+        Math.pow(currentPosition.y - touchStartPosition.y, 2)
+    );
+    
+    if (distance > 10) {
+        isTouchDragging = true;
+    }
 }
 
 function handleTouchEnd(e, card) {
     if (!isTouchDevice) return;
+    if (isTouchDragging) {
+        isTouchDragging = false;
+        return;
+    }
     
     const touchEndTime = Date.now();
     const touchDuration = touchEndTime - touchStartTime;
@@ -128,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.card').forEach(card => {
         // 터치 이벤트 리스너 (모바일 우선)
         card.addEventListener('touchstart', handleTouchStart, { passive: true });
+        card.addEventListener('touchmove', handleTouchMove, { passive: true });
         card.addEventListener('touchend', function(e) {
             handleTouchEnd(e, this);
         }, { passive: false });

@@ -1,6 +1,6 @@
 // 전역 변수로 타이머 ID를 저장
 let cardTimer = null;
-const cardTimerDuration = 5000;
+const cardTimerDuration = 30000;
 
 // 터치 이벤트 관련 변수
 let touchStartTime = 0;

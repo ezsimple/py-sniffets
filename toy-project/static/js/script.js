@@ -8,6 +8,34 @@ let touchStartPosition = { x: 0, y: 0 };
 let isTouchDevice = false;
 let isTouchDragging = false;
 
+function cancelCardTimer() {
+    if (cardTimer) {
+        clearTimeout(cardTimer);
+        cardTimer = null;
+    }
+}
+
+function startCardTimer(card, body) {
+    cancelCardTimer();
+    cardTimer = setTimeout(() => {
+        body.classList.remove('active');
+        card.classList.remove('active');
+        removeAllGrayscale();
+        cardTimer = null;
+    }, cardTimerDuration);
+}
+
+function resumeActiveCardTimer() {
+    const activeCard = document.querySelector('.card.active');
+    if (!activeCard) {
+        cancelCardTimer();
+        return;
+    }
+    const activeBody = activeCard.querySelector('.card-body.active');
+    if (!activeBody) return;
+    startCardTimer(activeCard, activeBody);
+}
+
 function isMobile() {
     const userAgent = navigator.userAgent.toLowerCase();
     const mobileKeywords = [
@@ -53,10 +81,7 @@ function toggleCard(clickedCard, event = null) {
     const clickedBody = clickedCard.querySelector('.card-body');
     
     // 이전 타이머가 있다면 취소
-    if (cardTimer) {
-        clearTimeout(cardTimer);
-        cardTimer = null;
-    }
+    cancelCardTimer();
 
     if (clickedBody.classList.contains('active')) {
         clickedBody.classList.remove('active');
@@ -77,12 +102,7 @@ function toggleCard(clickedCard, event = null) {
         applyGrayscale(clickedCard);
         
         // 타이머 설정
-        cardTimer = setTimeout(() => {
-            clickedBody.classList.remove('active');
-            clickedCard.classList.remove('active');
-            removeAllGrayscale();
-            cardTimer = null;
-        }, cardTimerDuration);
+        startCardTimer(clickedCard, clickedBody);
     }
 }
 
@@ -108,6 +128,7 @@ function handleTouchMove(e) {
     
     if (distance > 10) {
         isTouchDragging = true;
+        cancelCardTimer();
     }
 }
 
@@ -115,6 +136,7 @@ function handleTouchEnd(e, card) {
     if (!isTouchDevice) return;
     if (isTouchDragging) {
         isTouchDragging = false;
+        resumeActiveCardTimer();
         return;
     }
     

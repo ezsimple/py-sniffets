@@ -169,19 +169,19 @@ function handleTouchEnd(e, card) {
 
 // 이벤트 리스너 설정
 document.addEventListener('DOMContentLoaded', function() {
+    const isLikelyTouchDevice = isMobile();
     document.querySelectorAll('.card').forEach(card => {
-        // 터치 이벤트 리스너 (모바일 우선)
-        card.addEventListener('touchstart', handleTouchStart, { passive: true });
-        card.addEventListener('touchmove', handleTouchMove, { passive: true });
-        card.addEventListener('touchend', function(e) {
-            handleTouchEnd(e, this);
-        }, { passive: false });
-        
+        if (isLikelyTouchDevice) {
+            // 터치 이벤트 리스너 (모바일 우선)
+            card.addEventListener('touchstart', handleTouchStart, { passive: true });
+            card.addEventListener('touchmove', handleTouchMove, { passive: true });
+            card.addEventListener('touchend', function(e) {
+                handleTouchEnd(e, this);
+            }, { passive: false });
+            return;
+        } 
         // 클릭 이벤트 리스너 (데스크톱용)
         card.addEventListener('click', function(e) {
-            // 터치 디바이스에서는 클릭 이벤트 무시 (중복 방지)
-            if (isTouchDevice) return;
-            
             if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
                 e.preventDefault();
                 e.stopPropagation();
@@ -191,14 +191,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 마우스 이벤트 리스너 (데스크톱용)
         card.addEventListener('mouseover', function() {
-            // 터치 디바이스에서는 마우스 이벤트 무시
-            if (isTouchDevice) return;
             toggleCard(this);
         });
 
         card.addEventListener('mouseout', function() {
-            // 터치 디바이스에서는 마우스 이벤트 무시
-            if (isTouchDevice) return;
             const body = this.querySelector('.card-body');
             body.classList.remove('active');
             this.classList.remove('active');

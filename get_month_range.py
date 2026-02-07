@@ -3,6 +3,7 @@
 
 from datetime import date, datetime
 from typing import Optional, Tuple
+from range_factory import RangeFactory
 
 def get_month_range(param: Optional[str] = None) -> Tuple[str, str]:
     """
@@ -62,10 +63,10 @@ import sys
 if __name__ == '__main__':
 	if len(sys.argv) > 1:
 		param = sys.argv[1]
-		start_date, end_date = get_month_range(param)
+		start_date, end_date = RangeFacotry.month(param)
 		print(f"{start_date} ~ {end_date}")
 		sys.exit(0)
 
-	start_date, end_date = get_month_range()
+	start_date, end_date = RangeFactory.month()
 	print(f"{start_date} ~ {end_date}")
 	

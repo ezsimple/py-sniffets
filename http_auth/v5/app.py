@@ -317,7 +317,7 @@ async def download_file(request: Request, path: str):
     mime_type = mime.from_file(file_path)  # 파일의 MIME 타입 확인
 
     # 만약 MIME 타입을 알 수 없고, 확장자가 텍스트 기반인 경우 'text/plain'으로 설정
-    if extension in ['.py', '.md', '.txt', '.html', '.css', '.js', '.java', '.json', '.xml', '.csv', '.log', '.sh']:
+    if extension in ['.py', '.md', '.txt', '.js', '.java', '.json', '.xml', '.csv', '.log', '.sh']:
         mime_type = 'text/plain'
 
     # 디버깅 정보 로그

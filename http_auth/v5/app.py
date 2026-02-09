@@ -291,7 +291,7 @@ def guess_display_inline(file_path: str, mime_type: str) -> bool:
     # MIME 타입이 inline으로 열 수 있는지 확인 (추가적인 라이브러리 필요 없음)
     return mime_type.startswith('image/') or \
            mime_type.startswith('text/') or \
-           mime_type in ['application/pdf', 'application/xhtml+xml']
+           mime_type in ['application/pdf', 'application/xhtml+xml', 'application/xml', 'text/plain']
 
 @router.get("/download/{path:path}", response_class=FileResponse)
 async def download_file(request: Request, path: str):

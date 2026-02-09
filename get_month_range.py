@@ -25,7 +25,7 @@ def get_month_range(param: Optional[str] = None) -> Tuple[str, str]:
     """
 
     try:
-        # 1️⃣ 파라미터 없음 → 현재 월
+        # 파라미터 없음 → 현재 월
         if param is None:
             today = date.today()
             base = date(today.year, today.month, 1)
@@ -33,13 +33,13 @@ def get_month_range(param: Optional[str] = None) -> Tuple[str, str]:
         else:
             param = param.strip()
 
-            # 2️⃣ YYYY-MM-dd 우선 시도
+            # YYYY-MM-dd 우선 시도
             try:
                 dt = datetime.strptime(param, "%Y-%m-%d")
                 base = date(dt.year, dt.month, 1)
 
             except ValueError:
-                # 3️⃣ YY-MM 시도
+                # YY-MM 시도
                 yy, mm = map(int, param.split("-"))
                 base = date(2000 + yy, mm, 1)
 
@@ -48,7 +48,7 @@ def get_month_range(param: Optional[str] = None) -> Tuple[str, str]:
             "param must be one of: None, 'YY-MM', 'YYYY-MM-dd'"
         ) from e
 
-    # 4️⃣ 전달 1일 계산
+    # 전달 1일 계산
     if base.month == 1:
         prev_month = date(base.year - 1, 12, 1)
     else:
@@ -63,10 +63,10 @@ import sys
 if __name__ == '__main__':
 	if len(sys.argv) > 1:
 		param = sys.argv[1]
-		start_date, end_date = RangeFacotry.month(param)
+		start_date, end_date = get_month_range(param)
 		print(f"{start_date} ~ {end_date}")
 		sys.exit(0)
 
-	start_date, end_date = RangeFactory.month()
+	start_date, end_date = get_month_range()
 	print(f"{start_date} ~ {end_date}")
 	

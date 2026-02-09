@@ -46,10 +46,10 @@ import sys
 if __name__ == '__main__':
 	if len(sys.argv) > 1:
 		param = sys.argv[1]
-		start_date, end_date = RangeFactory.week(param)
+		start_date, end_date = get_week_range(param)
 		print(f"{start_date} ~ {end_date}")
 		sys.exit(0)
 
-	start_date, end_date = RangeFactory.week()
+	start_date, end_date = get_week_range()
 	print(f"{start_date} ~ {end_date}")
 	

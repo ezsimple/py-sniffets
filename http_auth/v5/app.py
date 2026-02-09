@@ -322,7 +322,7 @@ async def download_file(request: Request, path: str):
     logger.debug(f"media_type={mime_type or 'application/octet-stream'}, file_path={file_path}, filename={filename}, extension={extension}")
 
     # Content-Disposition 설정
-    disposition = 'inline' if guess_display_inline(file_path, mime_type) else 'attachment'
+    disposition = 'inline' if guess_display_inline(file_path, mime_type) or extension in ['.md', '.txt', '.html', '.css', '.js', '.py', '.java', '.json', '.xml', '.csv', '.log', '.pdf', '.sh' ] else 'attachment'
 
     # 파일 이름을 UTF-8로 인코딩
     encoded_filename = quote(filename.encode('utf-8'))

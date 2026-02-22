@@ -1,3 +1,7 @@
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.getElementsByName('username')[0].focus();
+});
+
 document.getElementById('loginForm').onsubmit = function(event) {
     event.preventDefault();
     const formData = new FormData(this);

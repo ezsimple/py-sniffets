@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', (event) => {
-    document.getElementsByName('username')[0].focus();
+    document.getElementById('username').focus();
 });
 
 document.getElementById('loginForm').onsubmit = function(event) {

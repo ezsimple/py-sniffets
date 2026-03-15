@@ -190,11 +190,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // 마우스 이벤트 리스너 (데스크톱용)
-        card.addEventListener('mouseover', function() {
+        card.addEventListener('mouseover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             toggleCard(this);
         });
 
-        card.addEventListener('mouseout', function() {
+        card.addEventListener('mouseout', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             const body = this.querySelector('.card-body');
             body.classList.remove('active');
             this.classList.remove('active');

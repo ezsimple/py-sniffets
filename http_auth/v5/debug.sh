@@ -8,8 +8,14 @@ PORT=3333
 fuser -k ${PORT}/tcp 2>/dev/null
 
 # uvicorn 관련 전체 종료 (reload 대응)
-pkill -f "uvicorn app:app" 2>/dev/null
+#pkill -f "uvicorn app:app" 2>/dev/null
 
+# 기존 그룹 kill
+if [ -f .uvicorn.pid ]; then
+    PGID=$(cat .uvicorn.pid)
+    kill -TERM -$PGID 2>/dev/null
+fi
 sleep 1
 
-python -m uvicorn app:app --host $HOST --port $PORT --reload
+setsid python -m uvicorn app:app --host ${HOST} --port ${PORT} --reload &
+echo $! > .uvicorn.pid

@@ -2,7 +2,7 @@
 toy-project/ # a1.mkeasy.kro.kr의 대문 페이지 & 카카오브라우저 탈출기능
 chat/ # 명언카드
 chat/v1/crawling.py # 명언크롤링
-quote/ # 명언클론API
+quote/v1 # 명언클론API
 http_auth/ # 개인용파일다운로드서버
 ../keyclock # 개인용파일다운로드서버 SSO 서버
 past-weather/ # 송악읍과거날씨

@@ -11,10 +11,9 @@ BASE_URL: str = "https://a1.mkeasy.kro.kr"
 
 ENDPOINTS: List[str] = [
     "/chat/",
-    "/rag1/",
     "/rag2/",
     "/v1/",
-    "/quotes",
+    "/quotes/health",
     "/holiday",
 ]
 

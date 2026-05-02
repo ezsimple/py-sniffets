@@ -9,20 +9,13 @@ else
 fi
 
 # 2. 기존 프로세스를 찾아서 kill
-PORT=$(echo $PORT)  # 환경 변수에서 포트 가져오기
+# fuser 기반 kill (더 확실)
+fuser -k ${PORT}/tcp 2>/dev/null
 
-# 기존 프로세스 찾기
-PIDS=$(lsof -t -i:$PORT)
-if [ -n "$PIDS" ]; then
-    echo "기존 프로세스(PIDs: $PIDS)를 종료합니다."
-    for PID in $PIDS; do
-        kill -9 $PID
-        echo "종료된 프로세스 PID: $PID"
-    done
-else
-    echo "종료할 프로세스가 없습니다."
-fi
+# uvicorn 관련 전체 종료 (reload 대응)
+pkill -f "uvicorn app:app" 2>/dev/null
 
+sleep 1
 
 # 3. nohup.out 존재하면 삭제
 if [ -f nohup.out ]; then

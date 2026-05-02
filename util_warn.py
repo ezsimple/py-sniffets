@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8 -*-
+
 from __future__ import annotations
 '''
 .README 파일에서 # WARN "cron 표현식" 메시지 형식의 라인을 읽어와서 

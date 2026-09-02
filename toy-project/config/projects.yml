@@ -47,8 +47,8 @@ personal_projects:
     image: 'image/kibana-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/kibana/'
 
-  - title: 'QR,BAR code'
-    description: 'QR/TOTP/BAR code 생성기'
+  - title: 'QR, BAR 코드 생성기'
+    description: 'Stateless QR / TOTP / Barcode 생성기'
     tech: 'React, Vite, TypeScript, styled-components, FastAPI, Pydantic, qrcode, pyotp, python-barcode, pillow, gunicorn'
     image: 'image/qr-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/qr/'

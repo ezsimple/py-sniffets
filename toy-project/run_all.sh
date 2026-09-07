@@ -10,3 +10,4 @@
 (cd ~/py-sniffets/past-weather; ./run.sh)
 (cd ~/oc/allow_origin_simple_http_server; ./run.sh)
 (cd ~/oc/hr-server; ./run.sh)
+(cd ~/work/qr-service; make run)

@@ -13,10 +13,19 @@ import os
 import socket
 import time
 import urllib.request
-from dotenv import load_dotenv
 
-# 환경변수 로드
-load_dotenv('.env.dev')
+# ponytail: dotenv 의존성 없이 stdlib으로 .env.dev 로드 (없으면 환경변수 그대로)
+for _envf in (".env.dev", ".env"):
+    try:
+        with open(_envf) as _f:
+            for _line in _f:
+                _line = _line.strip()
+                if _line and not _line.startswith("#") and "=" in _line:
+                    _k, _v = _line.split("=", 1)
+                    os.environ.setdefault(_k.strip(), _v.strip().strip("\"'"))
+        break
+    except FileNotFoundError:
+        continue
 
 BASE = "https://a1.mkeasy.kro.kr"
 TIMEOUT = 8

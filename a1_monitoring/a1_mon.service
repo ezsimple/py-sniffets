@@ -5,8 +5,10 @@ Wants=network-online.target
 
 [Service]
 Type=simple
+User=ubuntu
+Group=ubuntu
 WorkingDirectory=/home/ubuntu/py-sniffets/a1_monitoring
-ExecStart=/usr/bin/python3 /home/ubuntu/py-sniffets/a1_monitoring/a1_mon.py
+ExecStart=/home/ubuntu/.pyenv/versions/머신러닝/bin/python /home/ubuntu/py-sniffets/a1_monitoring/a1_mon.py
 Restart=always
 RestartSec=10
 Environment=CHECK_INTERVAL_SEC=180

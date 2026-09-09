@@ -1,0 +1,17 @@
+[Unit]
+Description=A1 mini monitoring agent (nginx backend health + telegram)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/ubuntu/py-sniffets/a1_monitoring
+ExecStart=/usr/bin/python3 /home/ubuntu/py-sniffets/a1_monitoring/a1_mon.py
+Restart=always
+RestartSec=10
+Environment=CHECK_INTERVAL_SEC=180
+# TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID 는 EnvironmentFile 로 주입
+EnvironmentFile=-/home/ubuntu/py-sniffets/a1_monitoring/.env
+
+[Install]
+WantedBy=multi-user.target

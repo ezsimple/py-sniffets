@@ -13,6 +13,10 @@ import os
 import socket
 import time
 import urllib.request
+from dotenv import load_dotenv
+
+# 환경변수 로드
+load_dotenv('.env.dev')
 
 BASE = "https://a1.mkeasy.kro.kr"
 TIMEOUT = 8

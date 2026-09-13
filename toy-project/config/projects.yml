@@ -53,8 +53,8 @@ personal_projects:
     image: 'image/qr-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/qr/'
 
-  - title: '우리딸 시간표'
-    description: '우리딸들 대학 시간표'
+  - title: '우리딸 수강표'
+    description: '우리딸들 대학수강표'
     tech: 'FastAPI, Pydantic, SQLAlchemy, SQLite, React, styled-components, Keycloak SSO, gunicorn'
     image: 'image/time-table-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/tmtbl/'

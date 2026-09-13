@@ -53,6 +53,12 @@ personal_projects:
     image: 'image/qr-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/qr/'
 
+  - title: '우리딸 시간표'
+    description: '우리딸들 대학 시간표'
+    tech: 'FastAPI, Pydantic, SQLAlchemy, SQLite, React, styled-components, Keycloak SSO, gunicorn'
+    image: 'image/time-table-thumbnail.png'
+    url: 'https://a1.mkeasy.kro.kr/tmtbl/'
+
 participated_projects:
   - title: '한국렌탈'
     description: '렌탈고객 포털 사이트, 기존 .NET 서비스를 java로 개편, 사내 ERP 연동, BackOffice 제공'

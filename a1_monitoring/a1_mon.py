@@ -47,6 +47,7 @@ SERVICES = {
     "holiday":      {"backend": "http://127.0.0.1:3002/holiday", "public": f"{BASE}/holiday"},
     "qr":           {"backend": "http://127.0.0.1:3200/", "public": f"{BASE}/qr/"},
     "kibana":       {"backend": "http://127.0.0.1:5601/kibana/", "public": f"{BASE}/kibana/"},
+    "tmtbl":        {"backend": "http://127.0.0.1:3800/", "public": f"{BASE}/tmtbl/"},
     "react-erp":    {"backend": "", "public": f"{BASE}/erp"},
     "calendar":     {"backend": "", "public": f"{BASE}/calendar"},
 }
@@ -109,9 +110,11 @@ def load_state():
 
 
 def save_state(st):
-    try:
-        with open(STATE_FILE, "w") as f:
+    try:  # ponytail: tmp+replace 원자적 저장 (읽기측 잘림 방지)
+        tmp = STATE_FILE + ".tmp"
+        with open(tmp, "w") as f:
             json.dump(st, f)
+        os.replace(tmp, STATE_FILE)
     except Exception as e:
         print(f"[warn] state 저장 실패: {e}")
 
@@ -129,7 +132,7 @@ def loop_once():
         prev = st.get(name, {}).get("down", False)
         if not alive and not prev:  # 새로 다운
             ok, ts = should_alert(st, name, now)
-            st[name] = {"down": True, "alerts": ts + ([now] if ok else ts)}
+            st[name] = {"down": True, "alerts": ts + ([now] if ok else [])}
             msg = f"[DOWN] {name}: {detail}"
             print(msg, flush=True)
             if ok:

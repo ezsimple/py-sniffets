@@ -17,7 +17,7 @@
             </a>
         </h1>
         <a href="/portfolio">
-            <img src="{{ url_for('static', filename='image/profile-thumbnail.png') }}" 
+            <img src="{{ url_for('static', filename='image/profile-thumbnail.png') }}?_={{ time }}" 
                  alt="프로필 이미지" 
                  class="profile-image">
         </a>
@@ -36,7 +36,7 @@
                                     {% for img in p.images %}
                                     <div class="carousel-item {% if loop.first %}active{% endif %}">
                                         <div class="portfolio-img-container">
-                                            <img src="{{ url_for('static', filename=img) }}" class="portfolio-img" alt="{{ p.title }} 이미지 {{ loop.index }}">
+                                            <img src="{{ url_for('static', filename=img) }}?_={{ time }}" class="portfolio-img" alt="{{ p.title }} 이미지 {{ loop.index }}">
                                         </div>
                                     </div>
                                     {% endfor %}
@@ -70,7 +70,7 @@
             <div class="row g-4 mb-5" style="width:100%;">
             <h2 class="section-title mb-4" style="margin-top: 80px;">스킬트리</h2>
                 <div class="skill-tree">
-                    <img src="{{ url_for('static', filename='image/skill_tree.png') }}" alt="스킬트리" class="skill-tree">
+                    <img src="{{ url_for('static', filename='image/skill_tree.png') }}?_={{ time }}" alt="스킬트리" class="skill-tree">
                 </div>
             </div>
         </div>

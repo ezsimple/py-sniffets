@@ -16,7 +16,7 @@
             </a>
         </h1>
         <a href="/skill">
-            <img src="{{ url_for('static', filename='image/profile-thumbnail.png') }}" 
+            <img src="{{ url_for('static', filename='image/profile-thumbnail.png') }}?_={{ time }}" 
                  alt="프로필 이미지" 
                  class="profile-image">
         </a>
@@ -31,7 +31,7 @@
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="card h-100">
                         <div class="card-header bg-white border-0">
-                            <img src="{{ url_for('static', filename=project.image) }}" 
+                            <img src="{{ url_for('static', filename=project.image) }}?_={{ time }}" 
                                  class="card-img-top" alt="{{ project.title }}">
                             <h5 class="card-title mt-2">{{ project.title }}</h5>
                         </div>
@@ -52,7 +52,7 @@
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="card h-100">
                         <div class="card-header bg-white border-0">
-                            <img src="{{ url_for('static', filename=project.image) }}" 
+                            <img src="{{ url_for('static', filename=project.image) }}?_={{ time }}" 
                                  class="card-img-top" alt="{{ project.title }}">
                             <h5 class="card-title mt-2">{{ project.title }}</h5>
                         </div>

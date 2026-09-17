@@ -10,7 +10,7 @@
 <body>
     <header>
         <a href="/">
-            <img src="{{ url_for('static', filename='image/profile-thumbnail.png') }}" alt="프로필 이미지" class="profile-image">
+            <img src="{{ url_for('static', filename='image/profile-thumbnail.png') }}?_={{ time }}" alt="프로필 이미지" class="profile-image">
         </a>
         <h1>
             Skill Tree
@@ -21,7 +21,7 @@
     </header>
     <div class="main-content">
         <div class="skill-tree">
-            <img src="{{ url_for('static', filename='image/skill_tree.png') }}" alt="스킬트리" class="skill-tree">
+            <img src="{{ url_for('static', filename='image/skill_tree.png') }}?_={{ time }}" alt="스킬트리" class="skill-tree">
         </div>
     </div>
     <footer>

@@ -6,6 +6,10 @@
     display: none; /* 모든 스크롤바 숨기기 */
 }
 
+html {
+    background-color: var(--background-color);
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -13,6 +17,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    min-height: 100dvh;
     overflow-x: hidden;
     background-color: var(--background-color);
 }
@@ -60,7 +65,7 @@ header .profile-image {
     transition: all 0.3s ease, filter 0.3s ease;
     position: relative;
     border: none;
-    border-radius: 0.35rem;
+    border-radius: 10px;
     background: white;
     overflow: visible;
     width: 240px;
@@ -87,7 +92,7 @@ header .profile-image {
     padding: 0.8rem;
     position: relative;
     z-index: 3;
-    border-radius: 0.35rem;
+    border-radius: 10px;
 }
 
 .card-body.active + .card-header::after {
@@ -101,7 +106,7 @@ header .profile-image {
     right: 0;
     background: white;
     border: none;
-    border-radius: 0 0 0.35rem 0.35rem;
+    border-radius: 0 0 10px 10px;
     padding: 0.8rem;
     visibility: hidden;
     opacity: 0;
@@ -171,7 +176,7 @@ header .profile-image {
 }
 
 .card-img-top {
-    border-radius: 0.35rem 0.35rem 0 0;
+    border-radius: 10px 10px 0 0;
     margin-bottom: 0.5rem;
     max-height: 165px;
     object-fit: cover;
@@ -206,7 +211,7 @@ footer {
     padding: 10px;
     width: 100%;
     position: relative;
-    clear: both;
+    margin-top: auto;
 }
 
 footer a {
@@ -226,7 +231,7 @@ footer a:hover {
     justify-content: center;
     padding: 20px;
     position: relative;
-    margin-bottom: 150px;
+    margin-bottom: 0;
 }
 
 .container {
@@ -336,7 +341,7 @@ a:hover {
     }
     
     .card {
-        width: 240px;
+        width: 280px;
         margin: 0 auto;
     }
     
@@ -346,7 +351,7 @@ a:hover {
     }
     
     .section-title {
-        width: 240px;
+        width: 280px;
         margin: 0 auto 30px;
         text-align: center;
     }

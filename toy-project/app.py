@@ -103,7 +103,7 @@ def create_app():
         기술 트리 페이지를 렌더링하는 엔드포인트입니다.
         현재 시간을 템플릿에 전달합니다.
         """
-        return render_template('skill.html', time=int(time.time()))
+        return render_template('skill.html', time=int(time.time() * 1000))
 
     @app.route('/')
     def projects():
@@ -123,7 +123,7 @@ def create_app():
         return render_template('card.html',
                              personal_projects=projects_data['personal_projects'],
                              participated_projects=projects_data['participated_projects'],
-                             time=int(time.time()))
+                             time=int(time.time() * 1000))
 
     @app.route('/portfolio')
     def portfolio():
@@ -141,7 +141,7 @@ def create_app():
                             portfolios=portfolios_data.get('portfolios', []), 
                             count_weather_data=count_weather_data,
                             count_quotes=count_quotes,
-                            time=int(time.time()))
+                            time=int(time.time() * 1000))
 
     return app  # 생성된 Flask 애플리케이션 인스턴스를 반환합니다.
 

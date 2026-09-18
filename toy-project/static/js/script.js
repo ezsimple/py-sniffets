@@ -18,11 +18,30 @@ function cancelCardTimer() {
 function startCardTimer(card, body) {
     cancelCardTimer();
     cardTimer = setTimeout(() => {
-        body.classList.remove('active');
-        card.classList.remove('active');
+        closeCard(card, body);
         removeAllGrayscale();
         cardTimer = null;
     }, cardTimerDuration);
+}
+
+// 펼침 카드가 absolute 오버레이라서 푸터를 덮고 스크롤 공백을 만듦.
+// 열린 카드에 본문 높이만큼 여백을 확보해 푸터를 밀어내는 방식으로 해결한다.
+function closeCard(card, body) {
+    body.classList.remove('active');
+    card.classList.remove('active');
+    card.parentElement.style.marginBottom = '';
+}
+
+function openCardSpacing(card, body) {
+    // 펼침 애니메이션(0.3s) 중간에는 높이가 덜 잡히므로 settled 후 재측정한다
+    const apply = () => {
+        if (!body.classList.contains('active')) return;
+        const spill = body.offsetHeight - 10; // top: calc(100% - 10px) 겹침분 제외
+        if (spill > 0) card.parentElement.style.marginBottom = spill + 'px';
+    };
+    requestAnimationFrame(apply);
+    setTimeout(apply, 350);
+    setTimeout(apply, 900);
 }
 
 function resumeActiveCardTimer() {
@@ -84,19 +103,18 @@ function toggleCard(clickedCard, event = null) {
     cancelCardTimer();
 
     if (clickedBody.classList.contains('active')) {
-        clickedBody.classList.remove('active');
-        clickedCard.classList.remove('active');
+        closeCard(clickedCard, clickedBody);
         removeAllGrayscale();
     } else {
         // 다른 모든 카드 비활성화
         document.querySelectorAll('.card-body').forEach(body => {
-            body.classList.remove('active');
-            body.closest('.card').classList.remove('active');
+            closeCard(body.closest('.card'), body);
         });
         
         // 현재 카드 활성화
         clickedBody.classList.add('active');
         clickedCard.classList.add('active');
+        openCardSpacing(clickedCard, clickedBody);
         
         // grayscale 효과 적용
         applyGrayscale(clickedCard);
@@ -200,8 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             e.stopPropagation();
             const body = this.querySelector('.card-body');
-            body.classList.remove('active');
-            this.classList.remove('active');
+            closeCard(this, body);
             removeAllGrayscale();
         });
     });
@@ -214,8 +231,7 @@ window.addEventListener('resize', function() {
         cardTimer = null;
     }
     document.querySelectorAll('.card-body').forEach(body => {
-        body.classList.remove('active');
-        body.closest('.card').classList.remove('active');
+        closeCard(body.closest('.card'), body);
     });
     removeAllGrayscale();
 });

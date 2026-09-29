@@ -2,11 +2,34 @@
 let cardTimer = null;
 const cardTimerDuration = 30000;
 
-// 터치 이벤트 관련 변수
-let touchStartTime = 0;
-let touchStartPosition = { x: 0, y: 0 };
+// bfcache(뒤로가기 복원) 시 구버전 코드로 동작하는 것을 방지
+window.addEventListener('pageshow', function (e) {
+    if (e.persisted) window.location.reload();
+});
+
+// 원격 진단용 (?debug=1 일 때만 화면에 터치 로그 표시, 임시)
+const __cardDbgOn = location.search.includes('debug=1');
+function __cardDbg(msg) {
+    if (!__cardDbgOn) return;
+    let el = document.getElementById('__cardDbg');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = '__cardDbg';
+        el.style.cssText = 'position:fixed;left:0;bottom:0;z-index:9999;background:rgba(0,0,0,.8);color:#0f0;font-size:11px;max-height:40vh;overflow:auto;padding:6px;white-space:pre-wrap;';
+        document.body.appendChild(el);
+    }
+    el.textContent += msg + '\n';
+}
+function cardIdx(card) {
+    return [...document.querySelectorAll('.card')].indexOf(card);
+}
+function activeIdx() {
+    return [...document.querySelectorAll('.card')].map((c, i) => c.classList.contains('active') ? i : -1).filter(i => i >= 0).join(',');
+}
+
+// 터치 식별자별 시작 상태 (다중 터치 시 카드 간 간섭 방지)
 let isTouchDevice = false;
-let isTouchDragging = false;
+const touchStartMap = new Map(); // identifier -> { time, x, y, dragging }
 
 function cancelCardTimer() {
     if (cardTimer) {
@@ -24,24 +47,10 @@ function startCardTimer(card, body) {
     }, cardTimerDuration);
 }
 
-// 펼침 카드가 absolute 오버레이라서 푸터를 덮고 스크롤 공백을 만듦.
-// 열린 카드에 본문 높이만큼 여백을 확보해 푸터를 밀어내는 방식으로 해결한다.
+// 펼침은 absolute 오버레이: 아래 카드를 밀지 않고 위로 덮는다.
 function closeCard(card, body) {
     body.classList.remove('active');
     card.classList.remove('active');
-    card.parentElement.style.marginBottom = '';
-}
-
-function openCardSpacing(card, body) {
-    // 펼침 애니메이션(0.3s) 중간에는 높이가 덜 잡히므로 settled 후 재측정한다
-    const apply = () => {
-        if (!body.classList.contains('active')) return;
-        const spill = body.offsetHeight - 10; // top: calc(100% - 10px) 겹침분 제외
-        if (spill > 0) card.parentElement.style.marginBottom = spill + 'px';
-    };
-    requestAnimationFrame(apply);
-    setTimeout(apply, 350);
-    setTimeout(apply, 900);
 }
 
 function resumeActiveCardTimer() {
@@ -114,7 +123,6 @@ function toggleCard(clickedCard, event = null) {
         // 현재 카드 활성화
         clickedBody.classList.add('active');
         clickedCard.classList.add('active');
-        openCardSpacing(clickedCard, clickedBody);
         
         // grayscale 효과 적용
         applyGrayscale(clickedCard);
@@ -127,53 +135,55 @@ function toggleCard(clickedCard, event = null) {
 // 터치 이벤트 처리 함수
 function handleTouchStart(e) {
     isTouchDevice = true;
-    touchStartTime = Date.now();
-    const touch = e.touches[0];
-    touchStartPosition = { x: touch.clientX, y: touch.clientY };
-    isTouchDragging = false;
+    const now = Date.now();
+    // e.touches[0]은 가장 오래된 터치라서 다중 터치 시 다른 카드 좌표가 섞인다.
+    // 새로 닿은 changedTouches를 식별자별로 기록한다.
+    for (const touch of e.changedTouches) {
+        touchStartMap.set(touch.identifier, {
+            time: now, x: touch.clientX, y: touch.clientY, dragging: false
+        });
+    }
+    __cardDbg(`start card=${cardIdx(e.currentTarget)} ids=${[...e.changedTouches].map(t => t.identifier)}`);
 }
 
 function handleTouchMove(e) {
-    if (!isTouchDevice || isTouchDragging) return;
-    
-    const touch = e.touches[0];
-    const currentPosition = { x: touch.clientX, y: touch.clientY };
-    
-    const distance = Math.sqrt(
-        Math.pow(currentPosition.x - touchStartPosition.x, 2) + 
-        Math.pow(currentPosition.y - touchStartPosition.y, 2)
-    );
-    
-    if (distance > 10) {
-        isTouchDragging = true;
-        cancelCardTimer();
+    for (const touch of e.changedTouches) {
+        const st = touchStartMap.get(touch.identifier);
+        if (!st || st.dragging) continue;
+
+        if (Math.hypot(touch.clientX - st.x, touch.clientY - st.y) > 10) {
+            st.dragging = true;
+            cancelCardTimer();
+        }
     }
+}
+
+function handleTouchCancel(e) {
+    for (const touch of e.changedTouches) {
+        touchStartMap.delete(touch.identifier);
+    }
+    resumeActiveCardTimer();
 }
 
 function handleTouchEnd(e, card) {
     if (!isTouchDevice) return;
-    if (isTouchDragging) {
-        isTouchDragging = false;
+    const touch = e.changedTouches[0];
+    const st = touchStartMap.get(touch.identifier);
+    touchStartMap.delete(touch.identifier);
+    const dur = st ? Date.now() - st.time : -1;
+    const dist = st ? Math.hypot(touch.clientX - st.x, touch.clientY - st.y).toFixed(1) : -1;
+    if (!st) { __cardDbg(`end card=${cardIdx(card)} id=${touch.identifier} NO-START`); return; }
+    if (st.dragging) {
+        __cardDbg(`end card=${cardIdx(card)} id=${touch.identifier} DRAG`);
         resumeActiveCardTimer();
         return;
     }
-    
-    const touchEndTime = Date.now();
-    const touchDuration = touchEndTime - touchStartTime;
-    
+
     // 터치 시간이 너무 길면 무시 (스크롤 등)
-    if (touchDuration > 500) return;
-    
-    const touch = e.changedTouches[0];
-    const touchEndPosition = { x: touch.clientX, y: touch.clientY };
-    
+    if (dur > 500) { __cardDbg(`end card=${cardIdx(card)} id=${touch.identifier} LONG dur=${dur}`); return; }
+
     // 터치 이동 거리가 너무 크면 무시 (스크롤 등)
-    const distance = Math.sqrt(
-        Math.pow(touchEndPosition.x - touchStartPosition.x, 2) + 
-        Math.pow(touchEndPosition.y - touchStartPosition.y, 2)
-    );
-    
-    if (distance > 10) return;
+    if (dist > 10) { __cardDbg(`end card=${cardIdx(card)} id=${touch.identifier} MOVED dist=${dist}`); return; }
     
     // 링크나 버튼 클릭은 무시
     const target = e.target;
@@ -183,16 +193,19 @@ function handleTouchEnd(e, card) {
     e.stopPropagation();
     
     toggleCard(card, e);
+    __cardDbg(`TOGGLE card=${cardIdx(card)} id=${touch.identifier} dur=${dur} dist=${dist} active=[${activeIdx()}]`);
 }
 
 // 이벤트 리스너 설정
 document.addEventListener('DOMContentLoaded', function() {
     const isLikelyTouchDevice = isMobile();
+    __cardDbg(`init isMobile=${isLikelyTouchDevice} branch=${isLikelyTouchDevice ? 'touch' : 'mouse'} maxTouch=${navigator.maxTouchPoints} ua=${navigator.userAgent.slice(0, 60)}`);
     document.querySelectorAll('.card').forEach(card => {
         if (isLikelyTouchDevice) {
             // 터치 이벤트 리스너 (모바일 우선)
             card.addEventListener('touchstart', handleTouchStart, { passive: true });
             card.addEventListener('touchmove', handleTouchMove, { passive: true });
+            card.addEventListener('touchcancel', handleTouchCancel, { passive: true });
             card.addEventListener('touchend', function(e) {
                 handleTouchEnd(e, this);
             }, { passive: false });

@@ -5,6 +5,18 @@ personal_projects:
     image: 'image/bible-rag-thumbnail2.png'
     url: 'https://a1.mkeasy.kro.kr/rag2/'
 
+  - title: 'GreenGreen'
+    description: '글로벌 IT 일일 브리핑'
+    tech: 'Go, OpenClaw, Telegram Bot API, Yahoo Finance, systemd'
+    image: 'image/greengreen-thumbnail.png'
+    url: ''
+
+  - title: 'HomeNAS'
+    description: 'Go 단일 바이너리 초경량 NAS'
+    tech: 'Go, vanilla JS, JWT, bcrypt, nginx'
+    image: 'image/homenas-thumbnail.png'
+    url: 'https://a1.mkeasy.kro.kr/nas/'
+
   - title: '파일 서버'
     description: '개인용 파일 서버 및 SSO 인증 처리'
     tech: 'FastAPI, pydantic, keycloak, cookie, redis, middleware'

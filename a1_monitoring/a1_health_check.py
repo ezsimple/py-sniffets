@@ -2,12 +2,15 @@ from typing import List, Tuple
 import httpx
 import time
 import os
+import sys
+
+from telegram import send_telegram
 
 
 # -----------------------------
 # 설정값 (반드시 초기화)
 # -----------------------------
-BASE_URL: str = "https://a1.mkeasy.kro.kr"
+BASE_URL: str = os.getenv("A1_BASE_URL", "https://a1.mkeasy.kro.kr")
 
 ENDPOINTS: List[str] = [
     "/chat/",
@@ -17,41 +20,29 @@ ENDPOINTS: List[str] = [
     "/holiday",
 ]
 
-TELEGRAM_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHAT_ID: str = os.getenv("TELEGRAM_CHAT_ID")
-TIMEOUT_SECONDS: int = 5
+TIMEOUT_SECONDS: int = int(os.getenv("HEALTH_TIMEOUT_SEC", "5"))
+RETRY_COUNT: int = int(os.getenv("HEALTH_RETRY_COUNT", "2"))
 
 # -----------------------------
 # 헬스체크
 # -----------------------------
 def check_endpoint(client: httpx.Client, path: str) -> Tuple[str, bool, str]:
     url: str = BASE_URL + path
+    last_err: str = ""
 
-    try:
-        response: httpx.Response = client.get(url, timeout=TIMEOUT_SECONDS)
-        if response.status_code >= 200 and response.status_code < 400:
-            return (path, True, f"{response.status_code}")
-        return (path, False, f"HTTP {response.status_code}")
-    except Exception as e:
-        return (path, False, str(e))
-
-
-# -----------------------------
-# 텔레그램 전송
-# -----------------------------
-def send_telegram(message: str) -> None:
-    url: str = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    payload: dict = {
-        "chat_id": TELEGRAM_CHAT_ID,
-        "text": message,
-    }
-
-    with httpx.Client() as client:
-        client.post(url, json=payload)
+    for _ in range(RETRY_COUNT):
+        try:
+            response: httpx.Response = client.get(url, timeout=TIMEOUT_SECONDS)
+            if 200 <= response.status_code < 400:
+                return (path, True, f"{response.status_code}")
+            last_err = f"HTTP {response.status_code}"
+        except Exception as e:
+            last_err = str(e)[:200]
+    return (path, False, last_err)
 
 
 # -----------------------------
-# 메인 로직
+# 메인 로직 (실패 시 exit 1 — cron이 실패를 감지)
 # -----------------------------
 def a1_health_check() -> None:
     failed: List[str] = []
@@ -75,6 +66,8 @@ def a1_health_check() -> None:
         message += "\n".join(failed)
 
         send_telegram(message)
+        print(message, file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

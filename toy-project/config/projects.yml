@@ -1,15 +1,27 @@
 personal_projects:
-  - title: '리쿠르트 통계'
-    description: '월간 직원연락망.xls 분석으로 만든 통계용 챠트'
-    tech: 'Flask, pandas, matplotlib, seaborn'
-    image: 'image/recrute-thumbnail.png'
-    url: 'https://a1.mkeasy.kro.kr/hr_list'
+  - title: 'AI 성경 RAG기반 챗봇'
+    description: '성경 31,091개 구절을 임베딩 시킨 elasticSearch와 LLM(AI)을, RAG기반으로 연계한 서비스, 출처 지원, 이전 대화 (30일치) 지원, 임베딩(re-index) 처리, Ensemble Retriever, min max 정규화'
+    tech: 'FastAPI, Elasticsearch(vectorstore), ORM(chatting), Jinja2, LangChain, HuggingFace, RAG, nori_tokenizer, konlpy(okt), React, vite, TypeScript, tailwindcss'
+    image: 'image/bible-rag-thumbnail2.png'
+    url: 'https://a1.mkeasy.kro.kr/rag2/'
 
   - title: '파일 서버'
     description: '개인용 파일 서버 및 SSO 인증 처리'
     tech: 'FastAPI, pydantic, keycloak, cookie, redis, middleware'
     image: 'image/file-server-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/v1'
+
+  - title: 'QR, BAR 코드 생성기'
+    description: 'Stateless QR / TOTP / Barcode 생성기'
+    tech: 'React, Vite, TypeScript, styled-components, FastAPI, Pydantic, qrcode, pyotp, python-barcode, pillow, gunicorn'
+    image: 'image/qr-thumbnail.png'
+    url: 'https://a1.mkeasy.kro.kr/qr/'
+
+  - title: '우리딸 수강표'
+    description: '우리딸들 대학수강표'
+    tech: 'FastAPI, Pydantic, SQLAlchemy, SQLite, React, styled-components, Keycloak SSO, gunicorn'
+    image: 'image/time-table-thumbnail.png'
+    url: 'https://a1.mkeasy.kro.kr/tmtbl/'
 
   - title: '명언 카드'
     description: '명언({count_quotes}개) API 서버 구현 및 연동, 한글 해석, share 제공'
@@ -35,29 +47,17 @@ personal_projects:
     image: 'image/calendar-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/calendar'
 
-  - title: 'AI 성경 RAG기반 챗봇'
-    description: '성경 31,091개 구절을 임베딩 시킨 elasticSearch와 LLM(AI)을, RAG기반으로 연계한 서비스, 출처 지원, 이전 대화 (30일치) 지원, 임베딩(re-index) 처리, Ensemble Retriever, min max 정규화'
-    tech: 'FastAPI, Elasticsearch(vectorstore), ORM(chatting), Jinja2, LangChain, HuggingFace, RAG, nori_tokenizer, konlpy(okt), React, vite, TypeScript, tailwindcss'
-    image: 'image/bible-rag-thumbnail2.png'
-    url: 'https://a1.mkeasy.kro.kr/rag2/'
+  - title: '리쿠르트 통계'
+    description: '월간 직원연락망.xls 분석으로 만든 통계용 챠트'
+    tech: 'Flask, pandas, matplotlib, seaborn'
+    image: 'image/recrute-thumbnail.png'
+    url: 'https://a1.mkeasy.kro.kr/hr_list'
 
   - title: 'kibana'
     description: 'elasticsearch, logstash, kibana, beats pipeline 구성 및 학습용'
     tech: 'Elasticsearch, Logstash, Kibana, Beats'
     image: 'image/kibana-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/kibana/'
-
-  - title: 'QR, BAR 코드 생성기'
-    description: 'Stateless QR / TOTP / Barcode 생성기'
-    tech: 'React, Vite, TypeScript, styled-components, FastAPI, Pydantic, qrcode, pyotp, python-barcode, pillow, gunicorn'
-    image: 'image/qr-thumbnail.png'
-    url: 'https://a1.mkeasy.kro.kr/qr/'
-
-  - title: '우리딸 수강표'
-    description: '우리딸들 대학수강표'
-    tech: 'FastAPI, Pydantic, SQLAlchemy, SQLite, React, styled-components, Keycloak SSO, gunicorn'
-    image: 'image/time-table-thumbnail.png'
-    url: 'https://a1.mkeasy.kro.kr/tmtbl/'
 
 participated_projects:
   - title: '한국렌탈'

@@ -11,21 +11,12 @@ stdlib only. 실행: python3 a1_mon.py (systemd: a1_mon.service 참조)
 import json
 import os
 import socket
+import sys
 import time
 import urllib.request
 
-# ponytail: dotenv 의존성 없이 stdlib으로 .env.dev 로드 (없으면 환경변수 그대로)
-for _envf in (".env.dev", ".env"):
-    try:
-        with open(_envf) as _f:
-            for _line in _f:
-                _line = _line.strip()
-                if _line and not _line.startswith("#") and "=" in _line:
-                    _k, _v = _line.split("=", 1)
-                    os.environ.setdefault(_k.strip(), _v.strip().strip("\"'"))
-        break
-    except FileNotFoundError:
-        continue
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from telegram import send_telegram  # ponytail: SSOT, import 시 .env.dev/.env/~/.env 로드됨
 
 BASE = "https://a1.mkeasy.kro.kr"
 TIMEOUT = 8
@@ -90,15 +81,7 @@ def check(name, cfg):
     return (True, "ok")
 
 
-def send_telegram(text):
-    token, chat = os.getenv("TELEGRAM_BOT_TOKEN"), os.getenv("TELEGRAM_CHAT_ID")
-    if not token or not chat:
-        print(f"[warn] telegram env 없음, stdout만: {text}")
-        return
-    data = json.dumps({"chat_id": chat, "text": text}).encode()
-    req = urllib.request.Request(f"https://api.telegram.org/bot{token}/sendMessage",
-                                 data=data, headers={"Content-Type": "application/json"})
-    urllib.request.urlopen(req, timeout=TIMEOUT).read()
+# (send_telegram은 SSOT 모듈 telegram.py 사용 — 여기 정의 금지)
 
 
 def load_state():

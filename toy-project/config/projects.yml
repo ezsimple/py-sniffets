@@ -8,7 +8,7 @@ personal_projects:
   - title: 'GreenGreen'
     description: '글로벌 IT 일일 브리핑'
     tech: 'Go, OpenClaw, Telegram Bot API, Yahoo Finance, systemd'
-    image: 'image/greengreen-thumbnail.png'
+    image: 'image/news-briefing-thumbnail.png'
     url: ''
 
   - title: 'HomeNAS'

@@ -1,6 +1,7 @@
 import os
 import re
 import magic
+import mimetypes
 import time
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Depends, HTTPException, APIRouter, status, Request
@@ -313,9 +314,12 @@ async def download_file(request: Request, path: str):
     # 파일 확장자 추출
     extension = file.suffix
 
-    # MIME 타입 자동 설정
-    mime = magic.Magic(mime=True)
-    mime_type = mime.from_file(file_path)  # 파일의 MIME 타입 확인
+    # 확장자 기준 MIME을 우선 (apk는 내용물이 zip이라 magic이 application/zip으로 오판)
+    mimetypes.add_type('application/vnd.android.package-archive', '.apk')
+    mime_type, _ = mimetypes.guess_type(filename)
+    if mime_type is None:
+        mime = magic.Magic(mime=True)
+        mime_type = mime.from_file(file_path)  # 파일의 MIME 타입 확인
 
     # 만약 MIME 타입을 알 수 없고, 확장자가 텍스트 기반인 경우 'text/plain'으로 설정
     if extension in ['.py', '.md', '.txt', '.js', '.java', '.json', '.xml', '.csv', '.log', '.sh']:
@@ -327,10 +331,10 @@ async def download_file(request: Request, path: str):
     # Content-Disposition 설정
     disposition = 'inline' if guess_display_inline(file_path, mime_type) else 'attachment'
 
-    # 파일 이름을 UTF-8로 인코딩
-    encoded_filename = quote(filename.encode('utf-8'))
+    # 파일 이름을 UTF-8로 인코딩 (RFC 5987, 원본 확장자 그대로 보존)
+    encoded_filename = quote(filename)
     response = FileResponse(file_path, media_type=mime_type or 'application/octet-stream')
-    response.headers["Content-Disposition"] = f'{disposition}; filename="{encoded_filename}"'
+    response.headers["Content-Disposition"] = f'{disposition}; filename="{encoded_filename}"; filename*=UTF-8\'\'{encoded_filename}'
 
     return response
 

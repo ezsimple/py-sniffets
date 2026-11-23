@@ -104,6 +104,10 @@ header .profile-image {
     position: relative;
     z-index: 3;
     border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 230px;
 }
 
 .card-body.active + .card-header::after {
@@ -189,13 +193,18 @@ header .profile-image {
 .card-img-top {
     border-radius: 10px 10px 0 0;
     margin-bottom: 0.5rem;
-    max-height: 165px;
+    height: 165px;
+    width: 100%;
     object-fit: cover;
+    object-position: top;
+    flex-shrink: 0;
 }
 
 .card-title {
     font-size: 1.1rem;
     margin-bottom: 0.25rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
 }
 
 .card-text {

@@ -1,5 +1,5 @@
 #!/bin/bash
-# 토이프로젝트와 관련한 모든 서비스 시작
+# 토이프로젝트와 관련한 모든 서비스 시작 (재실행해도 안전: 각 run.sh가 기존 프로세스를 먼저 종료하므로 재시작으로 동작)
 (cd ~/oc/key-server; ./run.sh)
 (cd ~/work/nodejs/bad_company; ./run.sh)
 (cd ~/work/nodejs/nest-calendar/v2/backend; ./run.sh)

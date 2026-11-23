@@ -6,8 +6,8 @@ personal_projects:
     url: 'https://a1.mkeasy.kro.kr/rag2/'
 
   - title: 'HomeNAS'
-    description: 'Go 단일 바이너리 초경량 NAS'
-    tech: 'Go, vanilla JS, JWT, bcrypt, nginx'
+    description: '초경량 NAS (UP/DOWN/SHARE)'
+    tech: 'Go, vanilla JS, JWT, bcrypt, nginx, fail2ban'
     image: 'image/homenas-thumbnail.png'
     url: 'https://a1.mkeasy.kro.kr/nas/'
 

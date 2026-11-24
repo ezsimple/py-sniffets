@@ -22,10 +22,11 @@ from deep_translator import GoogleTranslator
 from fastapi import APIRouter, HTTPException, Cookie, Depends
 from sqlalchemy.orm import Session
 from datetime import datetime
-from models.models import MinoLike, MinoQuote  # 모델 가져오기
+from models.models import MinoLike, MinoQuote, MinoTransCache, Base as ModelsBase  # 모델 가져오기
 from database import engine, SessionLocal, Base  # 데이터베이스 세션을 가져오는 방법
 from logger import LoggerSetup
 from pydantic import BaseModel
+import hashlib
 
 load_dotenv()
 
@@ -49,6 +50,7 @@ router = APIRouter(prefix=PREFIX)
 
 # 데이터베이스 테이블 생성
 Base.metadata.create_all(engine)  # 모든 테이블을 생성
+ModelsBase.metadata.create_all(engine, tables=[MinoTransCache.__table__])  # 번역 캐시 테이블 보장
 
 logger.info(f"WS_SERVER : {WS_SERVER}")
 
@@ -112,12 +114,44 @@ async def get_random_quote():
 #     translated_text = await loop.run_in_executor(None, translator.translate, quote['q'], 'en', 'kr')
 #     return translated_text
 
-async def translate_quote(quote):
+def _trans_key(text):
+    return hashlib.md5(text.encode('utf-8')).hexdigest()  # 긴 원문도 고정길이 키로
+
+
+def _save_trans_cache(session, text, translated):
+    try:  # 동시 저장 충돌해도 번역 결과는 그대로 반환
+        session.add(MinoTransCache(q_hash=_trans_key(text), q=text, q_ko=translated))
+        session.commit()
+    except Exception:
+        session.rollback()
+
+
+async def translate_quote(quote, session):
     try:
-        logger.debug(f"Attempting to translate quote: {quote['q']}")
-        translated_text = await asyncio.to_thread(GoogleTranslator(source='en', target='ko').translate, quote['q'])
-        logger.debug(f"Successfully translated quote: {translated_text}")
-        return translated_text
+        text = quote['q']
+        hit = session.query(MinoTransCache).filter(MinoTransCache.q_hash == _trans_key(text)).first()
+        if hit:  # DB 캐시 적중이면 외부 API 호출 생략
+            return hit.q_ko
+        logger.debug(f"Attempting to translate quote: {text}")
+        translated = None
+        async with httpx.AsyncClient(timeout=10) as client:
+            # 1순위: MyMemory (이 서버 IP는 구글에 차단됨)
+            try:
+                r = await client.get("https://api.mymemory.translated.net/get",
+                                     params={"q": text, "langpair": "en|ko"})
+                if r.status_code == 200:
+                    data = r.json()
+                    t = (data.get("responseData") or {}).get("translatedText", "")
+                    if t and data.get("responseStatus") == 200:
+                        translated = t
+            except Exception as e:
+                logger.warning(f"MyMemory failed, trying Google: {e}")
+            # 2순위: 기존 Google (차단 해제되면 다시 동작)
+            if not translated:
+                translated = await asyncio.to_thread(GoogleTranslator(source='en', target='ko').translate, text)
+        logger.debug(f"Successfully translated quote: {translated}")
+        _save_trans_cache(session, text, translated)
+        return translated
     except Exception as e:
         logger.error(f"Error in translate_quote: {str(e)}")
         return "번역에 실패했습니다."
@@ -139,7 +173,7 @@ async def get(request: Request, user_id: str = Cookie(None)):
 
     readme_content = get_readme_content(current_dir)
     timestamp = datetime.now().timestamp()  # 현재 시간을 타임스탬프로 변환
-    response = templates.TemplateResponse("chat.html", {"request": request, "timestamp": timestamp, "WS_SERVER": WS_SERVER, "readme_content": readme_content})
+    response = templates.TemplateResponse(request, "chat.html", {"timestamp": timestamp, "WS_SERVER": WS_SERVER, "readme_content": readme_content})
 
     if user_id is None:
         user_id = str(uuid.uuid4())
@@ -224,7 +258,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None), s
                     logger.error("Empty quote content received")
                     continue
 
-                translated_quote = await translate_quote(quote_data[0])
+                translated_quote = await translate_quote(quote_data[0], session)
                 quote_message_data = {
                     'id': 'server', # from
                     'user_id': f'{user_id}', # to

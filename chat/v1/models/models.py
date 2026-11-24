@@ -61,3 +61,15 @@ class MinoLike(Base):
         Index('idx_mino_like_hash', func.md5(user_id + cast(quote_id, String))),  # user_id와 quote_id의 해시를 사용한 인덱스
         Index('idx_mino_like_created_at', 'created_at')  # created_at 인덱스 추가
     )
+
+'''
+영문 격언 번역 캐시: 외부 번역 API 호출을 줄이기 위한 용도.
+원문 전체를 키로 쓰면 인덱스가 커지므로 md5 해시를 PK로 사용 (기존 코드의 해시 인덱스 관행과 동일).
+'''
+class MinoTransCache(Base):
+    __tablename__ = 'MinoTransCache'
+
+    q_hash = Column(String(length=32), primary_key=True, nullable=False)  # md5(원문)
+    q = Column(Text, nullable=False)  # 영문 원문
+    q_ko = Column(Text, nullable=False)  # 한글 번역
+    reg_date = Column(DateTime, server_default=func.now())  # 저장일시

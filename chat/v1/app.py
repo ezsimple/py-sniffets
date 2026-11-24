@@ -118,20 +118,25 @@ def _trans_key(text):
     return hashlib.md5(text.encode('utf-8')).hexdigest()  # 긴 원문도 고정길이 키로
 
 
-def _save_trans_cache(session, text, translated):
+def _save_trans_cache(text, translated):
     try:  # 동시 저장 충돌해도 번역 결과는 그대로 반환
-        session.add(MinoTransCache(q_hash=_trans_key(text), q=text, q_ko=translated))
-        session.commit()
+        with SessionLocal() as s:
+            s.add(MinoTransCache(q_hash=_trans_key(text), q=text, q_ko=translated))
+            s.commit()
     except Exception:
-        session.rollback()
+        pass  # with문이 세션 정리, 캐시 저장 실패는 번역 결과에 영향 없음
 
 
-async def translate_quote(quote, session):
+async def translate_quote(quote):
+    text = quote['q']
+    try:  # DB 캐시 조회 실패해도 외부 번역으로 계속 (캐시는 best-effort)
+        with SessionLocal() as s:
+            hit = s.query(MinoTransCache).filter(MinoTransCache.q_hash == _trans_key(text)).first()
+            if hit:  # DB 캐시 적중이면 외부 API 호출 생략
+                return hit.q_ko
+    except Exception as e:
+        logger.warning(f"TransCache lookup failed, falling back to API: {e}")
     try:
-        text = quote['q']
-        hit = session.query(MinoTransCache).filter(MinoTransCache.q_hash == _trans_key(text)).first()
-        if hit:  # DB 캐시 적중이면 외부 API 호출 생략
-            return hit.q_ko
         logger.debug(f"Attempting to translate quote: {text}")
         translated = None
         async with httpx.AsyncClient(timeout=10) as client:
@@ -150,7 +155,7 @@ async def translate_quote(quote, session):
             if not translated:
                 translated = await asyncio.to_thread(GoogleTranslator(source='en', target='ko').translate, text)
         logger.debug(f"Successfully translated quote: {translated}")
-        _save_trans_cache(session, text, translated)
+        _save_trans_cache(text, translated)
         return translated
     except Exception as e:
         logger.error(f"Error in translate_quote: {str(e)}")
@@ -183,10 +188,11 @@ async def get(request: Request, user_id: str = Cookie(None)):
     return response
 
 @router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None), session: Session = Depends(get_session)):
+async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None)):
     '''
     WebSocket에서는 Cookie를 읽지 못하는 경우가 있음.
     그러므로 먼저 /에서 쿠키를 생성하고, 클라이언트에서 쿠키를 읽어서, 쿼리 파라미터로 전달하는 방식을 사용.
+    DB 세션은 요청마다 단기로 생성 (긴 연결에 세션 재사용시 연결 끊김에 전체 실패).
     '''
     # == start : websocket handshake
     if user_id is None:
@@ -258,7 +264,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None), s
                     logger.error("Empty quote content received")
                     continue
 
-                translated_quote = await translate_quote(quote_data[0], session)
+                translated_quote = await translate_quote(quote_data[0])
                 quote_message_data = {
                     'id': 'server', # from
                     'user_id': f'{user_id}', # to
@@ -275,10 +281,10 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str = Query(None), s
                 continue
     except WebSocketDisconnect:
         logger.error(f"User disconnected: {user_id}")
-        del clients[user_id]  # 사용자 ID로 연결 제거
+        clients.pop(user_id, None)  # 다중 탭 중복 접속시 KeyError 방지
     except Exception as e:
         logger.error(f"Error in websocket handling for user {user_id}: {e}")
-        del clients[user_id] 
+        clients.pop(user_id, None)
 
 async def decode_user_id(user_id):
     try:
